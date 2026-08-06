@@ -9,6 +9,10 @@ export class BrokerPortalPage {
   }
 
   async login(email: string, password: string) {
+    if (await this.isQuoteManagerVisible()) {
+      return;
+    }
+
     await this.page.getByRole('textbox', { name: 'Email address' }).fill(email);
     await this.page.getByRole('textbox', { name: 'Password' }).fill(password);
     await this.page.getByRole('link', { name: 'Login' }).click();
@@ -24,6 +28,16 @@ export class BrokerPortalPage {
       await expect(startQuote).toBeVisible({ timeout: 60000 });
     }
     await this.waitForQuoteTableToStabilize();
+  }
+
+  private async isQuoteManagerVisible() {
+    const heading = this.page.getByRole('heading', { name: /Quote manager/i }).first();
+    const startQuote = this.page.getByRole('link', { name: /Start quote/i }).first();
+
+    return (
+      await heading.isVisible({ timeout: 1500 }).catch(() => false)
+      || await startQuote.isVisible({ timeout: 1500 }).catch(() => false)
+    );
   }
 
   async acceptCookiesIfVisible() {

@@ -1,0 +1,30 @@
+{
+  "runId": "2026-08-05T14-56-01-502",
+  "createdAtIso": "2026-08-05T09:26:01.502Z",
+  "createdAtLabel": "08/05/2026, 02:56:01 PM",
+  "environment": "SIT2",
+  "status": "passed",
+  "totalDurationMs": 67256,
+  "projects": [
+    "chromium"
+  ],
+  "summary": {
+    "total": 1,
+    "passed": 1,
+    "failed": 0,
+    "skipped": 0,
+    "timedOut": 0,
+    "interrupted": 0
+  },
+  "tests": [
+    {
+      "id": "chromium:tests/regression/TC_REG_002_create_commercial_ni_policy_single_product.spec.ts:TC_REG_002 | Create Commercial Northern Ireland policy (single product)",
+      "project": "MLIS",
+      "file": "tests/regression/TC_REG_002_create_commercial_ni_policy_single_product.spec.ts",
+      "title": "TC_REG_002 | Create Commercial Northern Ireland policy (single product)",
+      "fullTitle": " › chromium › regression\\TC_REG_002_create_commercial_ni_policy_single_product.spec.ts › @regression | E2E | Commercial | Northern Ireland › TC_REG_002 | Create Commercial Northern Ireland policy (single product)",
+      "status": "passed",
+      "durationMs": 60102
+    }
+  ]
+}

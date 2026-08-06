@@ -106,7 +106,6 @@ test.describe('@regression | E2E | Claims', () => {
 
     await salesforce.fillClaimInformationAndSave('Automated loss narrative for claim status update.');
     await salesforce.closeClaimAndMarkComplete();
-
     await page.waitForTimeout(5000);
   });
 });

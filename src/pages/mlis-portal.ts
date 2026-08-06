@@ -10,6 +10,10 @@ export class LoginPage {
   }
 
   async login(email: string, password: string) {
+    if (await this.isQuoteManagerVisible()) {
+      return;
+    }
+
     await this.page.getByRole('textbox', { name: 'Email address' }).fill(email);
     await this.page.getByRole('textbox', { name: 'Password' }).fill(password);
 
@@ -24,6 +28,16 @@ export class LoginPage {
 
     // Keep login lightweight; QuoteManagerPage.expectLoaded() performs robust post-login checks.
     await this.page.waitForLoadState('domcontentloaded');
+  }
+
+  private async isQuoteManagerVisible() {
+    const quoteManagerHeading = this.page.getByRole('heading', { name: /Quote manager/i }).first();
+    const startQuoteLink = this.page.getByRole('link', { name: /Start quote/i }).first();
+
+    return (
+      await quoteManagerHeading.isVisible({ timeout: 1500 }).catch(() => false)
+      || await startQuoteLink.isVisible({ timeout: 1500 }).catch(() => false)
+    );
   }
 }
 

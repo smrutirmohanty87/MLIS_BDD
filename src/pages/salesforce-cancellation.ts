@@ -1,7 +1,7 @@
 /// <reference types="node" />
 import * as crypto from 'crypto';
 import * as fs from 'fs';
-import { expect, Page } from '@playwright/test';
+import { expect, Locator, Page } from '@playwright/test';
 import { getSalesforceJwtConfig, getSalesforceLightningUrl } from '../config/env';
 
 type JwtSession = {
@@ -1387,6 +1387,17 @@ export class SalesforcePortalPage {
       return;
     }
 
+    // Some org layouts land directly on the claim detail screen (no explicit "Claim Information" tab).
+    const claimDetailHeading = this.page.getByRole('heading', { name: /Claim\s+Claims\s+Incurred|Claim/i }).first();
+    if (await claimDetailHeading.isVisible({ timeout: 4000 }).catch(() => false)) {
+      return;
+    }
+
+    const pathSection = this.page.getByRole('heading', { name: /Path/i }).first();
+    if (await pathSection.isVisible({ timeout: 4000 }).catch(() => false)) {
+      return;
+    }
+
     throw new Error('Unable to locate Claim Information tab or section.');
   }
 
@@ -1544,12 +1555,14 @@ export class SalesforcePortalPage {
     }
 
     await this.waitForLightningIdle();
-    await this.selectFirstVisibleDropdownOptionByLabel('Claim Sub Status', optionText);
+    await this.selectFirstVisibleDropdownOptionByLabel('*Claim Sub Status', optionText);
+    await this.page.waitForTimeout(1200);
 
     const doneButton = this.page.getByRole('button', { name: /Done/i }).first();
     await expect(doneButton).toBeVisible({ timeout: 60000 });
     await this.clickWhenUiReady(doneButton);
     await this.waitForLightningIdle();
+    await this.waitForClaimStatusPageToLoad();
   }
 
   private async clickButtonOrLink(label: RegExp) {
@@ -1630,17 +1643,25 @@ export class SalesforcePortalPage {
     throw new Error('Unable to locate a visible dropdown to select an option.');
   }
 
-  private async selectFirstVisibleDropdownOptionByLabel(label: string, optionText?: string) {
+  private async selectFirstVisibleDropdownOptionByLabel(label: string, optionText?: string, optional = false) {
+    const normalizedLabel = label.replace(/\*/g, '').trim();
+    const labelPattern = new RegExp(`\\*?\\s*${this.escapeForRegex(normalizedLabel)}`, 'i');
+
     const dialog = this.page.locator('[role="dialog"]:visible').first();
-    const dialogCombobox = dialog.getByRole('combobox', { name: label }).first();
+    if (!(await dialog.isVisible({ timeout: 3000 }).catch(() => false))) {
+      await this.selectClaimSubStatusInlineOnRecord(normalizedLabel, optionText, optional);
+      return;
+    }
+
+    const dialogCombobox = dialog.getByRole('combobox', { name: labelPattern }).first();
 
     if (await dialogCombobox.isVisible({ timeout: 5000 }).catch(() => false)) {
       await dialogCombobox.scrollIntoViewIfNeeded();
       await dialogCombobox.click({ timeout: 10000 });
       await this.waitForLightningIdle();
-      await this.page.waitForTimeout(500);
+      await this.page.waitForTimeout(1200);
 
-      const dialogOptions = dialog.locator('[role="listbox"] [role="option"], lightning-base-combobox-item, .slds-listbox__option, .slds-combobox__item, .slds-dropdown__item').filter({ hasText: /\S+/ });
+      const dialogOptions = this.page.locator('[role="listbox"] [role="option"], lightning-base-combobox-item, .slds-listbox__option, .slds-combobox__item, .slds-dropdown__item').filter({ hasText: /\S+/ });
       const option = optionText
         ? dialogOptions.filter({ hasText: new RegExp(this.escapeForRegex(optionText), 'i') }).first()
         : dialogOptions.filter({ hasNotText: /select|choose|none|--none--/i }).first();
@@ -1652,8 +1673,14 @@ export class SalesforcePortalPage {
       return;
     }
 
-    const labelLocator = dialog.locator(`xpath=(//label[contains(normalize-space(.), "${label}")])[1] | (//span[contains(normalize-space(.), "${label}")])[1] | (//div[contains(normalize-space(.), "${label}")])[1]`);
+    const labelLocator = dialog
+      .locator('label:visible, span:visible, div:visible')
+      .filter({ hasText: labelPattern })
+      .first();
     if (!(await labelLocator.isVisible({ timeout: 10000 }).catch(() => false))) {
+      if (optional) {
+        return;
+      }
       throw new Error(`Unable to locate dropdown label '${label}' in the visible dialog.`);
     }
 
@@ -1662,6 +1689,9 @@ export class SalesforcePortalPage {
     if (!(await dropdownButton.isVisible({ timeout: 10000 }).catch(() => false))) {
       const fallbackButton = fieldContainer.locator('xpath=.//span[contains(normalize-space(.), "▼") or contains(normalize-space(.), "▾") or contains(@class, "slds-combobox__form-element")][1]').first();
       if (!(await fallbackButton.isVisible({ timeout: 5000 }).catch(() => false))) {
+        if (optional) {
+          return;
+        }
         throw new Error(`Unable to locate Claim Sub Status dropdown button in the visible dialog.`);
       }
       await fallbackButton.scrollIntoViewIfNeeded();
@@ -1672,7 +1702,7 @@ export class SalesforcePortalPage {
     }
 
     await this.waitForLightningIdle();
-    await this.page.waitForTimeout(500);
+    await this.page.waitForTimeout(1200);
 
     const dialogOptions = dialog.locator('[role="listbox"] [role="option"], lightning-base-combobox-item, .slds-listbox__option, .slds-combobox__item, .slds-dropdown__item').filter({ hasText: /\S+/ });
     const option = optionText
@@ -1683,6 +1713,162 @@ export class SalesforcePortalPage {
     await option.scrollIntoViewIfNeeded();
     await option.click({ timeout: 10000 });
     await this.waitForLightningIdle();
+  }
+
+  private async selectClaimSubStatusInlineOnRecord(label: string, optionText?: string, optional = false) {
+    await this.waitForPathSavingStateToClear();
+
+    const directComboboxByProvidedXPath = this.page.locator('xpath=//*[@id="combobox-button-1085"]').first();
+    if (await directComboboxByProvidedXPath.isVisible({ timeout: 2000 }).catch(() => false)) {
+      await directComboboxByProvidedXPath.scrollIntoViewIfNeeded();
+      await this.clickWhenUiReady(directComboboxByProvidedXPath);
+      await this.waitForLightningIdle();
+      await this.page.waitForTimeout(1200);
+
+      await this.selectOptionFromOpenedCombobox(directComboboxByProvidedXPath, optionText);
+      return;
+    }
+
+    const directComboboxByIdPattern = this.page
+      .locator('xpath=//*[starts-with(@id, "combobox-button-") and contains(@aria-label, "Claim Sub Status")]')
+      .first();
+    if (await directComboboxByIdPattern.isVisible({ timeout: 3000 }).catch(() => false)) {
+      await directComboboxByIdPattern.scrollIntoViewIfNeeded();
+      await this.clickWhenUiReady(directComboboxByIdPattern);
+      await this.waitForLightningIdle();
+      await this.page.waitForTimeout(1200);
+
+      await this.selectOptionFromOpenedCombobox(directComboboxByIdPattern, optionText);
+      return;
+    }
+
+    const editButtonByName = this.page.getByRole('button', { name: new RegExp(`Edit\\s+${this.escapeForRegex(label)}`, 'i') }).first();
+
+    if (await editButtonByName.isVisible({ timeout: 7000 }).catch(() => false)) {
+      try {
+        await this.clickWhenUiReady(editButtonByName);
+      } catch {
+        await editButtonByName.click({ timeout: 10000, force: true });
+      }
+    } else {
+      const labelNode = this.page.locator('label:visible, span:visible, div:visible').filter({ hasText: new RegExp(this.escapeForRegex(label), 'i') }).first();
+      if (!(await labelNode.isVisible({ timeout: 7000 }).catch(() => false))) {
+        if (optional) {
+          return;
+        }
+        throw new Error(`Unable to locate '${label}' section before dropdown selection.`);
+      }
+
+      const rowEditButton = labelNode
+        .locator('xpath=ancestor::li[1]//button[contains(@aria-label, "Edit") or contains(normalize-space(.), "Edit")][1]')
+        .first();
+
+      if (!(await rowEditButton.isVisible({ timeout: 5000 }).catch(() => false))) {
+        if (optional) {
+          return;
+        }
+        throw new Error(`Unable to locate Edit button for '${label}'.`);
+      }
+
+      await this.clickWhenUiReady(rowEditButton);
+    }
+
+    await this.waitForLightningIdle();
+    await this.page.waitForTimeout(1200);
+
+    const activeDialog = this.page.locator('[role="dialog"]:visible, .slds-modal__container:visible').last();
+    if (await activeDialog.isVisible({ timeout: 4000 }).catch(() => false)) {
+      await this.selectFirstVisibleDropdownOptionByLabel(label, optionText, optional);
+      return;
+    }
+
+    const rowContainer = this.page
+      .locator('xpath=//li[.//*[contains(normalize-space(.), "Claim Sub Status")]][1]')
+      .first();
+    const rowCombobox = rowContainer
+      .locator('[role="combobox"]:visible, [role="button"][aria-haspopup="listbox"]:visible, .slds-combobox__input:visible')
+      .first();
+
+    if (await rowCombobox.isVisible({ timeout: 5000 }).catch(() => false)) {
+      await rowCombobox.scrollIntoViewIfNeeded();
+      await this.clickWhenUiReady(rowCombobox);
+      await this.waitForLightningIdle();
+      await this.page.waitForTimeout(1200);
+
+      await this.selectOptionFromOpenedCombobox(rowCombobox, optionText);
+      return;
+    }
+
+    if (optional) {
+      return;
+    }
+
+    throw new Error(`Unable to interact with '${label}' dropdown after opening inline edit.`);
+  }
+
+  private async selectOptionFromOpenedCombobox(combobox: Locator, optionText?: string) {
+    const controlsId = await combobox.getAttribute('aria-controls');
+
+    const scopedOptions = controlsId
+      ? this.page.locator(`#${controlsId} [role="option"], #${controlsId} lightning-base-combobox-item, #${controlsId} .slds-listbox__option, #${controlsId} .slds-combobox__item, #${controlsId} .slds-dropdown__item`).filter({ hasText: /\S+/ })
+      : this.page.locator('[role="listbox"]:visible [role="option"], [role="listbox"]:visible lightning-base-combobox-item, [role="listbox"]:visible .slds-listbox__option, [role="listbox"]:visible .slds-combobox__item, [role="listbox"]:visible .slds-dropdown__item').filter({ hasText: /\S+/ });
+
+    const option = optionText
+      ? scopedOptions.filter({ hasText: new RegExp(this.escapeForRegex(optionText), 'i') }).first()
+      : scopedOptions.filter({ hasNotText: /select|choose|none|--none--/i }).first();
+
+    await expect(option).toBeVisible({ timeout: 15000 });
+    await option.scrollIntoViewIfNeeded();
+    await option.click({ timeout: 10000 });
+    await this.waitForLightningIdle();
+    await this.page.waitForTimeout(1200);
+  }
+
+  private async waitForPathSavingStateToClear() {
+    for (let attempt = 1; attempt <= 20; attempt += 1) {
+      const blockingButton = this.page.locator('button:disabled').filter({ hasText: /Loading|Saving/i }).first();
+      const blockingAlert = this.page.getByText(/Loading\.\.\.|Saving\.\.\./i).first();
+
+      const isBlocking = (await blockingButton.isVisible({ timeout: 800 }).catch(() => false))
+        || (await blockingAlert.isVisible({ timeout: 800 }).catch(() => false));
+
+      if (!isBlocking) {
+        return;
+      }
+
+      await this.waitForLightningIdle();
+      if (attempt < 20) {
+        await this.page.waitForTimeout(1000);
+      }
+    }
+  }
+
+  private async waitForClaimStatusPageToLoad() {
+    await this.waitForLightningIdle();
+
+    const dialog = this.page.locator('[role="dialog"]:visible').first();
+    await expect(dialog).toBeHidden({ timeout: 60000 });
+
+    const statusPageMarkers = [
+      this.page.getByRole('tab', { name: /Claim Information|Related|Details/i }).first(),
+      this.page.getByRole('button', { name: /Closed Claim|Create Claim|Show more actions/i }).first(),
+      this.page.getByText(/Current Claim Status|Claim Status|Complete|Closed/i).first(),
+    ];
+
+    for (let attempt = 1; attempt <= 8; attempt += 1) {
+      for (const marker of statusPageMarkers) {
+        if (await marker.isVisible({ timeout: 2000 }).catch(() => false)) {
+          return;
+        }
+      }
+
+      await this.waitForLightningIdle();
+      if (attempt < 8) {
+        await this.page.waitForTimeout(1500);
+      }
+    }
+
+    throw new Error('Claim status page did not become visible after clicking Done.');
   }
 
   /**

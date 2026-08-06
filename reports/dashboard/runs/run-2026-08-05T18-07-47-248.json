@@ -1,0 +1,30 @@
+{
+  "runId": "2026-08-05T18-07-47-248",
+  "createdAtIso": "2026-08-05T12:37:47.248Z",
+  "createdAtLabel": "08/05/2026, 06:07:47 PM",
+  "environment": "SIT2",
+  "status": "passed",
+  "totalDurationMs": 282675,
+  "projects": [
+    "chromium"
+  ],
+  "summary": {
+    "total": 1,
+    "passed": 1,
+    "failed": 0,
+    "skipped": 0,
+    "timedOut": 0,
+    "interrupted": 0
+  },
+  "tests": [
+    {
+      "id": "chromium:tests/BDX/TC_BDX_001_INTRO_cancel_full_premium_return.spec.ts:TC_BDX_001 | England & Wales Commercial NB policy, CNR, MTA future date premium 300, cancel only MTA",
+      "project": "MLIS",
+      "file": "tests/BDX/TC_BDX_001_INTRO_cancel_full_premium_return.spec.ts",
+      "title": "TC_BDX_001 | England & Wales Commercial NB policy, CNR, MTA future date premium 300, cancel only MTA",
+      "fullTitle": " › chromium › BDX\\TC_BDX_001_INTRO_cancel_full_premium_return.spec.ts › @sanity | E2E | BDX | MLIS Policy | Introducer Commission | EW Commercial NB>CNR>MTA>Cancel only MTA › TC_BDX_001 | England & Wales Commercial NB policy, CNR, MTA future date premium 300, cancel only MTA",
+      "status": "passed",
+      "durationMs": 261967
+    }
+  ]
+}

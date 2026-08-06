@@ -1,0 +1,30 @@
+{
+  "runId": "2026-08-04T19-46-35-137",
+  "createdAtIso": "2026-08-04T14:16:35.137Z",
+  "createdAtLabel": "08/04/2026, 07:46:35 PM",
+  "environment": "SIT2",
+  "status": "failed",
+  "totalDurationMs": 24248,
+  "projects": [
+    "chromium"
+  ],
+  "summary": {
+    "total": 1,
+    "passed": 0,
+    "failed": 1,
+    "skipped": 0,
+    "timedOut": 0,
+    "interrupted": 0
+  },
+  "tests": [
+    {
+      "id": "chromium:tests/sanity/TC_SAN_016_cancel_and_reissue_live_policy.spec.ts:TC_SAN_016 | Cancel and reissue a live policy",
+      "project": "MLIS",
+      "file": "tests/sanity/TC_SAN_016_cancel_and_reissue_live_policy.spec.ts",
+      "title": "TC_SAN_016 | Cancel and reissue a live policy",
+      "fullTitle": " › chromium › sanity\\TC_SAN_016_cancel_and_reissue_live_policy.spec.ts › @sanity | E2E | Cancellation | Cancel and Reissue › TC_SAN_016 | Cancel and reissue a live policy",
+      "status": "failed",
+      "durationMs": 17384
+    }
+  ]
+}

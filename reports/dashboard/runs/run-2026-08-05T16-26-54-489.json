@@ -1,0 +1,183 @@
+{
+  "runId": "2026-08-05T16-26-54-489",
+  "createdAtIso": "2026-08-05T10:56:54.489Z",
+  "createdAtLabel": "08/05/2026, 04:26:54 PM",
+  "environment": "SIT1",
+  "status": "passed",
+  "totalDurationMs": 2705013,
+  "projects": [
+    "chrome"
+  ],
+  "summary": {
+    "total": 18,
+    "passed": 18,
+    "failed": 0,
+    "skipped": 0,
+    "timedOut": 0,
+    "interrupted": 0
+  },
+  "tests": [
+    {
+      "id": "chrome:tests/regression/TC_REG_034_create_claim_on_live_commercial_policy.spec.ts:TC_REG_034_COMM | Create Claim on a live commercial policy and submit mandatory details",
+      "project": "MLIS",
+      "file": "tests/regression/TC_REG_034_create_claim_on_live_commercial_policy.spec.ts",
+      "title": "TC_REG_034_COMM | Create Claim on a live commercial policy and submit mandatory details",
+      "fullTitle": " › chrome › regression\\TC_REG_034_create_claim_on_live_commercial_policy.spec.ts › @regression | E2E | Claims | Commercial › TC_REG_034_COMM | Create Claim on a live commercial policy and submit mandatory details",
+      "status": "passed",
+      "durationMs": 137305
+    },
+    {
+      "id": "chrome:tests/regression/TC_REG_034_create_claim_on_live_commercial_policy.spec.ts:TC_REG_034_COMM | Create Claim on a live commercial policy and submit mandatory details",
+      "project": "MLIS",
+      "file": "tests/regression/TC_REG_034_create_claim_on_live_commercial_policy.spec.ts",
+      "title": "TC_REG_034_COMM | Create Claim on a live commercial policy and submit mandatory details",
+      "fullTitle": " › chrome › regression\\TC_REG_034_create_claim_on_live_commercial_policy.spec.ts › @regression | E2E | Claims | Commercial › TC_REG_034_COMM | Create Claim on a live commercial policy and submit mandatory details",
+      "status": "passed",
+      "durationMs": 145942
+    },
+    {
+      "id": "chrome:tests/regression/TC_REG_034_create_claim_on_live_commercial_policy.spec.ts:TC_REG_034_COMM | Create Claim on a live commercial policy and submit mandatory details",
+      "project": "MLIS",
+      "file": "tests/regression/TC_REG_034_create_claim_on_live_commercial_policy.spec.ts",
+      "title": "TC_REG_034_COMM | Create Claim on a live commercial policy and submit mandatory details",
+      "fullTitle": " › chrome › regression\\TC_REG_034_create_claim_on_live_commercial_policy.spec.ts › @regression | E2E | Claims | Commercial › TC_REG_034_COMM | Create Claim on a live commercial policy and submit mandatory details",
+      "status": "passed",
+      "durationMs": 136053
+    },
+    {
+      "id": "chrome:tests/regression/TC_REG_034_create_claim_on_live_commercial_policy.spec.ts:TC_REG_034_COMM | Create Claim on a live commercial policy and submit mandatory details",
+      "project": "MLIS",
+      "file": "tests/regression/TC_REG_034_create_claim_on_live_commercial_policy.spec.ts",
+      "title": "TC_REG_034_COMM | Create Claim on a live commercial policy and submit mandatory details",
+      "fullTitle": " › chrome › regression\\TC_REG_034_create_claim_on_live_commercial_policy.spec.ts › @regression | E2E | Claims | Commercial › TC_REG_034_COMM | Create Claim on a live commercial policy and submit mandatory details",
+      "status": "passed",
+      "durationMs": 143518
+    },
+    {
+      "id": "chrome:tests/regression/TC_REG_034_create_claim_on_live_commercial_policy.spec.ts:TC_REG_034_COMM | Create Claim on a live commercial policy and submit mandatory details",
+      "project": "MLIS",
+      "file": "tests/regression/TC_REG_034_create_claim_on_live_commercial_policy.spec.ts",
+      "title": "TC_REG_034_COMM | Create Claim on a live commercial policy and submit mandatory details",
+      "fullTitle": " › chrome › regression\\TC_REG_034_create_claim_on_live_commercial_policy.spec.ts › @regression | E2E | Claims | Commercial › TC_REG_034_COMM | Create Claim on a live commercial policy and submit mandatory details",
+      "status": "passed",
+      "durationMs": 138064
+    },
+    {
+      "id": "chrome:tests/regression/TC_REG_034_create_claim_on_live_commercial_policy.spec.ts:TC_REG_034_COMM | Create Claim on a live commercial policy and submit mandatory details",
+      "project": "MLIS",
+      "file": "tests/regression/TC_REG_034_create_claim_on_live_commercial_policy.spec.ts",
+      "title": "TC_REG_034_COMM | Create Claim on a live commercial policy and submit mandatory details",
+      "fullTitle": " › chrome › regression\\TC_REG_034_create_claim_on_live_commercial_policy.spec.ts › @regression | E2E | Claims | Commercial › TC_REG_034_COMM | Create Claim on a live commercial policy and submit mandatory details",
+      "status": "passed",
+      "durationMs": 146737
+    },
+    {
+      "id": "chrome:tests/regression/TC_REG_034_create_claim_on_live_commercial_policy.spec.ts:TC_REG_034_COMM | Create Claim on a live commercial policy and submit mandatory details",
+      "project": "MLIS",
+      "file": "tests/regression/TC_REG_034_create_claim_on_live_commercial_policy.spec.ts",
+      "title": "TC_REG_034_COMM | Create Claim on a live commercial policy and submit mandatory details",
+      "fullTitle": " › chrome › regression\\TC_REG_034_create_claim_on_live_commercial_policy.spec.ts › @regression | E2E | Claims | Commercial › TC_REG_034_COMM | Create Claim on a live commercial policy and submit mandatory details",
+      "status": "passed",
+      "durationMs": 134571
+    },
+    {
+      "id": "chrome:tests/regression/TC_REG_034_create_claim_on_live_commercial_policy.spec.ts:TC_REG_034_COMM | Create Claim on a live commercial policy and submit mandatory details",
+      "project": "MLIS",
+      "file": "tests/regression/TC_REG_034_create_claim_on_live_commercial_policy.spec.ts",
+      "title": "TC_REG_034_COMM | Create Claim on a live commercial policy and submit mandatory details",
+      "fullTitle": " › chrome › regression\\TC_REG_034_create_claim_on_live_commercial_policy.spec.ts › @regression | E2E | Claims | Commercial › TC_REG_034_COMM | Create Claim on a live commercial policy and submit mandatory details",
+      "status": "passed",
+      "durationMs": 140930
+    },
+    {
+      "id": "chrome:tests/regression/TC_REG_034_create_claim_on_live_commercial_policy.spec.ts:TC_REG_034_COMM | Create Claim on a live commercial policy and submit mandatory details",
+      "project": "MLIS",
+      "file": "tests/regression/TC_REG_034_create_claim_on_live_commercial_policy.spec.ts",
+      "title": "TC_REG_034_COMM | Create Claim on a live commercial policy and submit mandatory details",
+      "fullTitle": " › chrome › regression\\TC_REG_034_create_claim_on_live_commercial_policy.spec.ts › @regression | E2E | Claims | Commercial › TC_REG_034_COMM | Create Claim on a live commercial policy and submit mandatory details",
+      "status": "passed",
+      "durationMs": 146116
+    },
+    {
+      "id": "chrome:tests/regression/TC_REG_034_create_claim_on_live_commercial_policy.spec.ts:TC_REG_034_COMM | Create Claim on a live commercial policy and submit mandatory details",
+      "project": "MLIS",
+      "file": "tests/regression/TC_REG_034_create_claim_on_live_commercial_policy.spec.ts",
+      "title": "TC_REG_034_COMM | Create Claim on a live commercial policy and submit mandatory details",
+      "fullTitle": " › chrome › regression\\TC_REG_034_create_claim_on_live_commercial_policy.spec.ts › @regression | E2E | Claims | Commercial › TC_REG_034_COMM | Create Claim on a live commercial policy and submit mandatory details",
+      "status": "passed",
+      "durationMs": 144886
+    },
+    {
+      "id": "chrome:tests/regression/TC_REG_034_create_claim_on_live_commercial_policy.spec.ts:TC_REG_034_COMM | Create Claim on a live commercial policy and submit mandatory details",
+      "project": "MLIS",
+      "file": "tests/regression/TC_REG_034_create_claim_on_live_commercial_policy.spec.ts",
+      "title": "TC_REG_034_COMM | Create Claim on a live commercial policy and submit mandatory details",
+      "fullTitle": " › chrome › regression\\TC_REG_034_create_claim_on_live_commercial_policy.spec.ts › @regression | E2E | Claims | Commercial › TC_REG_034_COMM | Create Claim on a live commercial policy and submit mandatory details",
+      "status": "passed",
+      "durationMs": 137969
+    },
+    {
+      "id": "chrome:tests/regression/TC_REG_034_create_claim_on_live_commercial_policy.spec.ts:TC_REG_034_COMM | Create Claim on a live commercial policy and submit mandatory details",
+      "project": "MLIS",
+      "file": "tests/regression/TC_REG_034_create_claim_on_live_commercial_policy.spec.ts",
+      "title": "TC_REG_034_COMM | Create Claim on a live commercial policy and submit mandatory details",
+      "fullTitle": " › chrome › regression\\TC_REG_034_create_claim_on_live_commercial_policy.spec.ts › @regression | E2E | Claims | Commercial › TC_REG_034_COMM | Create Claim on a live commercial policy and submit mandatory details",
+      "status": "passed",
+      "durationMs": 137009
+    },
+    {
+      "id": "chrome:tests/regression/TC_REG_034_create_claim_on_live_commercial_policy.spec.ts:TC_REG_034_COMM | Create Claim on a live commercial policy and submit mandatory details",
+      "project": "MLIS",
+      "file": "tests/regression/TC_REG_034_create_claim_on_live_commercial_policy.spec.ts",
+      "title": "TC_REG_034_COMM | Create Claim on a live commercial policy and submit mandatory details",
+      "fullTitle": " › chrome › regression\\TC_REG_034_create_claim_on_live_commercial_policy.spec.ts › @regression | E2E | Claims | Commercial › TC_REG_034_COMM | Create Claim on a live commercial policy and submit mandatory details",
+      "status": "passed",
+      "durationMs": 141559
+    },
+    {
+      "id": "chrome:tests/regression/TC_REG_034_create_claim_on_live_commercial_policy.spec.ts:TC_REG_034_COMM | Create Claim on a live commercial policy and submit mandatory details",
+      "project": "MLIS",
+      "file": "tests/regression/TC_REG_034_create_claim_on_live_commercial_policy.spec.ts",
+      "title": "TC_REG_034_COMM | Create Claim on a live commercial policy and submit mandatory details",
+      "fullTitle": " › chrome › regression\\TC_REG_034_create_claim_on_live_commercial_policy.spec.ts › @regression | E2E | Claims | Commercial › TC_REG_034_COMM | Create Claim on a live commercial policy and submit mandatory details",
+      "status": "passed",
+      "durationMs": 141457
+    },
+    {
+      "id": "chrome:tests/regression/TC_REG_034_create_claim_on_live_commercial_policy.spec.ts:TC_REG_034_COMM | Create Claim on a live commercial policy and submit mandatory details",
+      "project": "MLIS",
+      "file": "tests/regression/TC_REG_034_create_claim_on_live_commercial_policy.spec.ts",
+      "title": "TC_REG_034_COMM | Create Claim on a live commercial policy and submit mandatory details",
+      "fullTitle": " › chrome › regression\\TC_REG_034_create_claim_on_live_commercial_policy.spec.ts › @regression | E2E | Claims | Commercial › TC_REG_034_COMM | Create Claim on a live commercial policy and submit mandatory details",
+      "status": "passed",
+      "durationMs": 165442
+    },
+    {
+      "id": "chrome:tests/regression/TC_REG_034_create_claim_on_live_commercial_policy.spec.ts:TC_REG_034_COMM | Create Claim on a live commercial policy and submit mandatory details",
+      "project": "MLIS",
+      "file": "tests/regression/TC_REG_034_create_claim_on_live_commercial_policy.spec.ts",
+      "title": "TC_REG_034_COMM | Create Claim on a live commercial policy and submit mandatory details",
+      "fullTitle": " › chrome › regression\\TC_REG_034_create_claim_on_live_commercial_policy.spec.ts › @regression | E2E | Claims | Commercial › TC_REG_034_COMM | Create Claim on a live commercial policy and submit mandatory details",
+      "status": "passed",
+      "durationMs": 145655
+    },
+    {
+      "id": "chrome:tests/regression/TC_REG_034_create_claim_on_live_commercial_policy.spec.ts:TC_REG_034_COMM | Create Claim on a live commercial policy and submit mandatory details",
+      "project": "MLIS",
+      "file": "tests/regression/TC_REG_034_create_claim_on_live_commercial_policy.spec.ts",
+      "title": "TC_REG_034_COMM | Create Claim on a live commercial policy and submit mandatory details",
+      "fullTitle": " › chrome › regression\\TC_REG_034_create_claim_on_live_commercial_policy.spec.ts › @regression | E2E | Claims | Commercial › TC_REG_034_COMM | Create Claim on a live commercial policy and submit mandatory details",
+      "status": "passed",
+      "durationMs": 146618
+    },
+    {
+      "id": "chrome:tests/regression/TC_REG_034_create_claim_on_live_commercial_policy.spec.ts:TC_REG_034_COMM | Create Claim on a live commercial policy and submit mandatory details",
+      "project": "MLIS",
+      "file": "tests/regression/TC_REG_034_create_claim_on_live_commercial_policy.spec.ts",
+      "title": "TC_REG_034_COMM | Create Claim on a live commercial policy and submit mandatory details",
+      "fullTitle": " › chrome › regression\\TC_REG_034_create_claim_on_live_commercial_policy.spec.ts › @regression | E2E | Claims | Commercial › TC_REG_034_COMM | Create Claim on a live commercial policy and submit mandatory details",
+      "status": "passed",
+      "durationMs": 147006
+    }
+  ]
+}

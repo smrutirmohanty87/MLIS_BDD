@@ -1,0 +1,30 @@
+{
+  "runId": "2026-08-06T15-29-14-507",
+  "createdAtIso": "2026-08-06T09:59:14.507Z",
+  "createdAtLabel": "08/06/2026, 03:29:14 PM",
+  "environment": "SIT2",
+  "status": "passed",
+  "totalDurationMs": 210517,
+  "projects": [
+    "chrome"
+  ],
+  "summary": {
+    "total": 1,
+    "passed": 1,
+    "failed": 0,
+    "skipped": 0,
+    "timedOut": 0,
+    "interrupted": 0
+  },
+  "tests": [
+    {
+      "id": "chrome:tests/regression/TC_REG_034_change_claim_status_on_live_policy.spec.ts:TC_REG_034 | Create Claim on a live policy, update Claim Information and complete claim",
+      "project": "MLIS",
+      "file": "tests/regression/TC_REG_034_change_claim_status_on_live_policy.spec.ts",
+      "title": "TC_REG_034 | Create Claim on a live policy, update Claim Information and complete claim",
+      "fullTitle": " › chrome › regression\\TC_REG_034_change_claim_status_on_live_policy.spec.ts › @regression | E2E | Claims › TC_REG_034 | Create Claim on a live policy, update Claim Information and complete claim",
+      "status": "passed",
+      "durationMs": 202327
+    }
+  ]
+}

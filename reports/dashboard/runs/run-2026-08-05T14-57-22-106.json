@@ -1,0 +1,30 @@
+{
+  "runId": "2026-08-05T14-57-22-106",
+  "createdAtIso": "2026-08-05T09:27:22.106Z",
+  "createdAtLabel": "08/05/2026, 02:57:22 PM",
+  "environment": "SIT2",
+  "status": "passed",
+  "totalDurationMs": 69860,
+  "projects": [
+    "chromium"
+  ],
+  "summary": {
+    "total": 1,
+    "passed": 1,
+    "failed": 0,
+    "skipped": 0,
+    "timedOut": 0,
+    "interrupted": 0
+  },
+  "tests": [
+    {
+      "id": "chromium:tests/regression/TC_REG_003_create_commercial_scotland_policy_multiple_products.spec.ts:TC_REG_003 | Create Commercial Scotland policy (multiple products)",
+      "project": "MLIS",
+      "file": "tests/regression/TC_REG_003_create_commercial_scotland_policy_multiple_products.spec.ts",
+      "title": "TC_REG_003 | Create Commercial Scotland policy (multiple products)",
+      "fullTitle": " › chromium › regression\\TC_REG_003_create_commercial_scotland_policy_multiple_products.spec.ts › @regression | E2E | Commercial | Scotland › TC_REG_003 | Create Commercial Scotland policy (multiple products)",
+      "status": "passed",
+      "durationMs": 62878
+    }
+  ]
+}
