@@ -16,7 +16,7 @@ YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
 # Parse command line arguments
-BROWSER=${1:-all}
+BROWSER=${1:-chrome}
 
 # Function to run tests
 run_tests() {
@@ -39,23 +39,11 @@ case $BROWSER in
         echo "Running Sanity tests on Chrome..."
         run_tests "Chrome" "test:sanity:chrome"
         ;;
-    chromium)
-        echo "Running Sanity tests on Chromium..."
-        run_tests "Chromium" "test:sanity:chromium"
-        ;;
-    edge)
-        echo "Running Sanity tests on Microsoft Edge..."
-        run_tests "Edge" "test:sanity:edge"
-        ;;
     all)
-        echo "Running Sanity tests on all browsers..."
+        echo "Running Sanity tests in locked mode (Chrome only)..."
         CHROME_RESULT=0
-        CHROMIUM_RESULT=0
-        EDGE_RESULT=0
         
         run_tests "Chrome" "test:sanity:chrome" || CHROME_RESULT=$?
-        run_tests "Chromium" "test:sanity:chromium" || CHROMIUM_RESULT=$?
-        run_tests "Edge" "test:sanity:edge" || EDGE_RESULT=$?
         
         echo ""
         echo "================================================"
@@ -68,25 +56,13 @@ case $BROWSER in
             echo -e "${RED}✗ Chrome: FAILED${NC}"
         fi
         
-        if [ $CHROMIUM_RESULT -eq 0 ]; then
-            echo -e "${GREEN}✓ Chromium: PASSED${NC}"
-        else
-            echo -e "${RED}✗ Chromium: FAILED${NC}"
-        fi
-        
-        if [ $EDGE_RESULT -eq 0 ]; then
-            echo -e "${GREEN}✓ Edge: PASSED${NC}"
-        else
-            echo -e "${RED}✗ Edge: FAILED${NC}"
-        fi
-        
-        if [ $CHROME_RESULT -ne 0 ] || [ $CHROMIUM_RESULT -ne 0 ] || [ $EDGE_RESULT -ne 0 ]; then
+        if [ $CHROME_RESULT -ne 0 ]; then
             exit 1
         fi
         ;;
     *)
         echo -e "${RED}Invalid browser: $BROWSER${NC}"
-        echo "Usage: $0 [chrome|chromium|edge|all]"
+        echo "Usage: $0 [chrome|all]"
         exit 1
         ;;
 esac

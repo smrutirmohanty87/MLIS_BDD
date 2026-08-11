@@ -77,7 +77,7 @@ test.describe('@regression | E2E | MTA | Cancellation | NI Residential', () => {
     // Login to Salesforce and open the Insurance Policy record.
     await salesforce.goto();
     const sfCreds = getSalesforceCredentials();
-    await salesforce.login(sfCreds.username, sfCreds.password);
+    await salesforce.login(sfCreds.username, sfCreds.password, { useJwt: true, fast: true });
 
     await salesforce.searchAndOpenExactFromGlobalSearchGrid(policyNumber);
     await salesforce.openRelatedTab();

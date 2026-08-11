@@ -64,7 +64,7 @@ test.describe('@regression | E2E | NB | Save Exit | Global Search | Add Terms', 
     // Open Salesforce, use global search, and open the Submission record.
     await salesforce.goto();
     const sfCreds = getSalesforceCredentials();
-    await salesforce.login(sfCreds.username, sfCreds.password);
+    await salesforce.login(sfCreds.username, sfCreds.password, { useJwt: true, fast: true });
     await reg052.searchSalesforceAndOpenExactPolicyFromGrid(salesforce, policyReference);
 
     // 1) Add terms: Statement of Fact.

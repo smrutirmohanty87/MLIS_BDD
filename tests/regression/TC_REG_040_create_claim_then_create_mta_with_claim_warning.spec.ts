@@ -75,7 +75,7 @@ test.describe('@regression | E2E | Claims | MTA', () => {
     // Open policy in Salesforce.
     await salesforce.goto();
     const sfCreds = getSalesforceCredentials();
-    await salesforce.login(sfCreds.username, sfCreds.password);
+    await salesforce.login(sfCreds.username, sfCreds.password, { useJwt: true, fast: true });
 
     const searchAndOpenPolicyWithRetry = async (ref: string, attempts = 2) => {
       let lastError: unknown;

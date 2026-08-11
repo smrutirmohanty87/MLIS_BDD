@@ -84,7 +84,7 @@ test.describe('@regression | E2E | Commercial | Northern Ireland', () => {
 
     const sfCreds = getSalesforceCredentials();
     await salesforce.goto();
-    await salesforce.login(sfCreds.username, sfCreds.password);
+    await salesforce.login(sfCreds.username, sfCreds.password, { useJwt: true, fast: true });
     await salesforce.searchAndOpenExactFromGlobalSearchGrid(policyNumber);
     await salesforce.openRelatedTab();
     await reg052.openSubmissionStatementOfFactsViewAll();

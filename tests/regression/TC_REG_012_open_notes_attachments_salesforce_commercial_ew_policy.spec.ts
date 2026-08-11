@@ -70,7 +70,7 @@ test.describe('@regression | E2E | Notes & Attachments | Commercial', () => {
     // Step 4: Login to Salesforce Portal
     await salesforce.goto();
     const sfCreds = getSalesforceCredentials();
-    await salesforce.login(sfCreds.username, sfCreds.password);
+    await salesforce.login(sfCreds.username, sfCreds.password, { useJwt: true, fast: true });
 
     // Step 5-6: Global Search and open policy from grid by policy number
     await salesforce.searchPolicyAndOpenFromGlobalSearchGrid(policyNumber);

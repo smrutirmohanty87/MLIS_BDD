@@ -1,0 +1,30 @@
+{
+  "runId": "2026-08-10T17-47-05-348",
+  "createdAtIso": "2026-08-10T12:17:05.348Z",
+  "createdAtLabel": "08/10/2026, 05:47:05 PM",
+  "environment": "SIT1",
+  "status": "passed",
+  "totalDurationMs": 77625,
+  "projects": [
+    "chrome"
+  ],
+  "summary": {
+    "total": 1,
+    "passed": 1,
+    "failed": 0,
+    "skipped": 0,
+    "timedOut": 0,
+    "interrupted": 0
+  },
+  "tests": [
+    {
+      "id": "chrome:tests/sanity/TC_SAN_022_verify_broker_portal_home_menu_navigation.spec.ts:TC_SAN_022 | Verify each home page menu item click and navigation URL",
+      "project": "MLIS",
+      "file": "tests/sanity/TC_SAN_022_verify_broker_portal_home_menu_navigation.spec.ts",
+      "title": "TC_SAN_022 | Verify each home page menu item click and navigation URL",
+      "fullTitle": " › chrome › sanity\\TC_SAN_022_verify_broker_portal_home_menu_navigation.spec.ts › @sanity | UI | Broker Portal | Home Menu Navigation › TC_SAN_022 | Verify each home page menu item click and navigation URL",
+      "status": "passed",
+      "durationMs": 71902
+    }
+  ]
+}

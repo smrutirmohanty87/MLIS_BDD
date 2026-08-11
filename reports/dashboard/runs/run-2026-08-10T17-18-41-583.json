@@ -1,0 +1,228 @@
+{
+  "runId": "2026-08-10T17-18-41-583",
+  "createdAtIso": "2026-08-10T11:48:41.583Z",
+  "createdAtLabel": "08/10/2026, 05:18:41 PM",
+  "environment": "SIT1",
+  "status": "failed",
+  "totalDurationMs": 1460014,
+  "projects": [
+    "chrome"
+  ],
+  "summary": {
+    "total": 23,
+    "passed": 18,
+    "failed": 5,
+    "skipped": 0,
+    "timedOut": 0,
+    "interrupted": 0
+  },
+  "tests": [
+    {
+      "id": "chrome:tests/sanity/TC_SAN_001_create_commercial_ew_policy_multiple_products.spec.ts:TC_SAN_001 | Create Commercial England & Wales policy (multiple products)",
+      "project": "MLIS",
+      "file": "tests/sanity/TC_SAN_001_create_commercial_ew_policy_multiple_products.spec.ts",
+      "title": "TC_SAN_001 | Create Commercial England & Wales policy (multiple products)",
+      "fullTitle": " › chrome › sanity\\TC_SAN_001_create_commercial_ew_policy_multiple_products.spec.ts › @sanity | E2E | Commercial | England & Wales › TC_SAN_001 | Create Commercial England & Wales policy (multiple products)",
+      "status": "passed",
+      "durationMs": 55129
+    },
+    {
+      "id": "chrome:tests/sanity/TC_SAN_002_create_commercial_ew_policy_multiple_products_via_referral.spec.ts:TC_SAN_002 | Create Commercial England & Wales policy (multiple products) via referral",
+      "project": "MLIS",
+      "file": "tests/sanity/TC_SAN_002_create_commercial_ew_policy_multiple_products_via_referral.spec.ts",
+      "title": "TC_SAN_002 | Create Commercial England & Wales policy (multiple products) via referral",
+      "fullTitle": " › chrome › sanity\\TC_SAN_002_create_commercial_ew_policy_multiple_products_via_referral.spec.ts › @sanity | E2E | Commercial | England & Wales › TC_SAN_002 | Create Commercial England & Wales policy (multiple products) via referral",
+      "status": "passed",
+      "durationMs": 41724
+    },
+    {
+      "id": "chrome:tests/sanity/TC_SAN_003_create_commercial_ew_policy_single_product.spec.ts:TC_SAN_003 | Create Commercial England & Wales policy (single product)",
+      "project": "MLIS",
+      "file": "tests/sanity/TC_SAN_003_create_commercial_ew_policy_single_product.spec.ts",
+      "title": "TC_SAN_003 | Create Commercial England & Wales policy (single product)",
+      "fullTitle": " › chrome › sanity\\TC_SAN_003_create_commercial_ew_policy_single_product.spec.ts › @sanity | E2E | Commercial | England & Wales › TC_SAN_003 | Create Commercial England & Wales policy (single product)",
+      "status": "passed",
+      "durationMs": 55298
+    },
+    {
+      "id": "chrome:tests/sanity/TC_SAN_004_create_commercial_ew_policy_single_product_via_referral.spec.ts:TC_SAN_004 | Create Commercial England & Wales policy (single product) via referral",
+      "project": "MLIS",
+      "file": "tests/sanity/TC_SAN_004_create_commercial_ew_policy_single_product_via_referral.spec.ts",
+      "title": "TC_SAN_004 | Create Commercial England & Wales policy (single product) via referral",
+      "fullTitle": " › chrome › sanity\\TC_SAN_004_create_commercial_ew_policy_single_product_via_referral.spec.ts › @sanity | E2E | Commercial | England & Wales › TC_SAN_004 | Create Commercial England & Wales policy (single product) via referral",
+      "status": "passed",
+      "durationMs": 35996
+    },
+    {
+      "id": "chrome:tests/sanity/TC_SAN_005_complete_full_commercial_ew_quote_journey.spec.ts:TC_SAN_005 | Complete full commercial England & Wales quote journey end-to-end",
+      "project": "MLIS",
+      "file": "tests/sanity/TC_SAN_005_complete_full_commercial_ew_quote_journey.spec.ts",
+      "title": "TC_SAN_005 | Complete full commercial England & Wales quote journey end-to-end",
+      "fullTitle": " › chrome › sanity\\TC_SAN_005_complete_full_commercial_ew_quote_journey.spec.ts › @sanity | E2E | Salesforce Quote Journey | Commercial E&W › TC_SAN_005 | Complete full commercial England & Wales quote journey end-to-end",
+      "status": "passed",
+      "durationMs": 84790
+    },
+    {
+      "id": "chrome:tests/sanity/TC_SAN_006_complete_full_residential_ew_quote_journey.spec.ts:TC_SAN_006 | Complete full residential England & Wales quote journey end-to-end",
+      "project": "MLIS",
+      "file": "tests/sanity/TC_SAN_006_complete_full_residential_ew_quote_journey.spec.ts",
+      "title": "TC_SAN_006 | Complete full residential England & Wales quote journey end-to-end",
+      "fullTitle": " › chrome › sanity\\TC_SAN_006_complete_full_residential_ew_quote_journey.spec.ts › @sanity | E2E | Salesforce Quote Journey | Residential E&W › TC_SAN_006 | Complete full residential England & Wales quote journey end-to-end",
+      "status": "passed",
+      "durationMs": 84145
+    },
+    {
+      "id": "chrome:tests/sanity/TC_SAN_007_complete_full_residential_ew_multiple_products_quote_journey.spec.ts:TC_SAN_007 | Complete full residential England & Wales quote journey with multiple products",
+      "project": "MLIS",
+      "file": "tests/sanity/TC_SAN_007_complete_full_residential_ew_multiple_products_quote_journey.spec.ts",
+      "title": "TC_SAN_007 | Complete full residential England & Wales quote journey with multiple products",
+      "fullTitle": " › chrome › sanity\\TC_SAN_007_complete_full_residential_ew_multiple_products_quote_journey.spec.ts › @sanity | E2E | Salesforce Quote Journey | Residential E&W Multiple Products › TC_SAN_007 | Complete full residential England & Wales quote journey with multiple products",
+      "status": "failed",
+      "durationMs": 53542
+    },
+    {
+      "id": "chrome:tests/sanity/TC_SAN_008_cancel_from_inception_full_premium_return.spec.ts:TC_SAN_008 | Cancel policy from inception (full premium return)",
+      "project": "MLIS",
+      "file": "tests/sanity/TC_SAN_008_cancel_from_inception_full_premium_return.spec.ts",
+      "title": "TC_SAN_008 | Cancel policy from inception (full premium return)",
+      "fullTitle": " › chrome › sanity\\TC_SAN_008_cancel_from_inception_full_premium_return.spec.ts › @sanity | E2E | Cancellation | From Inception › TC_SAN_008 | Cancel policy from inception (full premium return)",
+      "status": "passed",
+      "durationMs": 123697
+    },
+    {
+      "id": "chrome:tests/sanity/TC_SAN_009_residential_quick_quote_ew_single_product_email_quotes.spec.ts:TC_SAN_009 | Residential quick quote E&W (single product) + email quotes + close dialog",
+      "project": "MLIS",
+      "file": "tests/sanity/TC_SAN_009_residential_quick_quote_ew_single_product_email_quotes.spec.ts",
+      "title": "TC_SAN_009 | Residential quick quote E&W (single product) + email quotes + close dialog",
+      "fullTitle": " › chrome › sanity\\TC_SAN_009_residential_quick_quote_ew_single_product_email_quotes.spec.ts › @sanity | E2E | Residential Quick Quote | England & Wales › TC_SAN_009 | Residential quick quote E&W (single product) + email quotes + close dialog",
+      "status": "passed",
+      "durationMs": 12247
+    },
+    {
+      "id": "chrome:tests/sanity/TC_SAN_010_residential_quick_quote_ew_multiple_products_email_quotes.spec.ts:TC_SAN_010 | Residential quick quote E&W (multiple products) + email quotes + close dialog",
+      "project": "MLIS",
+      "file": "tests/sanity/TC_SAN_010_residential_quick_quote_ew_multiple_products_email_quotes.spec.ts",
+      "title": "TC_SAN_010 | Residential quick quote E&W (multiple products) + email quotes + close dialog",
+      "fullTitle": " › chrome › sanity\\TC_SAN_010_residential_quick_quote_ew_multiple_products_email_quotes.spec.ts › @sanity | E2E | Residential Quick Quote | England & Wales › TC_SAN_010 | Residential quick quote E&W (multiple products) + email quotes + close dialog",
+      "status": "passed",
+      "durationMs": 14465
+    },
+    {
+      "id": "chrome:tests/sanity/TC_SAN_011_residential_quick_quote_scotland_single_product_enter_manual_email_quotes.spec.ts:TC_SAN_011 | Residential quick quote Scotland (single product) + enter manually + email quotes + close dialog",
+      "project": "MLIS",
+      "file": "tests/sanity/TC_SAN_011_residential_quick_quote_scotland_single_product_enter_manual_email_quotes.spec.ts",
+      "title": "TC_SAN_011 | Residential quick quote Scotland (single product) + enter manually + email quotes + close dialog",
+      "fullTitle": " › chrome › sanity\\TC_SAN_011_residential_quick_quote_scotland_single_product_enter_manual_email_quotes.spec.ts › @sanity | E2E | Residential Quick Quote | Scotland › TC_SAN_011 | Residential quick quote Scotland (single product) + enter manually + email quotes + close dialog",
+      "status": "passed",
+      "durationMs": 10332
+    },
+    {
+      "id": "chrome:tests/sanity/TC_SAN_013_verify_dual_share_gwp_consistency_ew_residential.spec.ts:TC_SAN_013 | Verify DUAL Share GWP value is consistent across Insurance Policy details",
+      "project": "MLIS",
+      "file": "tests/sanity/TC_SAN_013_verify_dual_share_gwp_consistency_ew_residential.spec.ts",
+      "title": "TC_SAN_013 | Verify DUAL Share GWP value is consistent across Insurance Policy details",
+      "fullTitle": " › chrome › sanity\\TC_SAN_013_verify_dual_share_gwp_consistency_ew_residential.spec.ts › @sanity | E2E | EW Residential | DUAL Share GWP › TC_SAN_013 | Verify DUAL Share GWP value is consistent across Insurance Policy details",
+      "status": "passed",
+      "durationMs": 77585
+    },
+    {
+      "id": "chrome:tests/sanity/TC_SAN_015_create_mta_mid_term_adjustment.spec.ts:TC_SAN_015 | Create MTA (Mid-Term Adjustment) on a live policy",
+      "project": "MLIS",
+      "file": "tests/sanity/TC_SAN_015_create_mta_mid_term_adjustment.spec.ts",
+      "title": "TC_SAN_015 | Create MTA (Mid-Term Adjustment) on a live policy",
+      "fullTitle": " › chrome › sanity\\TC_SAN_015_create_mta_mid_term_adjustment.spec.ts › @sanity | E2E | MTA › TC_SAN_015 | Create MTA (Mid-Term Adjustment) on a live policy",
+      "status": "passed",
+      "durationMs": 147615
+    },
+    {
+      "id": "chrome:tests/sanity/TC_SAN_016_cancel_and_reissue_live_policy.spec.ts:TC_SAN_016 | Cancel and reissue a live policy",
+      "project": "MLIS",
+      "file": "tests/sanity/TC_SAN_016_cancel_and_reissue_live_policy.spec.ts",
+      "title": "TC_SAN_016 | Cancel and reissue a live policy",
+      "fullTitle": " › chrome › sanity\\TC_SAN_016_cancel_and_reissue_live_policy.spec.ts › @sanity | E2E | Cancellation | Cancel and Reissue › TC_SAN_016 | Cancel and reissue a live policy",
+      "status": "passed",
+      "durationMs": 119578
+    },
+    {
+      "id": "chrome:tests/sanity/TC_SAN_017_broker_portal_commercial_manual_address_255_char.spec.ts:TC_SAN_018 | Create Commercial Northern Ireland policy with manual 255 character address entry",
+      "project": "MLIS",
+      "file": "tests/sanity/TC_SAN_017_broker_portal_commercial_manual_address_255_char.spec.ts",
+      "title": "TC_SAN_018 | Create Commercial Northern Ireland policy with manual 255 character address entry",
+      "fullTitle": " › chrome › sanity\\TC_SAN_017_broker_portal_commercial_manual_address_255_char.spec.ts › @sanity | E2E | Broker Portal | Commercial | Address Validation › TC_SAN_018 | Create Commercial Northern Ireland policy with manual 255 character address entry",
+      "status": "failed",
+      "durationMs": 39928
+    },
+    {
+      "id": "chrome:tests/sanity/TC_SAN_018_quote_journey_open_policy_perform_mta_cnr_cancellation.spec.ts:TC_SAN_005 | Complete full commercial England & Wales quote journey end-to-end",
+      "project": "MLIS",
+      "file": "tests/sanity/TC_SAN_018_quote_journey_open_policy_perform_mta_cnr_cancellation.spec.ts",
+      "title": "TC_SAN_005 | Complete full commercial England & Wales quote journey end-to-end",
+      "fullTitle": " › chrome › sanity\\TC_SAN_018_quote_journey_open_policy_perform_mta_cnr_cancellation.spec.ts › @sanity | E2E | Salesforce Quote Journey | Commercial E&W › TC_SAN_005 | Complete full commercial England & Wales quote journey end-to-end",
+      "status": "failed",
+      "durationMs": 75844
+    },
+    {
+      "id": "chrome:tests/sanity/TC_SAN_019_verify_footer_terms_and_privacy_links.spec.ts:TC_SAN_019 | Verify Terms and Conditions, Privacy Policy, and Cookies footer links",
+      "project": "MLIS",
+      "file": "tests/sanity/TC_SAN_019_verify_footer_terms_and_privacy_links.spec.ts",
+      "title": "TC_SAN_019 | Verify Terms and Conditions, Privacy Policy, and Cookies footer links",
+      "fullTitle": " › chrome › sanity\\TC_SAN_019_verify_footer_terms_and_privacy_links.spec.ts › @sanity | UI | Broker Portal | Footer Links › TC_SAN_019 | Verify Terms and Conditions, Privacy Policy, and Cookies footer links",
+      "status": "passed",
+      "durationMs": 15218
+    },
+    {
+      "id": "chrome:tests/sanity/TC_SAN_020_broker_portal_referral_condition_limit_product.spec.ts:TC_SAN_020 | Trigger referral when limit exceeds 5M and product is Contaminated Land failed/further action search",
+      "project": "MLIS",
+      "file": "tests/sanity/TC_SAN_020_broker_portal_referral_condition_limit_product.spec.ts",
+      "title": "TC_SAN_020 | Trigger referral when limit exceeds 5M and product is Contaminated Land failed/further action search",
+      "fullTitle": " › chrome › sanity\\TC_SAN_020_broker_portal_referral_condition_limit_product.spec.ts › @sanity | E2E | Broker Portal | Conditional Referral › TC_SAN_020 | Trigger referral when limit exceeds 5M and product is Contaminated Land failed/further action search",
+      "status": "passed",
+      "durationMs": 33134
+    },
+    {
+      "id": "chrome:tests/sanity/TC_SAN_021_create_residential_ew_policy_via_referral_limit_gt_5m.spec.ts:TC_SAN_021 | Create Residential England & Wales policy via referral with limit greater than 5M",
+      "project": "MLIS",
+      "file": "tests/sanity/TC_SAN_021_create_residential_ew_policy_via_referral_limit_gt_5m.spec.ts",
+      "title": "TC_SAN_021 | Create Residential England & Wales policy via referral with limit greater than 5M",
+      "fullTitle": " › chrome › sanity\\TC_SAN_021_create_residential_ew_policy_via_referral_limit_gt_5m.spec.ts › @sanity | E2E | Residential | England & Wales › TC_SAN_021 | Create Residential England & Wales policy via referral with limit greater than 5M",
+      "status": "passed",
+      "durationMs": 33232
+    },
+    {
+      "id": "chrome:tests/sanity/TC_SAN_022_verify_broker_portal_home_menu_navigation.spec.ts:TC_SAN_022 | Verify each home page menu item click and navigation URL",
+      "project": "MLIS",
+      "file": "tests/sanity/TC_SAN_022_verify_broker_portal_home_menu_navigation.spec.ts",
+      "title": "TC_SAN_022 | Verify each home page menu item click and navigation URL",
+      "fullTitle": " › chrome › sanity\\TC_SAN_022_verify_broker_portal_home_menu_navigation.spec.ts › @sanity | UI | Broker Portal | Home Menu Navigation › TC_SAN_022 | Verify each home page menu item click and navigation URL",
+      "status": "failed",
+      "durationMs": 61800
+    },
+    {
+      "id": "chrome:tests/sanity/TC_SAN_023_complete_full_commercial_ew_quote_journey_with_cnr.spec.ts:TC_SAN_023 | Complete full commercial England & Wales quote journey and perform CNR",
+      "project": "MLIS",
+      "file": "tests/sanity/TC_SAN_023_complete_full_commercial_ew_quote_journey_with_cnr.spec.ts",
+      "title": "TC_SAN_023 | Complete full commercial England & Wales quote journey and perform CNR",
+      "fullTitle": " › chrome › sanity\\TC_SAN_023_complete_full_commercial_ew_quote_journey_with_cnr.spec.ts › @sanity | E2E | Salesforce Quote Journey | Commercial E&W | CNR › TC_SAN_023 | Complete full commercial England & Wales quote journey and perform CNR",
+      "status": "passed",
+      "durationMs": 147444
+    },
+    {
+      "id": "chrome:tests/sanity/TC_SAN_024_complete_full_commercial_ew_quote_journey_with_cancellation.spec.ts:TC_SAN_024 | Complete full commercial England & Wales quote journey and perform cancellation",
+      "project": "MLIS",
+      "file": "tests/sanity/TC_SAN_024_complete_full_commercial_ew_quote_journey_with_cancellation.spec.ts",
+      "title": "TC_SAN_024 | Complete full commercial England & Wales quote journey and perform cancellation",
+      "fullTitle": " › chrome › sanity\\TC_SAN_024_complete_full_commercial_ew_quote_journey_with_cancellation.spec.ts › @sanity | E2E | Salesforce Quote Journey | Commercial E&W | Cancellation › TC_SAN_024 | Complete full commercial England & Wales quote journey and perform cancellation",
+      "status": "failed",
+      "durationMs": 63412
+    },
+    {
+      "id": "chrome:tests/sanity/TC_SAN_012_residential_quick_quote_scotland_multiple_products_enter_manual_email_quotes_slow.spec.ts:TC_SAN_012 | Residential quick quote Scotland (multiple products) + enter manually + email quotes + close dialog (slow)",
+      "project": "MLIS",
+      "file": "tests/sanity/TC_SAN_012_residential_quick_quote_scotland_multiple_products_enter_manual_email_quotes_slow.spec.ts",
+      "title": "TC_SAN_012 | Residential quick quote Scotland (multiple products) + enter manually + email quotes + close dialog (slow)",
+      "fullTitle": " › chrome › sanity\\TC_SAN_012_residential_quick_quote_scotland_multiple_products_enter_manual_email_quotes_slow.spec.ts › @sanity | E2E | Residential Quick Quote | Scotland › TC_SAN_012 | Residential quick quote Scotland (multiple products) + enter manually + email quotes + close dialog (slow)",
+      "status": "passed",
+      "durationMs": 14066
+    }
+  ]
+}

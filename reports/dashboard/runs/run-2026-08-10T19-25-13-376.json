@@ -1,0 +1,30 @@
+{
+  "runId": "2026-08-10T19-25-13-376",
+  "createdAtIso": "2026-08-10T13:55:13.376Z",
+  "createdAtLabel": "08/10/2026, 07:25:13 PM",
+  "environment": "SIT1",
+  "status": "passed",
+  "totalDurationMs": 197583,
+  "projects": [
+    "chromium"
+  ],
+  "summary": {
+    "total": 1,
+    "passed": 1,
+    "failed": 0,
+    "skipped": 0,
+    "timedOut": 0,
+    "interrupted": 0
+  },
+  "tests": [
+    {
+      "id": "chromium:tests/BDX/TC_BDX_003_BDE_COMM_policy_bdx_lines.spec.ts:TC_BDX_003_BDE_COMM | Create Residential NB policy, MTA (350.67), CNR with reason and verify BDX lines",
+      "project": "MLIS",
+      "file": "tests/BDX/TC_BDX_003_BDE_COMM_policy_bdx_lines.spec.ts",
+      "title": "TC_BDX_003_BDE_COMM | Create Residential NB policy, MTA (350.67), CNR with reason and verify BDX lines",
+      "fullTitle": " › chromium › BDX\\TC_BDX_003_BDE_COMM_policy_bdx_lines.spec.ts › @sanity | E2E | BDX | MLIS Policy | BDE Commission | NB>MTA>CNR › TC_BDX_003_BDE_COMM | Create Residential NB policy, MTA (350.67), CNR with reason and verify BDX lines",
+      "status": "passed",
+      "durationMs": 187591
+    }
+  ]
+}

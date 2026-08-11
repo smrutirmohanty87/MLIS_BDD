@@ -84,7 +84,7 @@ test.describe('@regression | E2E | MTA | Cancel and Reissue', () => {
     reg043.logStep('SF-01', 'Login to Salesforce and open policy');
     await salesforce.goto();
     const sfCreds = getSalesforceCredentials();
-    await salesforce.login(sfCreds.username, sfCreds.password);
+    await salesforce.login(sfCreds.username, sfCreds.password, { useJwt: true, fast: true });
 
     // Global Search -> open exact policy.
     let openedFromSearch = false;

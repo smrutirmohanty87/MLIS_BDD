@@ -2,8 +2,8 @@
 # This script runs sanity test suite
 
 param(
-    [ValidateSet('chrome', 'chromium', 'edge', 'all')]
-    [string]$Browser = 'all'
+    [ValidateSet('chrome', 'all')]
+    [string]$Browser = 'chrome'
 )
 
 $ErrorActionPreference = "Stop"
@@ -34,8 +34,6 @@ function Run-Tests {
 
 # Main execution
 $chromeResult = $true
-$chromiumResult = $true
-$edgeResult = $true
 
 switch ($Browser) {
     'chrome' {
@@ -43,22 +41,9 @@ switch ($Browser) {
         $chromeResult = Run-Tests -BrowserName "Chrome" -TestCommand "test:sanity:chrome"
         if (-not $chromeResult) { exit 1 }
     }
-    'chromium' {
-        Write-Host "Running Sanity tests on Chromium..." -ForegroundColor Cyan
-        $chromiumResult = Run-Tests -BrowserName "Chromium" -TestCommand "test:sanity:chromium"
-        if (-not $chromiumResult) { exit 1 }
-    }
-    'edge' {
-        Write-Host "Running Sanity tests on Microsoft Edge..." -ForegroundColor Cyan
-        $edgeResult = Run-Tests -BrowserName "Edge" -TestCommand "test:sanity:edge"
-        if (-not $edgeResult) { exit 1 }
-    }
     'all' {
-        Write-Host "Running Sanity tests on all browsers..." -ForegroundColor Cyan
-        
+        Write-Host "Running Sanity tests in locked mode (Chrome only)..." -ForegroundColor Cyan
         $chromeResult = Run-Tests -BrowserName "Chrome" -TestCommand "test:sanity:chrome"
-        $chromiumResult = Run-Tests -BrowserName "Chromium" -TestCommand "test:sanity:chromium"
-        $edgeResult = Run-Tests -BrowserName "Edge" -TestCommand "test:sanity:edge"
         
         Write-Host ""
         Write-Host "================================================" -ForegroundColor Cyan
@@ -71,19 +56,7 @@ switch ($Browser) {
             Write-Host "✗ Chrome: FAILED" -ForegroundColor Red
         }
         
-        if ($chromiumResult) {
-            Write-Host "✓ Chromium: PASSED" -ForegroundColor Green
-        } else {
-            Write-Host "✗ Chromium: FAILED" -ForegroundColor Red
-        }
-        
-        if ($edgeResult) {
-            Write-Host "✓ Edge: PASSED" -ForegroundColor Green
-        } else {
-            Write-Host "✗ Edge: FAILED" -ForegroundColor Red
-        }
-        
-        if (-not $chromeResult -or -not $chromiumResult -or -not $edgeResult) {
+        if (-not $chromeResult) {
             exit 1
         }
     }

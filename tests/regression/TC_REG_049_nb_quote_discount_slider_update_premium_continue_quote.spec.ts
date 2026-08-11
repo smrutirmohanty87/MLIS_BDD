@@ -60,7 +60,7 @@ test.describe('@regression | E2E | NB | Quotes Discount Slider', () => {
     // Login to Salesforce with dedicated default underwriter credentials.
     await salesforce.goto();
     const sfCreds = getSalesforceCredentials();
-    await salesforce.login(sfCreds.username, sfCreds.password);
+    await salesforce.login(sfCreds.username, sfCreds.password, { useJwt: true, fast: true });
 
     // Open policy, go to Quotes tab, adjust discount slider, update premium, continue quote.
     await reg049.searchSalesforceWithFallback(salesforce, policyNumber, caseRef);

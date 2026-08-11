@@ -75,7 +75,7 @@ test.describe('@regression | E2E | MTA | Cancellation', () => {
     // Login to Salesforce Portal
     await salesforce.goto();
     const sfCreds = getSalesforceCredentials();
-    await salesforce.login(sfCreds.username, sfCreds.password);
+    await salesforce.login(sfCreds.username, sfCreds.password, { useJwt: true, fast: true });
 
     // Global Search → open the exact policy number from the results grid
     await salesforce.searchAndOpenExactFromGlobalSearchGrid(policyNumber);

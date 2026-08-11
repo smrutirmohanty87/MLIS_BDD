@@ -1,0 +1,30 @@
+{
+  "runId": "2026-08-11T13-06-56-924",
+  "createdAtIso": "2026-08-11T07:36:56.924Z",
+  "createdAtLabel": "08/11/2026, 01:06:56 PM",
+  "environment": "SIT1",
+  "status": "passed",
+  "totalDurationMs": 216389,
+  "projects": [
+    "chromium"
+  ],
+  "summary": {
+    "total": 1,
+    "passed": 1,
+    "failed": 0,
+    "skipped": 0,
+    "timedOut": 0,
+    "interrupted": 0
+  },
+  "tests": [
+    {
+      "id": "chromium:tests/regression/TC_REG_049_nb_quote_discount_slider_update_premium_continue_quote.spec.ts:TC_REG_049 | Save and exit quote, then update discount on Salesforce Quotes tab and continue quote",
+      "project": "MLIS",
+      "file": "tests/regression/TC_REG_049_nb_quote_discount_slider_update_premium_continue_quote.spec.ts",
+      "title": "TC_REG_049 | Save and exit quote, then update discount on Salesforce Quotes tab and continue quote",
+      "fullTitle": " › chromium › regression\\TC_REG_049_nb_quote_discount_slider_update_premium_continue_quote.spec.ts › @regression | E2E | NB | Quotes Discount Slider › TC_REG_049 | Save and exit quote, then update discount on Salesforce Quotes tab and continue quote",
+      "status": "passed",
+      "durationMs": 205934
+    }
+  ]
+}

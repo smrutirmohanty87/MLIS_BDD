@@ -112,7 +112,7 @@ test.describe('@regression | E2E | EW Residential | Full Cancellation | DUAL GWP
       logStep('Salesforce login started');
       await salesforce.goto();
       const sfCreds = getSalesforceCredentials();
-      await salesforce.login(sfCreds.username, sfCreds.password);
+      await salesforce.login(sfCreds.username, sfCreds.password, { useJwt: true, fast: true });
       logStep('Salesforce login completed');
 
     const searchAndOpenPolicyWithRetry = async (ref: string, attempts = 3) => {

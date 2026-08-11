@@ -113,7 +113,7 @@ test.describe('@regression | E2E | BDX | Commercial NB>CNR>MTA>Cancellation', ()
 
     await salesforce.goto();
     const sfCreds = getSalesforceCredentials();
-    await salesforce.login(sfCreds.username, sfCreds.password);
+    await salesforce.login(sfCreds.username, sfCreds.password, { useJwt: true, fast: true });
     await salesforce.searchAndOpenExactFromGlobalSearchGrid(policyNumberText);
     await salesforce.openRelatedTab();
     await salesforce.openInsurancePolicyFromRelated(policyNumberText);

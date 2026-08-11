@@ -14,11 +14,7 @@ test.describe('@regression | E2E | Quote Journey | Underwriter Uplift | Manage P
     const salesforce = new SalesforcePortalPage(page);
     const quoteJourney = new QuoteJourneyUnderwriterUpliftPage(page);
 
-    await salesforce.goto();
-    await page.getByRole('textbox', { name: /username/i }).fill(sfCreds.username);
-    await page.getByRole('button', { name: /log in to sandbox|log in/i }).first().click();
-    await page.getByRole('textbox', { name: /password/i }).fill(sfCreds.password);
-    await page.getByRole('button', { name: /log in to sandbox|log in/i }).first().click();
+    await salesforce.login(sfCreds.username, sfCreds.password, { useJwt: true, fast: true });
 
     await quoteJourney.openQuoteJourney();
     await quoteJourney.selectLookupOption('Broker Account', 'MLIS intermediary', 'MLIS Test Intermediary');

@@ -80,7 +80,7 @@ test.describe('@regression | E2E | Notes & Attachments | MTA | Source Submission
     // Open policy in Salesforce.
     await salesforce.goto();
     const sfCreds = getSalesforceCredentials();
-    await salesforce.login(sfCreds.username, sfCreds.password);
+    await salesforce.login(sfCreds.username, sfCreds.password, { useJwt: true, fast: true });
 
     await salesforce.searchAndOpenExactFromGlobalSearchGrid(policyNumber);
     await salesforce.openRelatedTab();

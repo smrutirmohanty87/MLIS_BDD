@@ -98,7 +98,7 @@ test.describe('@regression | E2E | Commercial | Referral | Salesforce Assertion'
     // Search the same generated reference in Salesforce and open record from grid.
     await salesforce.goto();
     const sfCreds = getSalesforceCredentials();
-    await salesforce.login(sfCreds.username, sfCreds.password);
+    await salesforce.login(sfCreds.username, sfCreds.password, { useJwt: true, fast: true });
 
     let openedFromSearch = false;
     for (let attempt = 1; attempt <= 2; attempt += 1) {

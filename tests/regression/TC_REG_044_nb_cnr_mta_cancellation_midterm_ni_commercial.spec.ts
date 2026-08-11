@@ -79,7 +79,7 @@ test.describe('@regression | E2E | NI Commercial | NB | CNR | MTA | Cancellation
       // Login to Salesforce and open policy record.
       await salesforce.goto();
       const sfCreds = getSalesforceCredentials();
-      await salesforce.login(sfCreds.username, sfCreds.password);
+      await salesforce.login(sfCreds.username, sfCreds.password, { useJwt: true, fast: true });
 
       await salesforce.searchAndOpenExactFromGlobalSearchGrid(policyNumber);
       await salesforce.openRelatedTab();

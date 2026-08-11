@@ -1,0 +1,30 @@
+{
+  "runId": "2026-08-10T20-34-36-503",
+  "createdAtIso": "2026-08-10T15:04:36.503Z",
+  "createdAtLabel": "08/10/2026, 08:34:36 PM",
+  "environment": "SIT1",
+  "status": "passed",
+  "totalDurationMs": 105354,
+  "projects": [
+    "chromium"
+  ],
+  "summary": {
+    "total": 1,
+    "passed": 1,
+    "failed": 0,
+    "skipped": 0,
+    "timedOut": 0,
+    "interrupted": 0
+  },
+  "tests": [
+    {
+      "id": "chromium:tests/regression/TC_REG_054_quote_journey_underwriter_uplift.spec.ts:TC_REG_050 | Complete quote journey and verify quote uplift values on Quotes tab",
+      "project": "MLIS",
+      "file": "tests/regression/TC_REG_054_quote_journey_underwriter_uplift.spec.ts",
+      "title": "TC_REG_050 | Complete quote journey and verify quote uplift values on Quotes tab",
+      "fullTitle": " › chromium › regression\\TC_REG_054_quote_journey_underwriter_uplift.spec.ts › @regression | E2E | Quote Journey | Underwriter Uplift › TC_REG_050 | Complete quote journey and verify quote uplift values on Quotes tab",
+      "status": "passed",
+      "durationMs": 100285
+    }
+  ]
+}

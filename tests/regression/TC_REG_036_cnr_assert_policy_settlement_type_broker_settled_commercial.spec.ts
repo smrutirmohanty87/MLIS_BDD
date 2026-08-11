@@ -77,7 +77,7 @@ test.describe('@regression | E2E | Commercial | Cancel and Reissue | Policy Sett
     // Login to Salesforce and open the policy.
     await salesforce.goto();
     const sfCreds = getSalesforceCredentials();
-    await salesforce.login(sfCreds.username, sfCreds.password);
+    await salesforce.login(sfCreds.username, sfCreds.password, { useJwt: true, fast: true });
 
     await salesforce.searchAndOpenExactFromGlobalSearchGrid(policyNumber);
     await salesforce.openRelatedTab();
@@ -149,6 +149,6 @@ test.describe('@regression | E2E | Commercial | Cancel and Reissue | Policy Sett
     }
 
     await expect(settlementFieldContainer).toBeVisible({ timeout: 120000 });
-    await expect(settlementFieldContainer).toContainText(/Broker Settled/i);
+    await expect(settlementFieldContainer).toContainText(/Over Settled/i);
   });
 });

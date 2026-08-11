@@ -93,7 +93,7 @@ test.describe('@regression | E2E | Cancel and Reissue | MTA', () => {
     // Login to Salesforce and open policy.
     await salesforce.goto();
     const sfCreds = getSalesforceCredentials();
-    await salesforce.login(sfCreds.username, sfCreds.password);
+    await salesforce.login(sfCreds.username, sfCreds.password, { useJwt: true, fast: true });
 
     let openedFromSearch = false;
     for (let attempt = 1; attempt <= 2; attempt += 1) {

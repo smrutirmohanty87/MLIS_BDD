@@ -2,7 +2,8 @@
 // seed: tests/seed.spec.ts
 
 import { expect, Locator, Page, test } from '@playwright/test';
-import { getSalesforceCredentials, getSalesforceLightningUrl } from '../../src/config/env';
+import { getSalesforceCredentials } from '../../src/config/env';
+import { SalesforcePortalPage } from '../../src/pages/salesforce-cancellation';
 
 async function waitForLightningIdle(page: Page) {
   await page.waitForLoadState('domcontentloaded', { timeout: 15000 }).catch(() => {});
@@ -102,12 +103,9 @@ test.describe('@sanity | E2E | Salesforce Quote Journey | Commercial E&W', () =>
 
     const caseRef = `SF-QJ-COM-E2E-${Date.now()}`;
     const sfCreds = getSalesforceCredentials();
+    const salesforce = new SalesforcePortalPage(page);
 
-    await page.goto(getSalesforceLightningUrl(), { waitUntil: 'domcontentloaded' });
-    await page.getByRole('textbox', { name: /username/i }).fill(sfCreds.username);
-    await clickWhenReady(page.getByRole('button', { name: /log in to sandbox|log in/i }).first(), page);
-    await page.getByRole('textbox', { name: /password/i }).fill(sfCreds.password);
-    await clickWhenReady(page.getByRole('button', { name: /log in to sandbox|log in/i }).first(), page);
+    await salesforce.login(sfCreds.username, sfCreds.password, { useJwt: true, fast: true });
     await expect(page.getByRole('link', { name: 'Quote Journey' })).toBeVisible({ timeout: 120000 });
 
     await clickWhenReady(page.getByRole('link', { name: 'Quote Journey' }), page);

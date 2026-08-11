@@ -89,7 +89,7 @@ test.describe('@regression | E2E | Claims', () => {
 
     await salesforce.goto();
     const sfCreds = getClaimUserCredentials();
-    await salesforce.login(sfCreds.username, sfCreds.password, { useJwt: false, fast: true });
+    await salesforce.login(sfCreds.username, sfCreds.password, { useJwt: true, fast: true });
     await salesforce.closeAllWorkspaceTabs();
 
     await salesforce.searchAndOpenExactFromGlobalSearchGrid(policyNumber);
