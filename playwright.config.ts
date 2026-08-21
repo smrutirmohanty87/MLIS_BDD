@@ -39,8 +39,8 @@ export default defineConfig({
     // baseURL: 'http://localhost:3000',
 
     /* Always run headed to keep a single visible browser session. */
-    //headless: false,
-    headless: process.env.CI === 'true',
+    headless: true,
+   // headless: process.env.CI === 'true',
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'retain-on-failure',
