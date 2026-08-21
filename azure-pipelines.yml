@@ -97,6 +97,17 @@ stages:
             inputs:
               versionSpec: $(nodeVersion)
 
+          - task: DownloadSecureFile@1
+            name: salesforceJwtKey
+            displayName: 'Download Salesforce UAT2 JWT key'
+            inputs:
+              secureFile: 'salesforce-uat2-jwt.key'
+
+          - script: |
+              echo "##vso[task.setvariable variable=SALEFORCE_UAT2_JWT_PRIVATE_KEY_PATH]$(salesforceJwtKey.secureFilePath)"
+              echo "##vso[task.setvariable variable=SALESFORCE_UAT2_JWT_PRIVATE_KEY_PATH]$(salesforceJwtKey.secureFilePath)"
+            displayName: 'Set Salesforce UAT2 JWT key path'
+
           - task: Cache@2
             displayName: 'Cache npm dependencies'
             inputs:
@@ -171,6 +182,17 @@ stages:
             displayName: 'Install Node.js $(nodeVersion)'
             inputs:
               versionSpec: $(nodeVersion)
+
+          - task: DownloadSecureFile@1
+            name: salesforceJwtKey
+            displayName: 'Download Salesforce UAT2 JWT key'
+            inputs:
+              secureFile: 'salesforce-uat2-jwt.key'
+
+          - script: |
+              echo "##vso[task.setvariable variable=SALEFORCE_UAT2_JWT_PRIVATE_KEY_PATH]$(salesforceJwtKey.secureFilePath)"
+              echo "##vso[task.setvariable variable=SALESFORCE_UAT2_JWT_PRIVATE_KEY_PATH]$(salesforceJwtKey.secureFilePath)"
+            displayName: 'Set Salesforce UAT2 JWT key path'
 
           - task: Cache@2
             displayName: 'Cache npm dependencies'
@@ -247,6 +269,17 @@ stages:
             inputs:
               versionSpec: $(nodeVersion)
 
+          - task: DownloadSecureFile@1
+            name: salesforceJwtKey
+            displayName: 'Download Salesforce UAT2 JWT key'
+            inputs:
+              secureFile: 'salesforce-uat2-jwt.key'
+
+          - script: |
+              echo "##vso[task.setvariable variable=SALEFORCE_UAT2_JWT_PRIVATE_KEY_PATH]$(salesforceJwtKey.secureFilePath)"
+              echo "##vso[task.setvariable variable=SALESFORCE_UAT2_JWT_PRIVATE_KEY_PATH]$(salesforceJwtKey.secureFilePath)"
+            displayName: 'Set Salesforce UAT2 JWT key path'
+
           - task: Cache@2
             displayName: 'Cache npm dependencies'
             inputs:
@@ -306,6 +339,17 @@ stages:
             displayName: 'Install Node.js $(nodeVersion)'
             inputs:
               versionSpec: $(nodeVersion)
+
+          - task: DownloadSecureFile@1
+            name: salesforceJwtKey
+            displayName: 'Download Salesforce UAT2 JWT key'
+            inputs:
+              secureFile: 'salesforce-uat2-jwt.key'
+
+          - script: |
+              echo "##vso[task.setvariable variable=SALEFORCE_UAT2_JWT_PRIVATE_KEY_PATH]$(salesforceJwtKey.secureFilePath)"
+              echo "##vso[task.setvariable variable=SALESFORCE_UAT2_JWT_PRIVATE_KEY_PATH]$(salesforceJwtKey.secureFilePath)"
+            displayName: 'Set Salesforce UAT2 JWT key path'
 
           - task: Cache@2
             displayName: 'Cache npm dependencies'
@@ -387,6 +431,17 @@ stages:
             inputs:
               versionSpec: $(nodeVersion)
 
+          - task: DownloadSecureFile@1
+            name: salesforceJwtKey
+            displayName: 'Download Salesforce UAT2 JWT key'
+            inputs:
+              secureFile: 'salesforce-uat2-jwt.key'
+
+          - script: |
+              echo "##vso[task.setvariable variable=SALEFORCE_UAT2_JWT_PRIVATE_KEY_PATH]$(salesforceJwtKey.secureFilePath)"
+              echo "##vso[task.setvariable variable=SALESFORCE_UAT2_JWT_PRIVATE_KEY_PATH]$(salesforceJwtKey.secureFilePath)"
+            displayName: 'Set Salesforce UAT2 JWT key path'
+
           - task: Cache@2
             displayName: 'Cache npm dependencies'
             inputs:
@@ -446,6 +501,17 @@ stages:
             displayName: 'Install Node.js $(nodeVersion)'
             inputs:
               versionSpec: $(nodeVersion)
+
+          - task: DownloadSecureFile@1
+            name: salesforceJwtKey
+            displayName: 'Download Salesforce UAT2 JWT key'
+            inputs:
+              secureFile: 'salesforce-uat2-jwt.key'
+
+          - script: |
+              echo "##vso[task.setvariable variable=SALEFORCE_UAT2_JWT_PRIVATE_KEY_PATH]$(salesforceJwtKey.secureFilePath)"
+              echo "##vso[task.setvariable variable=SALESFORCE_UAT2_JWT_PRIVATE_KEY_PATH]$(salesforceJwtKey.secureFilePath)"
+            displayName: 'Set Salesforce UAT2 JWT key path'
 
           - task: Cache@2
             displayName: 'Cache npm dependencies'
