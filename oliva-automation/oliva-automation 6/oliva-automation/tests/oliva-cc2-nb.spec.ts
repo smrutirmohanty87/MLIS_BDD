@@ -172,6 +172,9 @@ test('create Expanded Contractors Combined NB policy end-to-end', async ({ page 
       await premiums.fillAndSubmit(entries.map((p) => ({ ...p, insurable: '' })));
     }
     expect(await quote.dualShareGwp()).toContain(CC2_EXPECTATIONS.dualShareGwp);
+    // After premiums full-page reload, navigate back to quote record view to access binders tab
+    await page.goto(`/lightning/r/Quote/${cc2QuoteId}/view`);
+    await waitForSpinners(page);
   });
 
   } // end non-resume (submission → premiums)

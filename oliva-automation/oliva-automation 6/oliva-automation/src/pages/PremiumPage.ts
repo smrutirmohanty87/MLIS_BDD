@@ -67,6 +67,8 @@ export class PremiumPage {
       throw new Error('Enter Premiums: no "Coverage" sections found on the form');
     }
 
+    console.log(`[PremiumPage] NB fillAndSubmit: ${sections} coverage sections found`);
+
     for (let i = 0; i < sections; i++) {
       const coverage = (await coverageInputs.nth(i).inputValue()).trim();
       const insurable = (await insurableInputs.nth(i).inputValue()).trim();
@@ -81,20 +83,17 @@ export class PremiumPage {
             `(coverage="${coverage}", insurable="${insurable}")`
         );
       }
+      console.log(
+        `[PremiumPage] NB section ${i}: "${coverage}" (insurable="${insurable}") → technical="${entry.technical}", grossWritten="${entry.grossWritten}", annualized="${entry.annualized}", commissionRate="${entry.commissionRate}"`
+      );
       await this.fillNth('Technical Premium', i, entry.technical);
       await this.fillNth('Gross Written Premium', i, entry.grossWritten);
       await this.fillNth('100% Annualized Gross Premium', i, entry.annualized);
       await this.fillNth('Agreed Intermediary Commission Rate', i, entry.commissionRate);
     }
 
-    await this.page.getByRole('button', { name: 'Submit', exact: true }).last().click();
-
-    // Full page reload back to the quote record page.
-    await this.page.waitForLoadState('domcontentloaded', { timeout: 120_000 });
-    const landmark = this.page
-      .getByRole('button', { name: 'Enter Premiums' })
-      .or(this.page.getByRole('tab', { name: 'Coverages' }));
-    await expect(landmark.first()).toBeVisible({ timeout: 120_000 });
+    console.log('[PremiumPage] NB all sections filled, now submitting...');
+    await this.submitAndWaitForReload();
   }
 
   /**
@@ -149,14 +148,93 @@ export class PremiumPage {
     await this.submitAndWaitForReload();
   }
 
+  /**
+   * MTA "Enter Premiums" with coverage-specific charge premiums.
+   * @param chargePremiums Array of { coverage, chargePremium } objects
+   * Matches each coverage name to the corresponding input and fills with its charge premium.
+   */
+  async fillMtaChargeAndSubmitByCoverage(
+    chargePremiums: Array<{ coverage: string; chargePremium: string }>
+  ): Promise<void> {
+    const escaped = '100% MTA Charge Premium'.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const charges = this.page
+      .getByLabel(new RegExp(`^\\*?\\s*${escaped}\\s*$`))
+      .filter({ visible: true });
+    await expect(charges.first()).toBeVisible({ timeout: 60_000 });
+    const count = await charges.count();
+    if (count === 0) {
+      throw new Error('MTA Enter Premiums: no "100% MTA Charge Premium" inputs found');
+    }
+
+    // Get all coverage names by looking at each section
+    const coverageInputs = this.page
+      .getByLabel('Coverage', { exact: true })
+      .filter({ visible: true });
+    const coverageCount = await coverageInputs.count();
+
+    if (coverageCount !== count) {
+      console.warn(
+        `MTA: coverage sections (${coverageCount}) != charge premium inputs (${count}); attempting to match by order`
+      );
+    }
+
+    console.log(`[PremiumPage] MTA fillByCoverage: ${count} charge premium inputs found`);
+    console.log(
+      `[PremiumPage] Expected chargePremiums: ${JSON.stringify(chargePremiums.map((cp) => cp.coverage))}`
+    );
+
+    // Fill each charge premium with the corresponding coverage value
+    for (let i = 0; i < count; i++) {
+      let chargePremium = '';
+      let coverage = '';
+
+      // Try to find matching coverage
+      if (i < coverageCount) {
+        coverage = await coverageInputs.nth(i).inputValue();
+        const match = chargePremiums.find((cp) => cp.coverage === coverage);
+        if (match) {
+          chargePremium = match.chargePremium;
+          console.log(`[PremiumPage] MTA row ${i}: "${coverage}" → "${chargePremium}"`);
+        } else {
+          console.warn(
+            `[PremiumPage] MTA row ${i}: coverage "${coverage}" has no matching charge premium entry`
+          );
+        }
+      }
+
+      if (chargePremium !== '') {
+        const input = charges.nth(i);
+        await input.scrollIntoViewIfNeeded();
+        await input.click({ clickCount: 3 });
+        await input.fill(chargePremium);
+        // Verify the value was set
+        const filledValue = await input.inputValue();
+        console.log(
+          `[PremiumPage] MTA row ${i}: filled "${chargePremium}", verified as "${filledValue}"`
+        );
+      }
+    }
+
+    await this.submitAndWaitForReload();
+  }
+
   /** Submit the OmniScript and wait for the full-page reload back to the quote. */
   private async submitAndWaitForReload(): Promise<void> {
+    console.log('[PremiumPage] Clicking Submit button...');
     await this.page.getByRole('button', { name: 'Submit', exact: true }).last().click();
-    await this.page.waitForLoadState('domcontentloaded', { timeout: 120_000 });
+    
+    console.log('[PremiumPage] Waiting for page load after Submit...');
+    // Wait for navigation to complete
+    await this.page.waitForNavigation({ waitUntil: 'domcontentloaded', timeout: 120_000 }).catch(() => {
+      // Navigation might not happen if we're already on the same page, so ignore errors
+    });
+    
+    console.log('[PremiumPage] Waiting for landmark (Enter Premiums or Coverages tab)...');
     const landmark = this.page
       .getByRole('button', { name: 'Enter Premiums' })
       .or(this.page.getByRole('tab', { name: 'Coverages' }));
     await expect(landmark.first()).toBeVisible({ timeout: 120_000 });
+    console.log('[PremiumPage] Page load complete after Submit');
   }
 
   /** Fill the i-th input for `label` (select-all via triple click first). */
@@ -171,5 +249,9 @@ export class PremiumPage {
     await input.scrollIntoViewIfNeeded();
     await input.click({ clickCount: 3 });
     await input.fill(value);
+    const filledValue = await input.inputValue();
+    console.log(
+      `[PremiumPage] fillNth("${label}", ${index}): set to "${value}", verified as "${filledValue}"`
+    );
   }
 }

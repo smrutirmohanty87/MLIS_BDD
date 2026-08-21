@@ -22,10 +22,11 @@ import {
 /**
  * End-to-end: Oliva Construction "Contractors All Risks - Project" (CARP)
  * New Business policy on the newprodqa2 sandbox. Auth is JWT (no password/
- * MFA): UW3 for the whole flow, UW5 (T-0016) only inside the conditional UAL
- * branch. Reuses the Renovation framework: generic OmniScript form engine for
- * the 5-step product questionnaire + 8 coverage forms, standalone-page Add Fee
- * (×3), bulk "Confirm No Manual RBS Referral Reasons", Path-driven issue/bond.
+ * MFA): UW5 (T-0016) for the whole flow by default. CARP_LOGIN_USER=uw3 switches
+ * to UW3 (exercises the conditional UAL referral branch). Reuses the Renovation
+ * framework: generic OmniScript form engine for the 5-step product questionnaire
+ * + 8 coverage forms, standalone-page Add Fee (×3), bulk "Confirm No Manual RBS
+ * Referral Reasons", Path-driven issue/bond.
  */
 test('create Contractors All Risks - Project NB policy end-to-end', async ({ page, browser }) => {
   test.setTimeout(45 * 60 * 1000);
@@ -41,8 +42,12 @@ test('create Contractors All Risks - Project NB policy end-to-end', async ({ pag
   const status = new QuoteStatusPage(page, CARP_UAL);
   const policy = new PolicyPage(page);
 
-  await test.step('Login as Construction UW3 (JWT — no MFA)', async () => {
-    await jwtLogin(page, CARP_USERS.uw3);
+  // The source doc runs the whole flow as UW5 (default, doc-exact).
+  // CARP_LOGIN_USER=uw3 switches to UW3 (exercises the conditional UAL referral branch).
+  const loginUser = process.env.CARP_LOGIN_USER === 'uw3' ? CARP_USERS.uw3 : CARP_USERS.uw5;
+
+  await test.step(`Login as Construction ${process.env.CARP_LOGIN_USER === 'uw3' ? 'UW3' : 'UW5'} (JWT — no MFA)`, async () => {
+    await jwtLogin(page, loginUser);
   });
 
   // Fast-iteration escape hatch: CARP_QUOTE_ID resumes at binders on an

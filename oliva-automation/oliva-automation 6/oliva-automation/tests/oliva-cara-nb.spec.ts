@@ -23,11 +23,9 @@ import {
 /**
  * End-to-end: Oliva "Contractors All Risks - Annual" (CARA) New Business
  * policy on the newprodqa2 sandbox. JWT auth (no password/MFA). Reuses the
- * Renovation/CARP/CONC framework: 4-step questionnaire, FIVE product-level
- * coverages by default (Terrorism excluded — binder RBS insert fails org-side
- * with "Dual MGA Commission should be greater than Intermediary and Introducer
- * Commission"; CARA_INCLUDE_TERRORISM=1 re-includes once fixed), per-coverage
- * binder selection across THREE different binders (BindersPage strict mode),
+ * Renovation/CARP/CONC framework: 4-step questionnaire, SIX product-level
+ * coverages by default (including Terrorism; set CARA_INCLUDE_TERRORISM=0 to exclude),
+ * per-coverage binder selection across different binders (BindersPage strict mode),
  * FULL per-RBS approval on every section + bulk confirm, three fees,
  * Path-driven issue/bond, Create Policy.
  *

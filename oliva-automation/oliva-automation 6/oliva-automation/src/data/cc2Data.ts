@@ -24,16 +24,16 @@ import { BinderChoice } from '../pages/BindersPage';
 // ---------------------------------------------------------------------------
 
 export const CC2_USERS = {
-  uw3: 'oliva.cons.puw3@dualgroup.com.newprodqa2',
-  uw5: 'oliva.cons.puw5@dualgroup.com.newprodqa2',
+  uw3: process.env.SF_USERNAME ?? 't-0011-con-uw3-auto-provar@scc.sit',
+  uw5: process.env.SF_UAL_APPROVER_USERNAME ?? 't-0016-con-uw5-auto-provar@scc.sit',
 };
 
 export const CC2_ACCOUNT = {
-  name: 'HOWDEN INSURANCE BROKERS LIMITED',
-  // Doc (SIT) wants "James Allen" — REST-verified 22/07/2026: the ONLY James
-  // contact on newprodqa2's HOWDEN account is "James Chambers"
-  // (003Pv00000aSux6IAC). Deviation recorded in cc2_exploration_report.md.
-  intermediaryContact: 'James Chambers',
+  name: process.env.CC2_ACCOUNT_NAME ?? 'HOWDEN INSURANCE BROKERS LIMITED',
+  // For SIT: use CC2_INTERMEDIARY_CONTACT env var to support environment-specific
+  // intermediary contact (required when Intermediary and Introducer accounts share
+  // the same name; browser UI will disambiguate via the contact name).
+  intermediaryContact: process.env.CC2_INTERMEDIARY_CONTACT ?? 'James Chambers',
 };
 
 /** Doc address for the new insured (7 Chelwood Close…). */
@@ -322,13 +322,34 @@ export const CC2_COVERAGES: RenoCoverage[] = [
       ],
     },
   },
+  // F) Terrorism — terrorism cover with contract value and zone selection.
+  {
+    addRowName: 'Terrorism',
+    form: {
+      name: 'Terrorism',
+      steps: [
+        {
+          title: 'Coverage Questions',
+          fields: [
+            { label: '*Cover Type', kind: 'picklist', value: 'Terrorism' },
+            { label: 'Law and Jurisdiction', kind: 'readonly', value: '' },
+            { label: 'Contract Value', kind: 'text', value: '1000000' },
+            { label: '*Zone', kind: 'picklist', value: 'A' },
+            { label: '*Floating or Specific Contract', kind: 'radio', value: 'Floating' },
+            { label: '*If Sum Insured or First Loss Limit', kind: 'picklist', value: 'Sum Insured' },
+          ],
+          action: 'Save',
+        },
+      ],
+    },
+  },
 ];
 
 /** EL Trade Details row (labels are live-verified literals). */
 export const CC2_EL_TRADE = {
-  tradeDescription: 'Agricultural Contractors',
-  wageroll: '600',
-  headcount: '600',
+  tradeDescription: 'Aerial & Satellite Erection',
+  wageroll: '123.00',
+  headcount: '14.00',
 };
 
 // D) Property Damage — on the "<insured> - United Kingdom" risk-location card.
@@ -381,6 +402,7 @@ export const CC2_PREMIUMS: RenoPremiumEntry[] = [
   { coverage: 'Property Damage', insurable: 'UK Test Insured', technical: '999.99', grossWritten: '999.99', annualized: '', commissionRate: '5' },
   { coverage: 'Professional Indemnity', insurable: '', technical: '167.44', grossWritten: '167.44', annualized: '', commissionRate: '5' },
   { coverage: 'Legal Expenses', insurable: '', technical: '666.44', grossWritten: '666.44', annualized: '', commissionRate: '5' },
+  { coverage: 'Terrorism', insurable: '', technical: '299.99', grossWritten: '299.99', annualized: '', commissionRate: '1' },
 ];
 
 // ---------------------------------------------------------------------------
@@ -395,9 +417,10 @@ export const CC2_BINDERS: BinderChoice[] = [
   { coverage: 'Employers Liability', name: 'Accelerant Construction & Commercial 2026', section: 'Contractors Combined', nrToBinder: 'New Business' },
   { coverage: 'Public & Products Liability', name: 'Accelerant Construction & Commercial 2026', section: 'Contractors Combined', nrToBinder: 'New Business' },
   { coverage: 'Contractors All Risks', name: 'Accelerant Construction & Commercial 2026', section: 'Contractors Combined', nrToBinder: 'New Business' },
-  { coverage: 'Property Damage', name: 'Allianz Contractors Combined 2026', section: 'Property Damage', nrToBinder: 'New Business' },
+  { coverage: 'Property Damage', name: 'Allianz Contractors Combined 2023', section: 'Property Damage', nrToBinder: 'New Business' },
   { coverage: 'Professional Indemnity', name: 'HCC Contractors Combined 2026', section: 'Contractors Combined', nrToBinder: 'New Business' },
-  { coverage: 'Legal Expenses', name: 'ARAG Legal Expenses Construction 2025', section: 'Contractors Combined', nrToBinder: 'New Business' },
+  { coverage: 'Legal Expenses', name: 'ARAG Legal Expenses 2023', section: 'Contractors Combined', nrToBinder: 'New Business' },
+  { coverage: 'Terrorism', name: 'AXA XL Contractors 2026', section: 'Section C – Terrorism – CONC & CARA', nrToBinder: 'New Business' },
 ];
 
 /** Default binder for BindersPage's 2nd ctor arg (unused in strict mode but
@@ -462,4 +485,27 @@ export const CC2_EXPECTATIONS = {
   submissionRiskIdPattern: /DOU\/\d+\/CONC\/\d+/,
   quoteRiskIdPattern: /DOU\/\d+\/CONC\/\d+\/\d+/,
   dualShareGwp: 'GBP', // Updated GWP expectation with 6 coverages + 3 fees
+  status: 'In Force',
+};
+
+/** MTA — Mid-term Adjustment lifecycle configuration. */
+export const CC2_MTA = {
+  effectiveOffsetDays: 3,
+  submissionOffsetDays: 0,
+  submissionTime: '09:00:00',
+  reason: 'Exposure/Limit Changes',
+  description: 'Test MTA',
+  chargePremium: '10',
+  policyNewMtaRenewal: 'MTA',
+  policyStatus: 'In Force',
+};
+
+/** Cancellation — applied to the policy. */
+export const CC2_CANCELLATION = {
+  category: 'Cancel the Policy from Inception',
+  instigatedBy: 'Customer',
+  reason: 'Product Too Expensive',
+  notes: 'Test Cancellation',
+  returnFullPremium: 'Yes',
+  policyStatus: 'Cancelled',
 };

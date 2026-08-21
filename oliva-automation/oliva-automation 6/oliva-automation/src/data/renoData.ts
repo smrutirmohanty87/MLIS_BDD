@@ -23,8 +23,8 @@ import { OmniForm, RenoCoverage } from './renoTypes';
 // ---------------------------------------------------------------------------
 
 export const RENO_ACCOUNT = {
-  name: 'HOWDEN INSURANCE BROKERS LIMITED',
-  intermediaryContact: 'James Chambers',
+  name: process.env.RENO_ACCOUNT_NAME ?? 'HOWDEN INSURANCE BROKERS LIMITED',
+  intermediaryContact: process.env.RENO_INTERMEDIARY_CONTACT ?? 'James Chambers',
 };
 
 /** Submission wizard "Client Information" step (images 3–4). */
@@ -304,9 +304,9 @@ export const RENO_PRODUCT_FORM: OmniForm = {
 // (Oliva-ConstructionTerrorism, 01tPu00000FtbhRIAR) has NO Binder_Section_
 // Coverage__c mapping to ANY Renovation binder section, so a quote containing
 // Terrorism can never pass Ready → Quote Issued ("Binders must be selected for
-// all applicable coverages"). Until an admin adds the mapping, Terrorism is
-// EXCLUDED by default; set RENO_INCLUDE_TERRORISM=1 to re-include it.
-const INCLUDE_TERRORISM = process.env.RENO_INCLUDE_TERRORISM === '1';
+// all applicable coverages"). Included by default; set RENO_INCLUDE_TERRORISM=0
+// to exclude if needed.
+const INCLUDE_TERRORISM = process.env.RENO_INCLUDE_TERRORISM !== '0';
 
 const RENO_COVERAGES_ALL: RenoCoverage[] = [
   // Coverage 1 — Contract Works (image20)
@@ -709,7 +709,7 @@ const RENO_COVERAGES_ALL: RenoCoverage[] = [
 
 export const RENO_COVERAGES: RenoCoverage[] = RENO_COVERAGES_ALL.filter(
   (c) => INCLUDE_TERRORISM || c.addRowName !== 'Terrorism'
-);
+); // Includes Terrorism by default (9 coverages); set RENO_INCLUDE_TERRORISM=0 to exclude
 
 // ---------------------------------------------------------------------------
 // Enter Premiums (images 33–38)
@@ -745,7 +745,7 @@ const RENO_PREMIUMS_ALL: RenoPremiumEntry[] = [
 
 export const RENO_PREMIUMS: RenoPremiumEntry[] = RENO_PREMIUMS_ALL.filter(
   (p) => INCLUDE_TERRORISM || p.coverage !== 'Terrorism'
-);
+); // Includes Terrorism by default (9 premiums); set RENO_INCLUDE_TERRORISM=0 to exclude
 
 // ---------------------------------------------------------------------------
 // Downstream workflow — Select Binders / Fee / UAL / users / expectations
@@ -773,7 +773,7 @@ export const RENO_BINDERS_ALL: RenoBinderChoice[] = [
 
 export const RENO_BINDERS: RenoBinderChoice[] = RENO_BINDERS_ALL.filter(
   (b) => INCLUDE_TERRORISM || b.coverage !== 'Terrorism'
-);
+); // Includes Terrorism by default (9 binders); set RENO_INCLUDE_TERRORISM=0 to exclude
 
 /** Default RENO binder for backward compat (used as fallback when specific coverage not found). */
 export const RENO_BINDER = RENO_BINDERS[0];
@@ -825,14 +825,53 @@ export const RENO_UAL = {
 
 /** Sandbox login users: UW3 does the build, UW5 approves the UAL referral. */
 export const RENO_USERS = {
-  uw3: 'oliva.cons.puw3@dualgroup.com.newprodqa2',
-  uw5: 'oliva.cons.puw5@dualgroup.com.newprodqa2',
+  uw3: process.env.SF_USERNAME ?? 'oliva.cons.puw3@dualgroup.com.newprodqa2',
+  uw5: process.env.SF_UAL_APPROVER_USERNAME ?? 'oliva.cons.puw5@dualgroup.com.newprodqa2',
 };
 
 export const RENO_POLICY_EXPECTATIONS = {
   status: 'In Force',
   newMtaRenewal: 'New Business',
   product: 'Renovation',
+};
+
+/** MTA — Mid-term Adjustment lifecycle configuration. */
+export const RENO_MTA = {
+  effectiveOffsetDays: 3,
+  submissionOffsetDays: 0,
+  submissionTime: '09:00:00',
+  reason: 'Exposure/Limit Changes',
+  description: 'Test MTA',
+  policyNewMtaRenewal: 'MTA',
+  policyStatus: 'In Force',
+  chargePremiums: [
+    { coverage: 'Contract Works', chargePremium: '27.78' },
+    { coverage: 'Existing Structures', chargePremium: '22.84' },
+    { coverage: 'Contents', chargePremium: '38.85' },
+    { coverage: 'Advanced Loss of Profits/Delayed Start Up', chargePremium: '23.37' },
+    { coverage: 'Own Plant', chargePremium: '61.67' },
+    { coverage: 'Hired in Plant', chargePremium: '38.89' },
+    { coverage: 'Public & Products Liability', chargePremium: '6.17' },
+    { coverage: 'Terrorism', chargePremium: '5.57' },
+    { coverage: 'JCT 6.5.1 Non Negligent Liability', chargePremium: '6.72' },
+  ],
+};
+
+/** MTA policy expectations after policy version creation. */
+export const RENO_MTA_POLICY_EXPECTATIONS = {
+  status: 'In Force',
+  newMtaRenewal: 'MTA',
+};
+
+/** Cancellation — applied to the policy. */
+export const RENO_CANCELLATION = {
+  category: 'Cancel the Policy from Inception',
+  instigatedBy: 'Customer',
+  reason: 'Product Unsuited/Misunderstood',
+  notes: 'Test Cancellation',
+  returnFullPremium: 'Yes',
+  returnFees: 'Yes',
+  policyStatus: 'Cancelled',
 };
 
 /** Employer Reference Number step. */

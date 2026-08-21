@@ -22,8 +22,11 @@ import { RenoPremiumEntry } from './renoData';
 // ---------------------------------------------------------------------------
 
 export const JCT_ACCOUNT = {
-  name: 'HOWDEN INSURANCE BROKERS LIMITED',
-  intermediaryContact: 'James Chambers',
+  name: process.env.JCT_ACCOUNT_NAME ?? 'HOWDEN INSURANCE BROKERS LIMITED',
+  // For SIT: use JCT_INTERMEDIARY_CONTACT env var to support environment-specific
+  // intermediary contact (required when Intermediary and Introducer accounts share
+  // the same name; browser UI will disambiguate via the contact name).
+  intermediaryContact: process.env.JCT_INTERMEDIARY_CONTACT ?? 'James Chambers',
 };
 
 export const JCT_CLIENT_INFO = {
@@ -227,8 +230,8 @@ export const JCT_UAL = {
 };
 
 export const JCT_USERS = {
-  uw3: 'oliva.cons.puw3@dualgroup.com.newprodqa2',
-  uw5: 'oliva.cons.puw5@dualgroup.com.newprodqa2',
+  uw3: process.env.SF_USERNAME ?? 'oliva.cons.puw3@dualgroup.com.newprodqa2',
+  uw5: process.env.SF_UAL_APPROVER_USERNAME ?? 'oliva.cons.puw5@dualgroup.com.newprodqa2',
 };
 
 export const JCT_POLICY_EXPECTATIONS = {
@@ -239,4 +242,25 @@ export const JCT_POLICY_EXPECTATIONS = {
   // DOU/00238392/JCTL/00, quote Risk_ID__c "DOU/00238392/JCTL/00/01",
   // Product_Code__c "Oliva-JCTNNL". (Doc/SIT policy suffix was /00/26.)
   riskIdPattern: /DOU\/\d+\/JCTL\/\d+\/\d+/,
+};
+
+// ---------------------------------------------------------------------------
+// MTA / CNR / Cancellation lifecycle data
+// ---------------------------------------------------------------------------
+
+export const JCT_MTA = {
+  effectiveOffsetDays: 3,
+  chargePremiums: [
+    { coverage: 'JCT 6.5.1 Non Negligent Liability', chargePremium: '22.84' },
+  ],
+};
+
+export const JCT_CANCELLATION = {
+  category: 'Cancel the Policy Midterm',
+  instigatedBy: 'Customer',
+  reason: 'Product Unsuited/Misunderstood',
+  notes: 'Test Cancellation',
+  returnFullPremium: 'Yes',
+  returnFees: 'Yes',
+  policyStatus: 'Cancelled',
 };

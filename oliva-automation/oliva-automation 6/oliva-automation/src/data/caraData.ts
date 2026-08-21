@@ -26,8 +26,8 @@ import { RenoPremiumEntry } from './renoData';
 // ---------------------------------------------------------------------------
 
 export const CARA_ACCOUNT = {
-  name: 'HOWDEN INSURANCE BROKERS LIMITED',
-  intermediaryContact: 'James Chambers',
+  name: process.env.CARA_ACCOUNT_NAME ?? 'HOWDEN INSURANCE BROKERS LIMITED',
+  intermediaryContact: process.env.CARA_INTERMEDIARY_CONTACT ?? 'James Chambers',
 };
 
 export const CARA_CLIENT_INFO = {
@@ -168,9 +168,9 @@ export const CARA_PRODUCT_FORM: OmniForm = {
 // validation. The Terrorism row therefore keeps its red flag and the quote
 // cannot pass the binder gate — same practical outcome as the Reno/CARP
 // Terrorism defect, different failure point (there: no binder offered; here:
-// offered but the RBS insert fails). Excluded by default;
-// CARA_INCLUDE_TERRORISM=1 re-includes once DUAL admins fix the binder config.
-const INCLUDE_TERRORISM = process.env.CARA_INCLUDE_TERRORISM === '1';
+// offered but the RBS insert fails). Included by default;
+// set CARA_INCLUDE_TERRORISM=0 to exclude once needed.
+const INCLUDE_TERRORISM = process.env.CARA_INCLUDE_TERRORISM !== '0';
 
 const CARA_COVERAGES_ALL: RenoCoverage[] = [
   // 1 — Contract Works (image14). CARA adds "Maximum contract period (months)"
@@ -311,7 +311,7 @@ const CARA_COVERAGES_ALL: RenoCoverage[] = [
 
 export const CARA_COVERAGES: RenoCoverage[] = CARA_COVERAGES_ALL.filter(
   (c) => INCLUDE_TERRORISM || c.addRowName !== 'Terrorism'
-);
+); // Includes Terrorism by default (6 coverages); set CARA_INCLUDE_TERRORISM=0 to exclude
 
 // ---------------------------------------------------------------------------
 // Premiums (images 21–23) — product-level, so Insurable Name renders EMPTY in
@@ -321,17 +321,17 @@ export const CARA_COVERAGES: RenoCoverage[] = CARA_COVERAGES_ALL.filter(
 // ---------------------------------------------------------------------------
 
 const CARA_PREMIUMS_ALL: RenoPremiumEntry[] = [
-  { coverage: 'Contract Works', insurable: '', technical: '457.88', grossWritten: '457.88', annualized: '', commissionRate: '5' },
-  { coverage: 'Employees Tools & Personal Effects', insurable: '', technical: '569.44', grossWritten: '569.44', annualized: '', commissionRate: '5' },
-  { coverage: 'Own Plant', insurable: '', technical: '137.74', grossWritten: '137.74', annualized: '', commissionRate: '5' },
-  { coverage: 'Hired in Plant', insurable: '', technical: '666.66', grossWritten: '666.66', annualized: '', commissionRate: '5' },
-  { coverage: 'Terrorism', insurable: '', technical: '779.77', grossWritten: '779.77', annualized: '', commissionRate: '1' },
-  { coverage: 'Legal Expenses', insurable: '', technical: '779.77', grossWritten: '779.77', annualized: '', commissionRate: '5' },
+  { coverage: 'Contract Works', insurable: '', technical: '375.66', grossWritten: '375.66', annualized: '', commissionRate: '5' },
+  { coverage: 'Employees Tools & Personal Effects', insurable: '', technical: '669.44', grossWritten: '669.44', annualized: '', commissionRate: '5' },
+  { coverage: 'Own Plant', insurable: '', technical: '237.74', grossWritten: '237.74', annualized: '', commissionRate: '5' },
+  { coverage: 'Hired in Plant', insurable: '', technical: '556.66', grossWritten: '556.66', annualized: '', commissionRate: '5' },
+  { coverage: 'Terrorism', insurable: '', technical: '788.66', grossWritten: '788.66', annualized: '', commissionRate: '1' },
+  { coverage: 'Legal Expenses', insurable: '', technical: '999.77', grossWritten: '999.77', annualized: '', commissionRate: '5' },
 ];
 
 export const CARA_PREMIUMS: RenoPremiumEntry[] = CARA_PREMIUMS_ALL.filter(
   (p) => INCLUDE_TERRORISM || p.coverage !== 'Terrorism'
-);
+); // Includes Terrorism by default (6 premiums); set CARA_INCLUDE_TERRORISM=0 to exclude
 
 /** "Is any part of policy Minimum & Deposit?" — Yes (image21). */
 export const CARA_MINIMUM_DEPOSIT = 'Yes';
@@ -345,9 +345,9 @@ export const CARA_MINIMUM_DEPOSIT = 'Yes';
 //     • Accelerant Oliva Construction 2024      | Contractors All Risks - Annual | GBP 850,000.00 cap
 //     • Accelerant Construction & Commercial 2026 | Contractors All Risks - Annual | GBP 843,970.86 cap  ← doc target
 //     • AXA XL Contractors 2026                 | Section B1 – Annual – CARA     | GBP 5,500,000.00 cap
-//   Terrorism — ONE binder offered:
-//     • AXA XL Contractors 2026 | Section C – Terrorism – CONC & CARA | GBP 2,748,440.46 cap
-//       (offered but NON-PERSISTABLE — see INCLUDE_TERRORISM defect note above)
+  //   Terrorism — ONE binder offered (INCLUDED BY DEFAULT):
+  //     • AXA XL Contractors 2026 | Section C – Terrorism – CONC & CARA | GBP 2,748,440.46 cap
+  //       (set CARA_INCLUDE_TERRORISM=0 to exclude if needed)
 //   Legal Expenses — ONE binder offered:
 //     • ARAG Legal Expenses Construction 2025 | 25 ARAG Construction Legal Expenses | GBP 593,338.93 cap
 //
@@ -381,20 +381,20 @@ export interface CaraBinderChoice {
   nrToBinder: string;
 }
 
-/** All six rows incl. Terrorism — used by the exploration spec to keep
- *  probing the Terrorism binder defect. Production flows use CARA_BINDERS. */
+/** All six rows incl. Terrorism by default. Terrorism can be excluded by
+ *  setting CARA_INCLUDE_TERRORISM=0 if needed. Production flows use CARA_BINDERS. */
 export const CARA_BINDERS_ALL: CaraBinderChoice[] = [
   { coverage: 'Contract Works', name: 'Accelerant Construction & Commercial 2026', section: 'Contractors All Risks - Annual', nrToBinder: 'New Business' },
   { coverage: 'Employees Tools', name: 'Accelerant Construction & Commercial 2026', section: 'Contractors All Risks - Annual', nrToBinder: 'New Business' },
   { coverage: 'Own Plant', name: 'Accelerant Construction & Commercial 2026', section: 'Contractors All Risks - Annual', nrToBinder: 'New Business' },
   { coverage: 'Hired in Plant', name: 'Accelerant Construction & Commercial 2026', section: 'Contractors All Risks - Annual', nrToBinder: 'New Business' },
   { coverage: 'Terrorism', name: 'AXA XL Contractors 2026', section: 'Section C – Terrorism – CONC & CARA', nrToBinder: 'New Business' },
-  { coverage: 'Legal Expenses', name: 'ARAG Legal Expenses Construction 2025', section: '25 ARAG Construction Legal Expenses', nrToBinder: 'New Business' },
+  { coverage: 'Legal Expenses', name: 'ARAG Legal Expenses 2023', section: '23 ARAG Legal Expenses', nrToBinder: 'New Business' },
 ];
 
 export const CARA_BINDERS: CaraBinderChoice[] = CARA_BINDERS_ALL.filter(
   (b) => INCLUDE_TERRORISM || b.coverage !== 'Terrorism'
-);
+); // Includes Terrorism by default (6 binders); set CARA_INCLUDE_TERRORISM=0 to exclude
 
 // ---------------------------------------------------------------------------
 // Fees — same three as CARP/CONC (catalog §2.8, doc text).
@@ -438,14 +438,14 @@ export const CARA_FEES = [
 // ---------------------------------------------------------------------------
 
 export const CARA_UAL = {
-  approverName: 'T-0016-SIT2-SCC-CON-UW5 Auto-Provar',
-  approverSearchTerms: ['t-0016', 'T-0016-SIT2-SCC-CON-UW5', 'T-0016'],
+  approverName: 'T-0016-SIT-SCC-CON-UW5 Auto-Provar',
+  approverSearchTerms: ['t-0016', 'T-0016-SIT-SCC-CON-UW5', 'T-0016'],
   errorToastText: 'Status cannot be changed as there are outstanding UAL/Carrier Referrals',
 };
 
 export const CARA_USERS = {
-  uw3: 'oliva.cons.puw3@dualgroup.com.newprodqa2',
-  uw5: 'oliva.cons.puw5@dualgroup.com.newprodqa2',
+  uw3: process.env.SF_USERNAME ?? 'oliva.cons.puw3@dualgroup.com.newprodqa2',
+  uw5: process.env.SF_UAL_APPROVER_USERNAME ?? 'oliva.cons.puw5@dualgroup.com.newprodqa2',
 };
 
 export const CARA_POLICY_EXPECTATIONS = {
@@ -453,4 +453,62 @@ export const CARA_POLICY_EXPECTATIONS = {
   newMtaRenewal: 'New Business',
   product: 'Contractors All Risks - Annual',
   riskIdPattern: /DOU\/\d+\/CARA\/\d+\/\d+/,
+};
+
+/**
+ * MTA (Mid-Term Adjustment) — applied to the NB policy created above.
+ * Charge premium (10) is applied to every coverage's "100% MTA Charge Premium" field.
+ * Effective date is 3 days from inception (policy inception = today).
+ */
+export const CARA_MTA = {
+  effectiveOffsetDays: 3,
+  submissionOffsetDays: 0,
+  submissionTime: '09:00:00',
+  reason: 'Coverage Changes',
+  description: 'Test Reference MTA',
+  policyNewMtaRenewal: 'MTA',
+  policyStatus: 'In Force',
+  chargePremiums: [
+    { coverage: 'Contract Works', chargePremium: '347.88' },
+    { coverage: 'Employees Tools & Personal Effects', chargePremium: '559.77' },
+    { coverage: 'Own Plant', chargePremium: '327.44' },
+    { coverage: 'Hired in Plant', chargePremium: '261.88' },
+    { coverage: 'Terrorism', chargePremium: '371.55' },
+    { coverage: 'Legal Expenses', chargePremium: '123.77' },
+  ],
+};
+
+/**
+ * Second MTA (Mid-Term Adjustment) — applied after the first MTA.
+ * Different charge premiums for each coverage.
+ */
+export const CARA_MTA_2 = {
+  effectiveOffsetDays: 5,
+  submissionOffsetDays: 0,
+  submissionTime: '10:00:00',
+  reason: 'Coverage Changes',
+  description: 'Test Reference MTA',
+  policyNewMtaRenewal: 'MTA',
+  policyStatus: 'In Force',
+  chargePremiums: [
+    { coverage: 'Contract Works', chargePremium: '-170.4' },
+    { coverage: 'Employees Tools & Personal Effects', chargePremium: '-299.99' },
+    { coverage: 'Own Plant', chargePremium: '-124.77' },
+    { coverage: 'Hired in Plant', chargePremium: '-157.22' },
+    { coverage: 'Terrorism', chargePremium: '-232.77' },
+    { coverage: 'Legal Expenses', chargePremium: '-111.88' },
+  ],
+};
+
+/**
+ * Cancellation — applied after second MTA.
+ * Cancels the policy from inception with full premium return.
+ */
+export const CARA_CANCELLATION = {
+  category: 'Cancel this MTA Only',
+  instigatedBy: 'Customer',
+  reason: 'Product Unsuited/Misunderstood',
+  notes: 'Test Reference Cancellation',
+  returnFullPremium: 'Yes',
+  policyStatus: 'Cancelled',
 };

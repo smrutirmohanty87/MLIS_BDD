@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { jwtLogin, sfQueryOne } from '../src/auth/sfJwt';
+import { jwtLogin } from '../src/auth/sfJwt';
 import { waitForSpinners, closeAllWorkspaceTabs } from '../src/utils/sf';
 import { AccountsPage } from '../src/pages/AccountsPage';
 import { SubmissionWizardPage } from '../src/pages/SubmissionWizardPage';
@@ -14,10 +14,11 @@ import { ClausesFeesPage } from '../src/pages/ClausesFeesPage';
 import { QuoteStatusPage } from '../src/pages/QuoteStatusPage';
 import { PolicyPage } from '../src/pages/PolicyPage';
 import { renoIssueAndBond } from '../src/flows/renoIssueAndBond';
+import { fillElTradeRow } from '../src/flows/ccNb';
 import {
   CC_ACCOUNT, CC_CLIENT_INFO, CC_RISK_INFO, CC_INSURABLE,
-  CC_PRODUCT_FORM, CC_COVERAGES, CC_PREMIUMS, CC_MINIMUM_DEPOSIT,
-  CC_BINDER, CC_FEES, CC_UAL, CC_USERS, CC_POLICY_EXPECTATIONS,
+  CC_PRODUCT_FORM, CC_COVERAGES, CC_PD_COVERAGE, CC_PREMIUMS, CC_MINIMUM_DEPOSIT,
+  CC_BINDERS, CC_BINDER_DEFAULT, CC_FEES, CC_UAL, CC_USERS, CC_POLICY_EXPECTATIONS,
 } from '../src/data/ccData';
 
 /**
@@ -39,16 +40,16 @@ test('create Contractors Combined NB policy end-to-end', async ({ page, browser 
   const quote = new QuotePage(page);
   const forms = new OmniScriptFormPage(page);
   const premiums = new PremiumPage(page);
-  const binders = new BindersPage(page, CC_BINDER);
+  const binders = new BindersPage(page, CC_BINDER_DEFAULT, CC_BINDERS);
   const rbs = new RbsApprovalPage(page);
   const status = new QuoteStatusPage(page, CC_UAL);
   const policy = new PolicyPage(page);
 
-  // The source doc runs the whole flow as UW5; default stays UW3 (exercises
-  // the conditional UAL referral branch). CC_LOGIN_USER=uw5 → doc-exact run.
-  const loginUser = process.env.CC_LOGIN_USER === 'uw5' ? CC_USERS.uw5 : CC_USERS.uw3;
+  // The source doc runs the whole flow as UW5 (default, doc-exact).
+  // CC_LOGIN_USER=uw3 switches to UW3 (exercises the conditional UAL referral branch).
+  const loginUser = process.env.CC_LOGIN_USER === 'uw3' ? CC_USERS.uw3 : CC_USERS.uw5;
 
-  await test.step(`Login as Construction ${process.env.CC_LOGIN_USER === 'uw5' ? 'UW5' : 'UW3'} (JWT — no MFA)`, async () => {
+  await test.step(`Login as Construction ${process.env.CC_LOGIN_USER === 'uw3' ? 'UW3' : 'UW5'} (JWT — no MFA)`, async () => {
     await jwtLogin(page, loginUser);
   });
 
@@ -70,13 +71,7 @@ test('create Contractors Combined NB policy end-to-end', async ({ page, browser 
   } else {
 
   await test.step('Open intermediary account and start submission', async () => {
-    const acc = await sfQueryOne(
-      loginUser,
-      `SELECT Id FROM Account WHERE Name = '${CC_ACCOUNT.name}' LIMIT 1`
-    );
-    if (!acc?.Id) throw new Error(`Account not found: ${CC_ACCOUNT.name}`);
-    await page.goto(`/lightning/r/Account/${acc.Id}/view`);
-    await waitForSpinners(page);
+    await accounts.openAccount(CC_ACCOUNT.name);
     await accounts.startNewOlivaSubmission();
   });
 
@@ -105,23 +100,36 @@ test('create Contractors Combined NB policy end-to-end', async ({ page, browser 
     await forms.fill(CC_PRODUCT_FORM);
   });
 
-  await test.step('Add Public & Products Liability coverage', async () => {
+  await test.step(`Add ${CC_COVERAGES.length} product-card coverages (EL, PPL, CAR, PI, Legal Expenses, Terrorism) plus Property Damage on risk-location card`, async () => {
     for (const cov of CC_COVERAGES) {
       await quote.addRenoCoverage(CC_INSURABLE.insurableName, cov.addRowName);
+      if (cov.addRowName === 'Employers Liability') {
+        // Trade Details grid row: bespoke fill BEFORE the generic engine
+        // (the engine mis-targets the row's combobox).
+        await fillElTradeRow(page);
+      }
       await forms.fill(cov.form);
     }
+  });
+
+  await test.step('Add Property Damage on the risk-location card', async () => {
+    await quote.addRenoCoverage('UK Test Insured - United Kingdom', CC_PD_COVERAGE.addRowName);
+    await forms.fill(CC_PD_COVERAGE.form);
   });
 
   await test.step('Enter premiums (Minimum & Deposit = Yes)', async () => {
     await quote.clickEnterPremiums();
     await premiums.answerMinimumDeposit(CC_MINIMUM_DEPOSIT);
     await premiums.fillAndSubmit(CC_PREMIUMS);
+    // After premiums full-page reload, navigate back to quote record view to access binders tab
+    await page.goto(`/lightning/r/Quote/${ccQuoteId}/view`);
+    await waitForSpinners(page);
   });
 
   } // end non-resume (submission → premiums)
 
   if (process.env.CC_SKIP_BINDERS !== '1') {
-    await test.step('Select binder (Accelerant Construction & Commercial 2026)', async () => {
+    await test.step(`Select binders per coverage (${CC_BINDERS.length} binders total)`, async () => {
       await binders.selectAllBinders();
     });
   }

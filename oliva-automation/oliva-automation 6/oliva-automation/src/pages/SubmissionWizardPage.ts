@@ -12,8 +12,15 @@ import { ukDate, waitForSpinners } from '../utils/sf';
 export class SubmissionWizardPage {
   constructor(private page: Page) {}
 
-  /** Step 1 — Submission Source: pick the Intermediary Contact, then Next. */
+  /** Step 1 — Submission Source: pick the Intermediary Contact, then Next. 
+   * Wait for the contact field to be interactive before attempting to fill it.
+   */
   async fillSubmissionSource(contact: string): Promise<void> {
+    // Wait for the Intermediary Contact field to become visible and interactive
+    const contactInput = this.page.getByLabel('Intermediary Contact', { exact: false }).first();
+    await expect(contactInput).toBeVisible({ timeout: 60_000 });
+    await waitForSpinners(this.page);
+    
     await this.pickTypeahead('Intermediary Contact', contact);
     await this.next();
   }

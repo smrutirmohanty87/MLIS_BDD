@@ -19,8 +19,11 @@ import { RenoPremiumEntry } from './renoData';
 // ---------------------------------------------------------------------------
 
 export const CC_ACCOUNT = {
-  name: 'HOWDEN INSURANCE BROKERS LIMITED',
-  intermediaryContact: 'James Chambers',
+  name: process.env.CC_ACCOUNT_NAME ?? 'HOWDEN INSURANCE BROKERS LIMITED',
+  // For SIT: use CC_INTERMEDIARY_CONTACT env var to support environment-specific
+  // intermediary contact (required when Intermediary and Introducer accounts share
+  // the same name; browser UI will disambiguate via the contact name).
+  intermediaryContact: process.env.CC_INTERMEDIARY_CONTACT ?? 'James Chambers',
 };
 
 export const CC_CLIENT_INFO = {
@@ -127,10 +130,37 @@ export const CC_PRODUCT_FORM: OmniForm = {
 };
 
 // ---------------------------------------------------------------------------
-// Coverage — ONE: Public & Products Liability (2 steps, images 15–16)
+// Coverage — SIX product coverages + Property Damage (risk-location card)
 // ---------------------------------------------------------------------------
 
 export const CC_COVERAGES: RenoCoverage[] = [
+  // A) Employers Liability — Trade Details grid row is handled by fillElTradeRow()
+  // helper (called in test before forms.fill) to work around the generic engine's
+  // difficulty targeting the row's combobox. Trade fields marked readonly to skip
+  // generic filling.
+  {
+    addRowName: 'Employers Liability',
+    form: {
+      name: 'Employers Liability',
+      steps: [
+        {
+          title: 'Coverage Questions',
+          fields: [
+            { label: 'Drivers Supervisory Wageroll', kind: 'currency', value: '600' },
+            { label: 'Drivers Supervisory Headcount', kind: 'number', value: '600' },
+            { label: 'Heat Wageroll', kind: 'currency', value: '600' },
+            { label: 'Woodworking/ Metalworking Wageroll', kind: 'currency', value: '600' },
+            // Trade Details grid row is handled by fillElTradeRow() helper
+            { label: 'Trade Description', kind: 'readonly', value: 'Agricultural Contractors' },
+            { label: '(Name of trade description) wageroll', kind: 'readonly', value: '600' },
+            { label: '(Name of trade description) headcount', kind: 'readonly', value: '600' },
+          ],
+          action: 'Save',
+        },
+      ],
+    },
+  },
+  // B) Public & Products Liability
   {
     addRowName: 'Public & Products Liability',
     form: {
@@ -140,10 +170,10 @@ export const CC_COVERAGES: RenoCoverage[] = [
           title: 'Public & Products Liability',
           fields: [
             { label: 'Is public & products liability cover required', kind: 'picklist', value: 'Public & Products Liability' },
-            { label: 'Trade 1 Turnover', kind: 'text', value: '1600.00' },
-            { label: 'Turnover derived from heat work', kind: 'text', value: '1600.00' },
-            { label: 'Annual payments to bona fide sub contractors', kind: 'text', value: '1600.00' },
-            { label: 'Annual cost of materials', kind: 'text', value: '1600.00' },
+            { label: 'Trade 1 Turnover', kind: 'currency', value: '1600' },
+            { label: 'Turnover derived from heat work', kind: 'currency', value: '1600' },
+            { label: 'Annual payments to bona fide sub contractors', kind: 'currency', value: '1600' },
+            { label: 'Annual cost of materials', kind: 'currency', value: '1600' },
           ],
           action: 'Next',
         },
@@ -166,30 +196,152 @@ export const CC_COVERAGES: RenoCoverage[] = [
       ],
     },
   },
+  // C) Contractors All Risks
+  {
+    addRowName: 'Contractors All Risks',
+    form: {
+      name: 'Contractors All Risks',
+      steps: [
+        {
+          title: 'Coverage Questions',
+          fields: [
+            { label: 'Is contract works cover required', kind: 'radio', value: 'Yes' },
+            { label: 'Maximum Contract Value', kind: 'currency', value: '1000' },
+            { label: 'Maximum contract period (months)', kind: 'text', value: '300' },
+            { label: 'Is employees tools cover required', kind: 'radio', value: 'Yes' },
+            { label: 'Total value of employees tools', kind: 'currency', value: '1000' },
+            { label: 'Maximum sum insured employees tools per employee', kind: 'currency', value: '1000' },
+            { label: 'Employees Tools Excess', kind: 'picklist', value: '1000' },
+            { label: 'Is own plant cover required', kind: 'radio', value: 'Yes' },
+            { label: 'Total value of own plant', kind: 'currency', value: '1000' },
+            { label: 'Is DUAL DNA+ Required', kind: 'radio', value: 'Yes' },
+            { label: 'Number of new DUAL DNA+ kits required', kind: 'picklist', value: '15' },
+            { label: 'DNA+ Lifecycle', kind: 'picklist', value: '3' },
+            { label: 'Is hired in plant cover required', kind: 'radio', value: 'Yes' },
+            { label: 'Annual Hiring Fees', kind: 'currency', value: '1000' },
+            { label: 'Hired in plant maximum accident value', kind: 'currency', value: '1000' },
+            { label: 'Theft & malicious damage excess', kind: 'picklist', value: '1000' },
+            { label: 'All other car claims excess', kind: 'picklist', value: '1000' },
+          ],
+          action: 'Save',
+        },
+      ],
+    },
+  },
+  // D) Professional Indemnity
+  {
+    addRowName: 'Professional Indemnity',
+    form: {
+      name: 'Professional Indemnity',
+      steps: [
+        {
+          title: 'Coverage Questions',
+          fields: [
+            { label: 'Does the business comply with GDPR regulations', kind: 'radio', value: 'Yes' },
+            { label: 'Business have <10 properties/leases and all located within the UK and NI', kind: 'radio', value: 'Yes' },
+            { label: 'The business is domiciled within the UK and NI', kind: 'radio', value: 'Yes' },
+            { label: 'Is the insured a main contractor/property developer', kind: 'radio', value: 'Yes' },
+          ],
+          action: 'Save',
+        },
+      ],
+    },
+  },
+  // E) Legal Expenses
+  {
+    addRowName: 'Legal Expenses',
+    form: {
+      name: 'Legal Expenses',
+      steps: [
+        {
+          title: 'Coverage Questions',
+          fields: [
+            { label: 'Does the business comply with GDPR regulations', kind: 'radio', value: 'Yes' },
+            { label: 'Business have <10 properties/leases and all located within the UK and NI', kind: 'radio', value: 'Yes' },
+            { label: 'The business is domiciled within the UK and NI', kind: 'radio', value: 'Yes' },
+            { label: 'Is contract & debt recovery cover required', kind: 'radio', value: 'Yes' },
+            { label: 'Is the insured a main contractor/property developer', kind: 'radio', value: 'Yes' },
+          ],
+          action: 'Save',
+        },
+      ],
+    },
+  },
+  // F) Terrorism
+  {
+    addRowName: 'Terrorism',
+    form: {
+      name: 'Terrorism',
+      steps: [
+        {
+          title: 'Coverage Questions',
+          fields: [
+            { label: '*Cover Type', kind: 'picklist', value: 'Terrorism' },
+            { label: 'Law and Jurisdiction', kind: 'readonly', value: '' },
+            { label: 'Contract Value', kind: 'text', value: '1000000' },
+            { label: '*Zone', kind: 'picklist', value: 'A' },
+            { label: '*Floating or Specific Contract', kind: 'radio', value: 'Floating' },
+            { label: '*If Sum Insured or First Loss Limit', kind: 'picklist', value: 'Sum Insured' },
+          ],
+          action: 'Save',
+        },
+      ],
+    },
+  },
 ];
 
+// Property Damage — on the "UK Test Insured - United Kingdom" risk-location card
+export const CC_PD_COVERAGE: RenoCoverage = {
+  addRowName: 'Property Damage',
+  form: {
+    name: 'Property Damage',
+    steps: [
+      {
+        title: 'Coverage Questions',
+        fields: [
+          { label: 'What level of property cover is required', kind: 'picklist', value: 'Option 2' },
+          { label: 'NACOSS approved alarm system', kind: 'radio', value: 'Yes' },
+          { label: 'Property Excess', kind: 'picklist', value: '350' },
+        ],
+        action: 'Save',
+      },
+    ],
+  },
+};
+
 // ---------------------------------------------------------------------------
-// Premiums (image18) — Insurable Name renders EMPTY on the CONC premium grid.
+// Premiums — Minimum & Deposit = Yes; all coverages included
 // ---------------------------------------------------------------------------
 
 export const CC_PREMIUMS: RenoPremiumEntry[] = [
+  { coverage: 'Employers Liability', insurable: '', technical: '457.22', grossWritten: '457.22', annualized: '', commissionRate: '5' },
   { coverage: 'Public & Products Liability', insurable: '', technical: '1247.44', grossWritten: '1247.44', annualized: '', commissionRate: '5' },
+  { coverage: 'Contractors All Risks', insurable: '', technical: '467.77', grossWritten: '467.77', annualized: '', commissionRate: '5' },
+  { coverage: 'Professional Indemnity', insurable: '', technical: '167.44', grossWritten: '167.44', annualized: '', commissionRate: '5' },
+  { coverage: 'Legal Expenses', insurable: '', technical: '666.44', grossWritten: '666.44', annualized: '', commissionRate: '5' },
+  { coverage: 'Terrorism', insurable: '', technical: '299.99', grossWritten: '299.99', annualized: '', commissionRate: '1' },
+  { coverage: 'Property Damage', insurable: 'UK Test Insured', technical: '999.99', grossWritten: '999.99', annualized: '', commissionRate: '5' },
 ];
 
 /** "Is any part of policy Minimum & Deposit?" — Yes (image18). */
 export const CC_MINIMUM_DEPOSIT = 'Yes';
 
 // ---------------------------------------------------------------------------
-// Binder — FOUR available binders on the PPL row (image20); the doc adds
-// "Accelerant Construction & Commercial 2026" (section "Contractors Combined").
-// BindersPage must click the Add button in THIS binder's row, not the first.
+// Binders — per-coverage selection (BindersPage strict mode)
 // ---------------------------------------------------------------------------
 
-export const CC_BINDER = {
-  name: 'Accelerant Construction & Commercial 2026',
-  section: 'Contractors Combined',
-  nrToBinder: 'New Business',
-};
+export const CC_BINDERS = [
+  { coverage: 'Employers Liability', name: 'Accelerant Construction & Commercial 2026', section: 'Contractors Combined', nrToBinder: 'New Business' },
+  { coverage: 'Public & Products Liability', name: 'Accelerant Construction & Commercial 2026', section: 'Contractors Combined', nrToBinder: 'New Business' },
+  { coverage: 'Contractors All Risks', name: 'Accelerant Construction & Commercial 2026', section: 'Contractors Combined', nrToBinder: 'New Business' },
+  { coverage: 'Professional Indemnity', name: 'HCC Contractors Combined 2023', section: 'Contractors Combined', nrToBinder: 'New Business' },
+  { coverage: 'Legal Expenses', name: 'ARAG Legal Expenses 2023', section: 'Contractors Combined', nrToBinder: 'New Business' },
+  { coverage: 'Terrorism', name: 'AXA XL Contractors 2026', section: 'Section C – Terrorism – CONC & CARA', nrToBinder: 'New Business' },
+  { coverage: 'Property Damage', name: 'Allianz Contractors Combined 2023', section: 'Property Damage', nrToBinder: 'New Business' },
+];
+
+/** Default binder for BindersPage 2nd ctor arg (unused in strict mode but required) */
+export const CC_BINDER_DEFAULT = CC_BINDERS[0];
 
 // ---------------------------------------------------------------------------
 // Fees — same three as CARP (doc text; no fee screenshots in this doc).
@@ -239,8 +391,15 @@ export const CC_UAL = {
 };
 
 export const CC_USERS = {
-  uw3: 'oliva.cons.puw3@dualgroup.com.newprodqa2',
-  uw5: 'oliva.cons.puw5@dualgroup.com.newprodqa2',
+  uw3: process.env.SF_CONS_UW3 ?? 't-0011-con-uw3-auto-provar@scc.sit',
+  uw5: process.env.SF_CONS_UW5 ?? 't-0016-con-uw5-auto-provar@scc.sit',
+};
+
+/** EL Trade Details row (labels are live-verified literals). */
+export const CC_EL_TRADE = {
+  tradeDescription: 'Agricultural Contractors',
+  wageroll: '600',
+  headcount: '600',
 };
 
 export const CC_POLICY_EXPECTATIONS = {
@@ -249,4 +408,39 @@ export const CC_POLICY_EXPECTATIONS = {
   // Doc image 40 also highlights the Risk ID and Product on the policy.
   product: 'Contractors Combined',
   riskIdPattern: /DOU\/\d+\/CONC\/\d+\/\d+/,
+};
+
+/**
+ * MTA — Mid-term Adjustment on Contractors Combined policy.
+ */
+export const CC_MTA = {
+  effectiveOffsetDays: 3,
+  submissionOffsetDays: 0,
+  submissionTime: '09:00:00',
+  reason: 'Exposure/Limit Changes',
+  description: 'Test MTA',
+  policyNewMtaRenewal: 'MTA',
+  policyStatus: 'In Force',
+  chargePremiums: [
+    { coverage: 'Employers Liability', chargePremium: '22.86' },
+    { coverage: 'Public & Products Liability', chargePremium: '62.37' },
+    { coverage: 'Contractors All Risks', chargePremium: '23.39' },
+    { coverage: 'Professional Indemnity', chargePremium: '8.37' },
+    { coverage: 'Legal Expenses', chargePremium: '33.32' },
+    { coverage: 'Terrorism', chargePremium: '15.00' },
+    { coverage: 'Property Damage', chargePremium: '50.00' },
+  ],
+};
+
+/**
+ * Cancellation — applied after MTA.
+ * Cancels the policy from inception with full premium return.
+ */
+export const CC_CANCELLATION = {
+  category: 'Cancel this MTA Only',
+  instigatedBy: 'Customer',
+  reason: 'Product Unsuited/Misunderstood',
+  notes: 'Test Reference Cancellation',
+  returnFullPremium: 'Yes',
+  policyStatus: 'Cancelled',
 };

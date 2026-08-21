@@ -18,17 +18,19 @@ import { RenoPremiumEntry } from './renoData';
 // ---------------------------------------------------------------------------
 
 export const CARP_ACCOUNT = {
-  name: 'HOWDEN INSURANCE BROKERS LIMITED',
-  // Doc text says "James Chamber"; the screenshot (image2) shows "James
-  // Chambers" — the typeahead search term below matches both.
-  intermediaryContact: 'James Chambers',
+  name: process.env.CARP_ACCOUNT_NAME ?? 'HOWDEN INSURANCE BROKERS LIMITED',
+  // For SIT: use CARP_INTERMEDIARY_CONTACT env var to support environment-specific
+  // intermediary contact (required when Intermediary and Introducer accounts share
+  // the same name; browser UI will disambiguate via the contact name).
+  intermediaryContact: process.env.CARP_INTERMEDIARY_CONTACT ?? 'James Chambers',
 };
 
 export const CARP_CLIENT_INFO = {
   // Existing client (Create New Client = No). The doc's SITP example used
   // "Moorgarth Retail Limited…", but on newprodqa2 the verified existing
   // client offered by the typeahead is "PG Test Insured" (live-explored).
-  insuredName: 'UK Test Insured',
+  // For SIT: use CARP_INSURED_NAME env var to support environment-specific clients.
+  insuredName: process.env.CARP_INSURED_NAME ?? 'UK Test Insured',
   industrySector: 'Construction',
   activityCode: 'Aerial & Satellite Erection',
   product: 'Contractors All Risks - Project',
@@ -148,9 +150,9 @@ export const CARP_PRODUCT_FORM: OmniForm = {
 // CARP coverages are mapped, 74 rows) — a quote containing Terrorism can never
 // pass Ready → Quote Issued. The doc's own numbers agree: its policy GWP
 // excludes the Terrorism premium (4,850.44 = 5,850.95 − 1,000.51) and no
-// Terrorism RBS row exists. Excluded by default; CARP_INCLUDE_TERRORISM=1
-// re-includes once admins add the mapping.
-const INCLUDE_TERRORISM = process.env.CARP_INCLUDE_TERRORISM === '1';
+// Terrorism RBS row exists. Included by default; set CARP_INCLUDE_TERRORISM=0
+// to exclude if needed.
+const INCLUDE_TERRORISM = process.env.CARP_INCLUDE_TERRORISM !== '0';
 
 const CARP_COVERAGES_ALL: RenoCoverage[] = [
   // Coverage 1 — Contract Works (single step, image15)
@@ -186,7 +188,7 @@ const CARP_COVERAGES_ALL: RenoCoverage[] = [
             { label: 'Existing Structures Sum Insured', kind: 'text', value: '167985.66' },
             { label: 'Is the building listed', kind: 'radio', value: 'No' },
             { label: 'Existing Structures Basis of Cover', kind: 'picklist', value: 'Full perils' },
-            { label: "Select 'Type of Property'", kind: 'picklist', value: 'Barn' },
+            { label: "Select 'Type of Property' if 'Other' please provide details below", kind: 'picklist', value: 'Barn' },
             { label: 'Wall Construction', kind: 'text', value: '1300' },
             { label: 'Roof Construction', kind: 'text', value: '1300' },
             { label: 'Year of Build', kind: 'text', value: '2026' },
@@ -353,7 +355,7 @@ const CARP_COVERAGES_ALL: RenoCoverage[] = [
 
 export const CARP_COVERAGES: RenoCoverage[] = CARP_COVERAGES_ALL.filter(
   (c) => INCLUDE_TERRORISM || c.addRowName !== 'Terrorism'
-);
+); // Includes Terrorism by default (8 coverages); set CARP_INCLUDE_TERRORISM=0 to exclude
 
 // ---------------------------------------------------------------------------
 // Premiums (images 27–30) — technical = gross, commission 5% everywhere.
@@ -362,19 +364,19 @@ export const CARP_COVERAGES: RenoCoverage[] = CARP_COVERAGES_ALL.filter(
 const CARP_INSURED = 'UK Test Insured';
 
 const CARP_PREMIUMS_ALL: RenoPremiumEntry[] = [
-  { coverage: 'Contract Works', insurable: CARP_INSURED, technical: '501.65', grossWritten: '501.65', annualized: '', commissionRate: '5' },
-  { coverage: 'Existing Structures', insurable: CARP_INSURED, technical: '146.98', grossWritten: '146.98', annualized: '', commissionRate: '5' },
-  { coverage: 'Advanced Loss of Profits/Delayed Start Up', insurable: CARP_INSURED, technical: '2000.97', grossWritten: '2000.97', annualized: '', commissionRate: '5' },
-  { coverage: 'Own Plant', insurable: CARP_INSURED, technical: '459.45', grossWritten: '459.45', annualized: '', commissionRate: '5' },
-  { coverage: 'Hired in Plant', insurable: CARP_INSURED, technical: '750.99', grossWritten: '750.99', annualized: '', commissionRate: '5' },
-  { coverage: 'Public & Products Liability', insurable: CARP_INSURED, technical: '500.44', grossWritten: '500.44', annualized: '', commissionRate: '5' },
-  { coverage: 'Terrorism', insurable: CARP_INSURED, technical: '1000.51', grossWritten: '1000.51', annualized: '', commissionRate: '1' },
-  { coverage: 'JCT 6.5.1 Non Negligent Liability', insurable: CARP_INSURED, technical: '489.96', grossWritten: '489.96', annualized: '', commissionRate: '5' },
+  { coverage: 'Contract Works', insurable: CARP_INSURED, technical: '555.55', grossWritten: '555.55', annualized: '', commissionRate: '5' },
+  { coverage: 'Existing Structures', insurable: CARP_INSURED, technical: '456.77', grossWritten: '456.77', annualized: '', commissionRate: '5' },
+  { coverage: 'Advanced Loss of Profits/Delayed Start Up', insurable: CARP_INSURED, technical: '467.44', grossWritten: '467.44', annualized: '', commissionRate: '5' },
+  { coverage: 'Own Plant', insurable: CARP_INSURED, technical: '1233.44', grossWritten: '1233.44', annualized: '', commissionRate: '5' },
+  { coverage: 'Hired in Plant', insurable: CARP_INSURED, technical: '777.77', grossWritten: '777.77', annualized: '', commissionRate: '5' },
+  { coverage: 'Public & Products Liability', insurable: CARP_INSURED, technical: '123.44', grossWritten: '123.44', annualized: '', commissionRate: '5' },
+  { coverage: 'Terrorism', insurable: CARP_INSURED, technical: '111.44', grossWritten: '111.44', annualized: '', commissionRate: '1' },
+  { coverage: 'JCT 6.5.1 Non Negligent Liability', insurable: CARP_INSURED, technical: '134.44', grossWritten: '134.44', annualized: '', commissionRate: '5' },
 ];
 
 export const CARP_PREMIUMS: RenoPremiumEntry[] = CARP_PREMIUMS_ALL.filter(
   (p) => INCLUDE_TERRORISM || p.coverage !== 'Terrorism'
-);
+); // Includes Terrorism by default (8 premiums); set CARP_INCLUDE_TERRORISM=0 to exclude
 
 /** "Is any part of policy Minimum & Deposit?" — Yes for CARP (image27). */
 export const CARP_MINIMUM_DEPOSIT = 'Yes';
@@ -398,13 +400,13 @@ export const CARP_BINDERS_ALL: CarpBinderChoice[] = [
   { coverage: 'Own Plant', name: 'Accelerant Construction & Commercial 2026', section: 'Contractors All Risks - Project', nrToBinder: 'New Business' },
   { coverage: 'Hired in Plant', name: 'Accelerant Construction & Commercial 2026', section: 'Contractors All Risks - Project', nrToBinder: 'New Business' },
   { coverage: 'Public & Products Liability', name: 'Accelerant Construction & Commercial 2026', section: 'Contractors All Risks - Project', nrToBinder: 'New Business' },
-  { coverage: 'Terrorism', name: 'AXA XL Contractors 2026', section: 'Section C – Terrorism – CONC & CARP', nrToBinder: 'New Business' },
+  { coverage: 'Terrorism', name: 'TEST AXA XL CONST', section: 'Section C – Terrorism – CARP', nrToBinder: 'New Business' },
   { coverage: 'JCT 6.5.1 Non Negligent Liability', name: 'Accelerant Construction & Commercial 2026', section: 'Contractors All Risks - Project', nrToBinder: 'New Business' },
 ];
 
 export const CARP_BINDERS: CarpBinderChoice[] = CARP_BINDERS_ALL.filter(
   (b) => INCLUDE_TERRORISM || b.coverage !== 'Terrorism'
-);
+); // Includes Terrorism by default (8 binders); set CARP_INCLUDE_TERRORISM=0 to exclude
 
 /** Default CARP binder for backward compat (used as fallback when specific coverage not found). */
 export const CARP_BINDER = CARP_BINDERS[0];
@@ -451,17 +453,81 @@ export const CARP_FEES = [
 // ---------------------------------------------------------------------------
 
 export const CARP_UAL = {
-  approverName: 'T-0016-SIT2-SCC-CON-UW5 Auto-Provar',
-  approverSearchTerms: ['t-0016', 'T-0016-SIT2-SCC-CON-UW5', 'T-0016'],
+  approverName: 'T-0016-SIT-SCC-CON-UW5 Auto-Provar',
+  approverSearchTerms: ['t-0016', 'T-0016-SIT-SCC-CON-UW5', 'T-0016'],
   errorToastText: 'Status cannot be changed as there are outstanding UAL/Carrier Referrals',
 };
 
 export const CARP_USERS = {
-  uw3: 'oliva.cons.puw3@dualgroup.com.newprodqa2',
-  uw5: 'oliva.cons.puw5@dualgroup.com.newprodqa2',
+  uw3: 't-0011-con-uw3-auto-provar@scc.sit',
+  uw5: 't-0016-con-uw5-auto-provar@scc.sit',
 };
 
 export const CARP_POLICY_EXPECTATIONS = {
   status: 'In Force',
   newMtaRenewal: 'New Business',
+};
+
+/**
+ * MTA (Mid-Term Adjustment) — applied to the NB policy created above.
+ * Charge premium (10) is applied to every coverage's "100% MTA Charge Premium" field.
+ * Effective date is 3 days from inception (policy inception = today).
+ */
+export const CARP_MTA = {
+  effectiveOffsetDays: 3,
+  submissionOffsetDays: 0,
+  submissionTime: '09:00:00',
+  reason: 'Exposure/Limit Changes',
+  description: 'Test MTA',
+  policyNewMtaRenewal: 'MTA',
+  policyStatus: 'In Force',
+  chargePremiums: [
+    { coverage: 'Contract Works', chargePremium: '27.78' },
+    { coverage: 'Existing Structures', chargePremium: '22.84' },
+    { coverage: 'Advanced Loss of Profits/Delayed Start Up', chargePremium: '23.37' },
+    { coverage: 'Own Plant', chargePremium: '61.67' },
+    { coverage: 'Hired in Plant', chargePremium: '38.89' },
+    { coverage: 'Public & Products Liability', chargePremium: '6.17' },
+    { coverage: 'Terrorism', chargePremium: '5.57' },
+    { coverage: 'JCT 6.5.1 Non Negligent Liability', chargePremium: '6.72' },
+  ],
+};
+
+/**
+ * Cancellation — applied after second MTA.
+ * Cancels the policy from inception with full premium return.
+ */
+export const CARP_CANCELLATION = {
+  category: 'Cancel this MTA Only',
+  instigatedBy: 'Customer',
+  reason: 'Product Unsuited/Misunderstood',
+  notes: 'Test Reference Cancellation',
+  returnFullPremium: 'Yes',
+  policyStatus: 'Cancelled',
+};
+
+/**
+ * Cancel and Reissue (CNR) — applied to NB policy.
+ * Resulting policy keeps New Business status.
+ */
+export const CARP_CNR = {
+  reasonForCandR: 'Other',
+  description: 'Test CNR',
+  policyNewMtaRenewal: 'New Business',
+  policyStatus: 'In Force',
+};
+
+/**
+ * Renewal — applied to policy from CNR.
+ * Per-coverage premium values for renewal.
+ */
+export const CARP_RENEWAL = {
+  policyNewMtaRenewal: 'Renewal',
+  policyStatus: 'In Force',
+  premium: {
+    technical: '55.56',
+    grossWritten: '55.56',
+    annualized: '555.50',
+    commissionRate: '5',
+  },
 };

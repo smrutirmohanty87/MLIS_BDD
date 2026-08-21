@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { jwtLogin, sfQueryOne } from '../src/auth/sfJwt';
+import { jwtLogin } from '../src/auth/sfJwt';
 import { waitForSpinners, closeAllWorkspaceTabs } from '../src/utils/sf';
 import { AccountsPage } from '../src/pages/AccountsPage';
 import { SubmissionWizardPage } from '../src/pages/SubmissionWizardPage';
@@ -13,22 +13,24 @@ import { RbsApprovalPage } from '../src/pages/RbsApprovalPage';
 import { ClausesFeesPage } from '../src/pages/ClausesFeesPage';
 import { QuoteStatusPage } from '../src/pages/QuoteStatusPage';
 import { PolicyPage } from '../src/pages/PolicyPage';
+import { PolicyActionsPage } from '../src/pages/PolicyActionsPage';
 import { renoIssueAndBond } from '../src/flows/renoIssueAndBond';
 import {
   RENO_ACCOUNT, RENO_CLIENT_INFO, RENO_RISK_INFO, RENO_INSURABLE,
   RENO_PRODUCT_FORM, RENO_COVERAGES, RENO_PREMIUMS, RENO_MINIMUM_DEPOSIT,
   RENO_BINDERS, RENO_FEES, RENO_UAL, RENO_USERS, RENO_POLICY_EXPECTATIONS,
+  RENO_MTA_POLICY_EXPECTATIONS, RENO_CANCELLATION,
 } from '../src/data/renoData';
 
 /**
- * End-to-end: Oliva Construction "Renovation" New Business policy on the
- * newprodqa2 sandbox. Auth is JWT (no password/MFA): UW3 for the whole flow,
- * UW5 (T-0016) opened only inside the conditional UAL branch. Reuses the Care
- * framework via injected Construction data (binder/fee/UAL) + the generic
- * OmniScript form engine for the product questionnaire and 9 coverage forms.
+ * End-to-end: Oliva Construction "Renovation" New Business, MTA, CNR, and Cancellation flow
+ * on the SIT sandbox. Auth is JWT (no password/MFA): UW5 (T-0016) for the whole flow by default.
+ * RENO_LOGIN_USER=uw3 switches to UW3. Reuses the Care framework via injected Construction
+ * data (binder/fee/UAL) + the generic OmniScript form engine for the product questionnaire
+ * and 9 coverage forms.
  */
 test('create Construction Renovation NB policy end-to-end', async ({ page, browser }) => {
-  test.setTimeout(45 * 60 * 1000);
+  test.setTimeout(90 * 60 * 1000);
 
   const accounts = new AccountsPage(page);
   const wizard = new SubmissionWizardPage(page);
@@ -42,8 +44,12 @@ test('create Construction Renovation NB policy end-to-end', async ({ page, brows
   const status = new QuoteStatusPage(page, RENO_UAL);
   const policy = new PolicyPage(page);
 
-  await test.step('Login as Construction UW3 (JWT — no MFA)', async () => {
-    await jwtLogin(page, RENO_USERS.uw3);
+  // The source doc runs the whole flow as UW5 (default, doc-exact).
+  // RENO_LOGIN_USER=uw3 switches to UW3 (exercises the conditional UAL referral branch).
+  const loginUser = process.env.RENO_LOGIN_USER === 'uw3' ? RENO_USERS.uw3 : RENO_USERS.uw5;
+
+  await test.step(`Login as Construction ${process.env.RENO_LOGIN_USER === 'uw3' ? 'UW3' : 'UW5'} (JWT — no MFA)`, async () => {
+    await jwtLogin(page, loginUser);
   });
 
   // Fast-iteration escape hatch: RENO_QUOTE_ID skips the ~12-min submission +
@@ -72,16 +78,7 @@ test('create Construction Renovation NB policy end-to-end', async ({ page, brows
   } else {
 
   await test.step('Open intermediary account and start submission', async () => {
-    // Resolve the account id via REST and open the record DIRECTLY — the
-    // console list view renders in a cramped split-view when other tabs are
-    // open (newprodqa2 remembers tabs per user), which breaks list navigation.
-    const acc = await sfQueryOne(
-      RENO_USERS.uw3,
-      `SELECT Id FROM Account WHERE Name = '${RENO_ACCOUNT.name}' LIMIT 1`
-    );
-    if (!acc?.Id) throw new Error(`Account not found: ${RENO_ACCOUNT.name}`);
-    await page.goto(`/lightning/r/Account/${acc.Id}/view`);
-    await waitForSpinners(page);
+    await accounts.openAccount(RENO_ACCOUNT.name);
     await accounts.startNewOlivaSubmission();
   });
 
@@ -127,6 +124,9 @@ test('create Construction Renovation NB policy end-to-end', async ({ page, brows
     await quote.clickEnterPremiums();
     await premiums.answerMinimumDeposit(RENO_MINIMUM_DEPOSIT);
     await premiums.fillAndSubmit(RENO_PREMIUMS);
+    // After premiums full-page reload, navigate back to quote record view to access binders tab
+    await page.goto(`/lightning/r/Quote/${renoQuoteId}/view`);
+    await waitForSpinners(page);
   });
 
   } // end non-resume (submission → premiums)
@@ -179,5 +179,96 @@ test('create Construction Renovation NB policy end-to-end', async ({ page, brows
   await test.step('Assert policy record', async () => {
     await policy.assertState(RENO_POLICY_EXPECTATIONS.status, RENO_POLICY_EXPECTATIONS.newMtaRenewal);
     console.log(`Renovation policy created: ${policyNumber}`);
+  });
+
+  await test.step('MTA — Mid-term Adjustment', async () => {
+    const policyActions = new PolicyActionsPage(page);
+    await policyActions.createMta();
+    console.log('[reno] MTA created');
+    
+    // Capture MTA quote ID from URL
+    const mtaQuoteMatch = page.url().match(/\/Quote\/([a-zA-Z0-9]+)\//)?.[1];
+    if (!mtaQuoteMatch) {
+      throw new Error('Could not parse MTA quote ID from URL');
+    }
+    const mtaQuoteId = mtaQuoteMatch;
+    console.log(`[reno] MTA quote ID: ${mtaQuoteId}`);
+    
+    // Navigate directly to the MTA quote and wait for the Coverages tab to load
+    await page.goto(`/lightning/r/Quote/${mtaQuoteId}/view`);
+    await waitForSpinners(page);
+    await expect(
+      page.getByRole('tab', { name: 'Coverages', exact: true }).first()
+    ).toBeVisible({ timeout: 60_000 });
+    console.log('[reno] MTA quote loaded');
+    
+    console.log('[reno] MTA entering premiums...');
+    await quote.clickEnterPremiums();
+    
+    console.log('[reno] MTA answering minimum deposit question...');
+    await premiums.answerMinimumDeposit(RENO_MINIMUM_DEPOSIT);
+    
+    console.log('[reno] MTA filling MTA charge premium: 10');
+    await premiums.fillMtaChargeAndSubmit('10');
+    console.log('[reno] MTA charge premium submitted');
+    
+    // Ensure we're back on the MTA quote after premium submission
+    await expect(
+      page.getByRole('tab', { name: 'Coverages', exact: true }).first()
+    ).toBeVisible({ timeout: 60_000 });
+    console.log('[reno] MTA back on quote record after premium submission');
+    
+    await rbs.approveFirstRbs(mtaQuoteId);
+    console.log('[reno] MTA RBS record approved');
+    
+    await renoIssueAndBond(page, browser, status, true); // Skip sanction check for MTA
+    console.log('[reno] MTA quote issued and bonded');
+    
+    // Navigate back to MTA quote after issue/bond, then create policy version
+    await page.goto(`/lightning/r/Quote/${mtaQuoteId}/view`);
+    await waitForSpinners(page);
+    
+    const mtaPolicy = await status.createPolicyVersion();
+    await status.goToPolicy();
+    await policy.assertState(RENO_MTA_POLICY_EXPECTATIONS.status, RENO_MTA_POLICY_EXPECTATIONS.newMtaRenewal);
+    console.log(`RENO MTA policy validated: ${mtaPolicy}`);
+  });
+
+  await test.step('CNR — Cancel and Reissue', async () => {
+    const policyActions = new PolicyActionsPage(page);
+    await policyActions.startCancelAndReissue();
+    console.log('[reno] CNR started');
+    
+    // Capture CNR quote ID from URL
+    const cnrQuoteMatch = page.url().match(/\/Quote\/([a-zA-Z0-9]+)\//)?.[1];
+    const cnrQuoteId = cnrQuoteMatch || '';
+    
+    await status.confirmNoManualRbsReferralReasons();
+    console.log('[reno] CNR RBS confirmation completed');
+    
+    // Navigate back to the CNR quote after RBS confirmation
+    await page.goto(`/lightning/r/Quote/${cnrQuoteId}/view`);
+    await waitForSpinners(page);
+    
+    await renoIssueAndBond(page, browser, status);
+    console.log('[reno] CNR quote issued and bonded');
+    
+    const reissuedPolicy = await status.cancelAndReissuePolicy();
+    await status.goToPolicy();
+    await policy.assertState(RENO_POLICY_EXPECTATIONS.status);
+    console.log(`RENO CNR policy validated: ${reissuedPolicy}`);
+  });
+
+  await test.step('Cancellation', async () => {
+    const policyActions = new PolicyActionsPage(page);
+    await policyActions.cancelPolicy(RENO_CANCELLATION);
+    console.log('[reno] Cancellation initiated and form submitted');
+    
+    // Wait for navigation and verify cancellation
+    await page.waitForTimeout(2000);
+    console.log(`[reno] Final URL: ${page.url()}`);
+    
+    await policy.assertState(RENO_CANCELLATION.policyStatus);
+    console.log('[reno] Policy cancelled successfully');
   });
 });

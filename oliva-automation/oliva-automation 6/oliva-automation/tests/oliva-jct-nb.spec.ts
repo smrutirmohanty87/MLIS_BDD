@@ -42,11 +42,11 @@ test('create JCT 6.5.1 Non Negligent Liability NB policy end-to-end', async ({ p
   const status = new QuoteStatusPage(page, JCT_UAL);
   const policy = new PolicyPage(page);
 
-  // The source doc runs the whole flow as UW5; default stays UW3 (exercises
-  // the conditional UAL referral branch). JCT_LOGIN_USER=uw5 → doc-exact run.
-  const loginUser = process.env.JCT_LOGIN_USER === 'uw5' ? JCT_USERS.uw5 : JCT_USERS.uw3;
+  // The source doc runs the whole flow as UW5 (default, doc-exact).
+  // JCT_LOGIN_USER=uw3 switches to UW3 (exercises the conditional UAL referral branch).
+  const loginUser = process.env.JCT_LOGIN_USER === 'uw3' ? JCT_USERS.uw3 : JCT_USERS.uw5;
 
-  await test.step(`Login as Construction ${process.env.JCT_LOGIN_USER === 'uw5' ? 'UW5' : 'UW3'} (JWT — no MFA)`, async () => {
+  await test.step(`Login as Construction ${process.env.JCT_LOGIN_USER === 'uw3' ? 'UW3' : 'UW5'} (JWT — no MFA)`, async () => {
     await jwtLogin(page, loginUser);
   });
 
@@ -120,6 +120,9 @@ test('create JCT 6.5.1 Non Negligent Liability NB policy end-to-end', async ({ p
     await quote.clickEnterPremiums();
     await premiums.answerMinimumDeposit(JCT_MINIMUM_DEPOSIT);
     await premiums.fillAndSubmit(JCT_PREMIUMS);
+    // After premiums full-page reload, navigate back to quote record view to access binders tab
+    await page.goto(`/lightning/r/Quote/${jctQuoteId}/view`);
+    await waitForSpinners(page);
   });
 
   } // end non-resume (submission → premiums)

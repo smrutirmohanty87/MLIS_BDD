@@ -11,7 +11,37 @@ export const ACCOUNT = {
   intermediaryContact: 'Amy Thorpe',
 };
 
-export const CLIENT_INFO = {
+export const OLIVA_PRODUCTS = {
+	care: ['Care Howden', 'Care Non Howden', 'Care ROI'] as const,
+  construction: [
+    'Renovation',
+    'Contractors Excess Layer',
+    'Contractors All Risks - Annual',
+    'Contractors Combined',
+    'Contractors All Risks - Project',
+    'JCT 6.5.1 Non Negligent Liability',
+    'Legal Expenses',
+  ] as const,
+};
+
+export type CareProduct = (typeof OLIVA_PRODUCTS.care)[number];
+export type ConstructionProduct = (typeof OLIVA_PRODUCTS.construction)[number];
+export type OlivaProduct = CareProduct | ConstructionProduct;
+
+export const PRODUCT_HLCOB: Record<OlivaProduct, 'Care' | 'Construction'> = {
+  'Care Howden': 'Care',
+  'Care Non Howden': 'Care',
+  'Care ROI': 'Care',
+  Renovation: 'Construction',
+  'Contractors Excess Layer': 'Construction',
+  'Contractors All Risks - Annual': 'Construction',
+  'Contractors Combined': 'Construction',
+  'Contractors All Risks - Project': 'Construction',
+  'JCT 6.5.1 Non Negligent Liability': 'Construction',
+  'Legal Expenses': 'Construction',
+};
+
+export const CLIENT_INFO_CARE = {
   createNewClient: 'No' as const,
   insuredName:
     'Moorgarth Retail Limited as employer and Allclear Demolition Ltd as contractors',
@@ -27,6 +57,17 @@ export const CLIENT_INFO = {
   clientTurnover: '500000',
   clientClassificationType: 'Small',
 };
+
+export const CLIENT_INFO_CONSTRUCTION = {
+  ...CLIENT_INFO_CARE,
+  industrySector: 'Construction',
+  activityCode: 'Contraction work',
+  highLevelClassOfBusiness: 'Construction',
+  product: 'Contractors All Risks - Annual',
+};
+
+/** Backward-compatible alias used by existing Care flows. */
+export const CLIENT_INFO = CLIENT_INFO_CARE;
 
 export const RISK_INFO = {
   riskType: 'Insurance',
@@ -194,7 +235,7 @@ export const FEE = {
  * Used ONLY when marking the quote stage fails with
  * "Status cannot be changed as there are outstanding UAL/Carrier Referrals".
  */
-export const UAL = {
+export const UAL_CARE = {
   approverName: 'T-0006-SIT2-SCC-CAR-UW5 Auto-Provar',
   /**
    * The restricted "Quote UAL Approvers" lookup behaves differently per quote
@@ -210,6 +251,81 @@ export const UAL = {
   approverSearchTerms: ['Provar', 'T-0006-SIT2-SCC-CAR-UW5', 'T-0006'],
   errorToastText: 'Status cannot be changed as there are outstanding UAL/Carrier Referrals',
 };
+
+export const UAL_CONSTRUCTION = {
+  approverName: 'T-0016-SIT2-SCC-CON-UW5 Auto-Provar',
+  approverSearchTerms: ['Provar', 'T-0016-SIT2-SCC-CON-UW5', 'T-0016'],
+  errorToastText: 'Status cannot be changed as there are outstanding UAL/Carrier Referrals',
+};
+
+/**
+ * Environment-specific UAL approver data
+ * @param baseUrl - The Salesforce instance URL
+ * @param credentialType - 'care' or 'con'
+ * @returns UAL approver data for the environment
+ */
+export function getUalApproverForEnvironment(
+  baseUrl: string,
+  credentialType: 'care' | 'con' = 'care'
+): { approverName: string; approverSearchTerms: string[]; errorToastText: string } {
+  const isSitp = baseUrl.includes('--sitp');
+  const isUat2 = baseUrl.includes('--uat2');
+  const isSit = baseUrl.includes('--sit');
+  
+  if (credentialType === 'care') {
+    if (isUat2) {
+      return {
+        approverName: 'T-0006-UAT2-SCC-CAR-UW5 Auto-Provar',
+        approverSearchTerms: ['T-0006-UAT2', 'CAR-UW5', 'T-0006', 'Auto-Provar', 'Provar'],
+        errorToastText: 'Status cannot be changed as there are outstanding UAL/Carrier Referrals',
+      };
+    }
+    if (isSitp) {
+      return {
+        approverName: 'T-0006-SIT2-SCC-CAR-UW5 Auto-Provar',
+        approverSearchTerms: ['Provar', 'T-0006-SIT2-SCC-CAR-UW5', 'T-0006'],
+        errorToastText: 'Status cannot be changed as there are outstanding UAL/Carrier Referrals',
+      };
+    }
+    if (isSit) {
+      return {
+        approverName: 'T-0006-SIT-SCC-CAR-UW5 Auto-Provar',
+        approverSearchTerms: ['Provar', 'T-0006-SIT-SCC-CAR-UW5', 'T-0006'],
+        errorToastText: 'Status cannot be changed as there are outstanding UAL/Carrier Referrals',
+      };
+    }
+    // Default to newprodqa2
+    return UAL_CARE;
+  }
+  
+  // Construction
+  if (isUat2) {
+    return {
+      approverName: 'T-0016-UAT2-SCC-CON-UW5 Auto-Provar',
+      approverSearchTerms: ['T-0016-UAT2', 'CON-UW5', 'T-0016', 'Auto-Provar', 'Provar'],
+      errorToastText: 'Status cannot be changed as there are outstanding UAL/Carrier Referrals',
+    };
+  }
+  if (isSitp) {
+    return {
+      approverName: 'T-0016-SIT2-SCC-CON-UW5 Auto-Provar',
+      approverSearchTerms: ['Provar', 'T-0016-SIT2-SCC-CON-UW5', 'T-0016'],
+      errorToastText: 'Status cannot be changed as there are outstanding UAL/Carrier Referrals',
+    };
+  }
+  if (isSit) {
+    return {
+      approverName: 'T-0016-SIT-SCC-CON-UW5 Auto-Provar',
+      approverSearchTerms: ['Provar', 'T-0016-SIT-SCC-CON-UW5', 'T-0016'],
+      errorToastText: 'Status cannot be changed as there are outstanding UAL/Carrier Referrals',
+    };
+  }
+  // Default to newprodqa2
+  return UAL_CONSTRUCTION;
+}
+
+/** Backward-compatible alias used by existing Care flows/pages. */
+export const UAL = UAL_CARE;
 
 export const POLICY_EXPECTATIONS = {
   settlementCurrency: 'GBP',

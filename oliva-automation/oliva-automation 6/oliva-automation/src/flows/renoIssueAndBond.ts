@@ -10,11 +10,14 @@ import { RENO_USERS } from '../data/renoData';
  * UW5/UAL branch), but the UW5 approver context authenticates via JWT
  * (newprodqa2 enforces MFA) instead of a password. `status` must already be
  * constructed with RENO_UAL (T-0016 approver).
+ *
+ * @param skipSanctionCheck If true, skip sanction check (used for MTA quotes where sanction was already done on NB)
  */
 export async function renoIssueAndBond(
   page: Page,
   browser: Browser,
-  status: QuoteStatusPage
+  status: QuoteStatusPage,
+  skipSanctionCheck: boolean = false
 ): Promise<void> {
   const result = await status.markStage('Quote Issued');
   if (result === 'ual-required') {
@@ -43,8 +46,10 @@ export async function renoIssueAndBond(
     }
   }
 
-  await status.runSanctionCheck();
-  await status.waitForSanctionPass();
+  if (!skipSanctionCheck) {
+    await status.runSanctionCheck();
+    await status.waitForSanctionPass();
+  }
 
   const bound = await status.markStage('Bound');
   if (bound !== 'ok') {

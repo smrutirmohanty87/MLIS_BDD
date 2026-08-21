@@ -1,16 +1,12 @@
 import { expect, Locator, Page } from '@playwright/test';
-import { getSalesforceLightningUrl } from '../config/env';
 import { SalesforcePortalPage } from './salesforce-cancellation';
 
 export class SalesforceQuoteJourneyCommercialEWPage {
   constructor(private readonly page: Page) {}
 
   async loginAndOpenQuoteJourney(username: string, password: string) {
-    await this.page.goto(getSalesforceLightningUrl(), { waitUntil: 'domcontentloaded' });
-    await this.page.getByRole('textbox', { name: /username/i }).fill(username);
-    await this.clickWhenReady(this.page.getByRole('button', { name: /log in to sandbox|log in/i }).first());
-    await this.page.getByRole('textbox', { name: /password/i }).fill(password);
-    await this.clickWhenReady(this.page.getByRole('button', { name: /log in to sandbox|log in/i }).first());
+    const salesforce = new SalesforcePortalPage(this.page);
+    await salesforce.login(username, password, { useJwt: true, fast: true });
     await expect(this.page.getByRole('link', { name: 'Quote Journey' })).toBeVisible({ timeout: 120000 });
 
     await this.clickWhenReady(this.page.getByRole('link', { name: 'Quote Journey' }));

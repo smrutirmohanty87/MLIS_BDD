@@ -40,36 +40,20 @@ export class QuotePage {
   /** Click the card's "Show Coverages" toggle link if it is still collapsed. */
   private async expandCoverages(card: Locator): Promise<void> {
     await expect(card).toBeVisible({ timeout: 30_000 });
-    // Already expanded (Add controls visible)? Nothing to do — clicking the
-    // toggle again would COLLAPSE it.
-    if (await this.addControl(card).first().isVisible().catch(() => false)) {
-      console.log('[QuotePage] expandCoverages: already expanded (card Add visible)');
-      return;
-    }
+    
+    // Check if card is already expanded by looking for the toggle button and its aria-expanded state
     let show = card.getByText('Show Coverages', { exact: true }).first();
-    // Card-scope can miss (Contractors Combined: the innermost matching tile is
-    // the Product Questions card, which owns no toggle). Fall back to expanding
-    // EVERY visible page-wide toggle — only collapsed regions render a
-    // "Show Coverages" link, so this can never collapse an expanded one.
-    if (!(await show.isVisible().catch(() => false))) {
-      const all = this.page
-        .getByText('Show Coverages', { exact: true })
-        .filter({ visible: true });
-      const n = await all.count();
-      console.log(`[QuotePage] card-scoped toggle missing — expanding ${n} region(s) page-wide`);
-      for (let i = 0; i < n; i++) {
-        // Always click the FIRST remaining toggle: each click removes one.
-        await all.first().click().catch(() => {});
-        await waitForSpinners(this.page);
+    const isShowVisible = await show.isVisible({ timeout: 5000 }).catch(() => false);
+    
+    if (isShowVisible) {
+      // Check if toggle is collapsed
+      const isExpanded = (await show.getAttribute('aria-expanded').catch(() => null)) === 'true';
+      if (isExpanded) {
+        console.log('[QuotePage] expandCoverages: toggle already expanded (aria-expanded=true)');
+        return;
       }
-      return;
-    }
-    if (await show.isVisible().catch(() => false)) {
+      // Toggle is collapsed - click it
       console.log('[QuotePage] expandCoverages: clicking card-scoped Show Coverages');
-      // A transient empty Vlocity loading <div> can sit OVER the toggle and
-      // intercept pointer events for a long time (observed 45s+). Try normal
-      // clicks first; force-click as a last resort (dispatches to the toggle
-      // itself, bypassing the overlay hit-target check).
       try {
         await show.click({ timeout: 15_000 });
       } catch {
@@ -83,6 +67,27 @@ export class QuotePage {
         }
       }
       await waitForSpinners(this.page);
+      return;
+    }
+    
+    // Show toggle not in card scope - expand all page-wide toggles that are collapsed
+    const allToggles = this.page
+      .getByText('Show Coverages', { exact: true })
+      .filter({ visible: true });
+    const n = await allToggles.count();
+    console.log(`[QuotePage] card-scoped toggle missing — found ${n} page-wide toggle(s)`);
+    
+    for (let i = 0; i < n; i++) {
+      const toggle = this.page
+        .getByText('Show Coverages', { exact: true })
+        .filter({ visible: true })
+        .nth(i);
+      const isExpanded = (await toggle.getAttribute('aria-expanded').catch(() => null)) === 'true';
+      if (!isExpanded) {
+        console.log(`[QuotePage] Expanding page-wide toggle ${i + 1}/${n}`);
+        await toggle.click().catch(() => {});
+        await waitForSpinners(this.page);
+      }
     }
   }
 
@@ -270,63 +275,89 @@ export class QuotePage {
    */
   async addRenoCoverage(insurableName: string, coverageName: string): Promise<void> {
     await this.showInsurableCoverages(insurableName);
-    const card = this.card(insurableName);
-    const cardRow = card
-      .locator('tr, li, div')
-      .filter({ hasText: coverageName })
-      .filter({ has: this.addControl(this.page) })
-      .last();
-    // Card-scoped row first. If the card scope misses (Contractors Combined:
-    // the innermost tile matching the card text holds NO coverage rows, and a
-    // DOM page-wide row match clicked the WRONG Add — the Risk Locations one),
-    // fall back to VISUAL ROW ALIGNMENT: click the Add control that sits on
-    // the same on-screen row as the coverage's own text (shadow-piercing JS —
-    // the same technique as the Terrorism sum-insured table).
-    if (await this.addControl(cardRow).first().isVisible({ timeout: 8000 }).catch(() => false)) {
-      // A just-closed coverage modal can leave a stale INVISIBLE
-      // `.slds-modal__container` in the DOM that still intercepts pointer
-      // events (observed live). Normal click first; force-click as fallback.
-      const add = this.addControl(cardRow).first();
-      try {
-        await add.click({ timeout: 15_000 });
-      } catch {
-        await waitForSpinners(this.page);
-        console.log(`[QuotePage] Add "${coverageName}" overlay-blocked — force-clicking`);
-        await add.click({ force: true });
-      }
-    } else {
-      // Deterministic Contractors-Combined path (live-diagnosed DOM facts):
-      // the "Show Coverages" toggle is a real BUTTON whose LABEL never changes
-      // — only aria-expanded tells the truth; the coverage rows exist in the
-      // DOM even when collapsed (0×0), so wait on row-text VISIBILITY; each
-      // row is an innermost div.slds-grid.slds-wrap wrapping label + its own
-      // aria-label="Add" button.
-      console.log(`[QuotePage] "${coverageName}" not in card scope — toggle-state path`);
-      const rowText = coverageName;
+    
+    const rowText = coverageName;
+    
+    // Try to find coverage row with extended wait - sometimes toggles disappear
+    // after multiple coverages are added, but rows become visible without needing
+    // to click the toggle (they may be auto-expanded or scrollable).
+    for (let attempt = 0; attempt < 15; attempt++) {
       const covText = this.page
         .getByText(rowText, { exact: false })
-        .filter({ visible: true })
-        .first();
-      const toggle = this.page
-        .getByRole('button', { name: 'Show Coverages' })
-        .first();
-      for (let attempt = 0; attempt < 3; attempt++) {
-        if (await covText.isVisible().catch(() => false)) break;
-        if ((await toggle.getAttribute('aria-expanded').catch(() => null)) !== 'true') {
-          await toggle.click().catch(() => {});
-        }
-        await covText.waitFor({ state: 'visible', timeout: 8000 }).catch(() => {});
-        await waitForSpinners(this.page);
+        .filter({ visible: true });
+      const count = await covText.count();
+      
+      if (count > 0) {
+        console.log(`[QuotePage] Coverage "${coverageName}" text found on page (attempt ${attempt + 1})`);
+        break;
       }
-      await expect(covText).toBeVisible({ timeout: 15_000 });
-      const row = this.page
-        .locator('div.slds-grid.slds-wrap')
-        .filter({ hasText: rowText })
-        .filter({ visible: true })
-        .last();
-      await row.getByRole('button', { name: 'Add', exact: true }).first().click();
-      await waitForSpinners(this.page);
+      
+      // If toggle exists, try clicking it
+      if (attempt % 3 === 2) {
+        const toggle = this.page
+          .getByText('Show Coverages', { exact: true })
+          .filter({ visible: true })
+          .first();
+        const toggleExists = await toggle.isVisible({ timeout: 2000 }).catch(() => false);
+        if (toggleExists) {
+          const isExpanded = (await toggle.getAttribute('aria-expanded').catch(() => null)) === 'true';
+          if (!isExpanded) {
+            console.log(`[QuotePage] Clicking "Show Coverages" toggle (attempt ${attempt + 1})`);
+            await toggle.click().catch(() => {});
+            await waitForSpinners(this.page);
+          }
+        }
+      }
+      
+      if (attempt < 14) {
+        console.log(`[QuotePage] Waiting for coverage "${coverageName}" to appear (attempt ${attempt + 1}/15)`);
+        await this.page.waitForTimeout(500);
+      }
     }
+    
+    // Try to scroll the card into view if row is still not found
+    const covText = this.page
+      .getByText(rowText, { exact: false })
+      .filter({ visible: true });
+    const count = await covText.count();
+    
+    if (count === 0) {
+      console.log(`[QuotePage] Coverage "${coverageName}" still not visible, scrolling card...`);
+      const card = this.card(insurableName);
+      await card.scrollIntoViewIfNeeded().catch(() => {});
+      await this.page.waitForTimeout(1000);
+    }
+    
+    // Now find and click the Add button
+    const targetRow = this.page
+      .locator('div.slds-grid.slds-wrap')
+      .filter({ hasText: rowText })
+      .filter({ visible: true })
+      .last();
+    
+    await expect(targetRow).toBeVisible({ timeout: 30_000 });
+    
+    const addBtn = targetRow
+      .getByRole('button', { name: 'Add', exact: true })
+      .first();
+    
+    // Click with retry logic for overlay blocks
+    for (let attempt = 0; attempt < 3; attempt++) {
+      try {
+        await addBtn.click({ timeout: 15_000 });
+        console.log(`[QuotePage] Clicked Add for "${coverageName}"`);
+        break;
+      } catch (err) {
+        if (attempt === 2) throw err;
+        console.log(`[QuotePage] Add button overlay-blocked (attempt ${attempt + 1}) — retrying`);
+        await waitForSpinners(this.page);
+        await this.page.waitForTimeout(1000);
+      }
+    }
+    
+    await waitForSpinners(this.page);
+    
+    // Wait for coverage modal to open
     await expect(
       this.page
         .getByText('Territorial Limits', { exact: false })

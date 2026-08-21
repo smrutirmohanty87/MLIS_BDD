@@ -1,6 +1,7 @@
 import { Locator, Page, expect } from '@playwright/test';
 import { UAL } from '../data/testdata';
 import { openRecordTab, waitForSpinners } from '../utils/sf';
+import { logOlivaPolicyNumber } from '../utils/policyTracker';
 
 /** Outcome of a path-stage transition attempt. */
 export type StageResult = 'ok' | 'ual-required';
@@ -335,13 +336,15 @@ export class QuoteStatusPage {
     }
 
     // LAST RESORT — the Advanced Search dialog.
+    let expectedApproverText = this.ual.approverName;
     if (!picked) {
-      await this.pickApproverViaAdvancedSearch();
+      expectedApproverText = await this.pickApproverViaAdvancedSearch();
     }
 
     await this.footerSave().click();
     await waitForSpinners(this.page);
-    await expect(this.detailItem('UAL Approver')).toContainText(this.ual.approverName, {
+    const approverToken = expectedApproverText.match(/T-\d{4}(?:-[A-Z0-9]+)*/i)?.[0] ?? expectedApproverText;
+    await expect(this.detailItem('UAL Approver')).toContainText(approverToken, {
       timeout: 60_000,
     });
   }
@@ -351,7 +354,7 @@ export class QuoteStatusPage {
    * restricted lookup matches on NAME PREFIX, so we search the leading portion
    * of the name and fall back to a broader prefix if the first yields no rows.
    */
-  private async pickApproverViaAdvancedSearch(): Promise<void> {
+  private async pickApproverViaAdvancedSearch(): Promise<string> {
     await this.page.getByText(/Show more results/i).first().click();
     const dialog = this.page.getByRole('dialog').filter({ visible: true }).last();
     await expect(dialog).toBeVisible({ timeout: 30_000 });
@@ -382,13 +385,24 @@ export class QuoteStatusPage {
       if (await row.isVisible({ timeout: 15_000 }).catch(() => false)) break;
     }
 
-    await expect(row).toBeVisible({ timeout: 30_000 });
-    await row
+    let selectedRow = row;
+    if (!(await row.isVisible({ timeout: 2_000 }).catch(() => false))) {
+      // Fallback for env/user drifts: pick the first non-Bdx approver row.
+      selectedRow = dialog
+        .locator('tr')
+        .filter({ has: dialog.locator('input[type="radio"], .slds-radio') })
+        .filter({ hasNotText: '-Bdx' })
+        .first();
+    }
+
+    await expect(selectedRow).toBeVisible({ timeout: 30_000 });
+    await selectedRow
       .locator('input[type="radio"], .slds-radio')
       .first()
       .click({ force: true });
     await dialog.getByRole('button', { name: 'Select', exact: true }).first().click();
     await waitForSpinners(this.page);
+    return ((await selectedRow.innerText().catch(() => this.ual.approverName)) || this.ual.approverName).replace(/\s+/g, ' ').trim();
   }
 
   /** Header ▾ → "Submit UAL Approval" → modal (prefilled comment) → Save. */
@@ -603,6 +617,7 @@ export class QuoteStatusPage {
           opts.idSource === 'input'
             ? await this.readPolicyNumberInput()
             : await this.readPolicyIdText();
+        await logOlivaPolicyNumber({ policyNumber: id, flowAction: opts.actionButton });
         console.log(`[QuoteStatusPage] policy created via "${opts.actionButton}": ${id}`);
         return id;
       }

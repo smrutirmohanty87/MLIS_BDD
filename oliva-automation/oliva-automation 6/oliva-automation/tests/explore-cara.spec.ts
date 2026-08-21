@@ -197,18 +197,13 @@ test.describe('CARA exploration suite', () => {
       await page.waitForTimeout(2500);
       const insOpts = await visibleOptions(page);
       console.log(`[explore] Insured Name options: ${JSON.stringify(insOpts.slice(0, 10))}`);
-      const insuredOptions = page
+      await page
         .locator('[role="option"]:not(.slds-path__link), lightning-base-combobox-item')
         .or(page.getByText(d.insuredName, { exact: true }))
-        .filter({ visible: true });
-
-      const preferredInsuredOption = insuredOptions.filter({ hasText: d.insuredName }).first();
-      if (await preferredInsuredOption.isVisible({ timeout: 5000 }).catch(() => false)) {
-        await preferredInsuredOption.click();
-      } else {
-        // Fallback for orgs where exact label text differs slightly from seed data.
-        await insuredOptions.first().click();
-      }
+        .filter({ visible: true })
+        .filter({ hasText: 'Moorgarth' })
+        .first()
+        .click();
       await waitForSpinners(page);
 
       await pickOptionCapture(page, 'Industry Sector', d.industrySector);

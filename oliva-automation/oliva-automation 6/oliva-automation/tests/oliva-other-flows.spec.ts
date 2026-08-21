@@ -52,7 +52,7 @@ test('lifecycle chain: CNR → MTA → Renewal → Cancellation', async ({ page,
   await test.step('MTA — Mid-term Adjustment', async () => {
     await policyActions.createMta();
     await quote.clickEnterPremiums();
-    await premiums.fillMtaChargeAndSubmit(MTA.chargePremium);
+    await premiums.fillMtaChargeAndSubmitByCoverage(MTA.chargePremiums);
     await rbs.approveFirstRbs();
     await issueAndBond(page, browser, status);
     const mtaPolicy = await status.createPolicyVersion();

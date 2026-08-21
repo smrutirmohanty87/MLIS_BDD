@@ -26,9 +26,10 @@ import { issueAndBond } from './issueAndBond';
  * Shared by the standalone NB spec and by the CNR→MTA→Renewal→Cancellation
  * chain (which needs an in-force NB policy as its base).
  *
+ * @param skipLogin - If true, skip password login (for JWT auth environments)
  * @returns the generated policy number.
  */
-export async function createNbPolicy(page: Page, browser: Browser): Promise<string> {
+export async function createNbPolicy(page: Page, browser: Browser, skipLogin = false): Promise<string> {
   const insuredCard = 'Moorgarth'; // default UK insurable card contains this text
   const login = new LoginPage(page);
   const accounts = new AccountsPage(page);
@@ -43,7 +44,10 @@ export async function createNbPolicy(page: Page, browser: Browser): Promise<stri
   const clausesFees = new ClausesFeesPage(page);
   const status = new QuoteStatusPage(page);
 
-  await login.login(process.env.SF_USERNAME!, process.env.SF_PASSWORD!);
+  // Skip password login if skipLogin=true (JWT auth) or SF_PASSWORD is not set
+  if (!skipLogin && process.env.SF_PASSWORD) {
+    await login.login(process.env.SF_USERNAME!, process.env.SF_PASSWORD!);
+  }
 
   // Fast-iteration escape hatch: skip the ~7-min NB build and start the
   // lifecycle chain from an existing in-force New Business policy.

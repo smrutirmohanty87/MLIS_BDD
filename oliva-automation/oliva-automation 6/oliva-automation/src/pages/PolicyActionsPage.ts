@@ -81,19 +81,49 @@ export class PolicyActionsPage {
 
   /**
    * Cancellation — header ▾ → "Cancel Policy" → fill form → Next →
-   * "Enter Premiums" (Return FULL Premium = Yes) → Submit. The policy record
-   * then shows the "Cancelled" path stage (asserted by the caller via
+   * "Enter Premiums" (Return FULL Premium = Yes, Do you want to return fee(s)? = Yes if present) → Submit.
+   * The policy record then shows the "Cancelled" path stage (asserted by the caller via
    * PolicyPage.assertState).
+   *
+   * Note: Effective Date is auto-filled by Salesforce and is readonly.
+   *
+   * @param cancellationData Optional cancellation data; defaults to CANCELLATION from testdata
    */
-  async cancelPolicy(): Promise<void> {
+  async cancelPolicy(
+    cancellationData?: {
+      category: string;
+      instigatedBy: string;
+      reason: string;
+      notes: string;
+      returnFullPremium: string;
+      returnFees?: string;
+      policyStatus?: string;
+    }
+  ): Promise<void> {
+    const data = cancellationData ?? CANCELLATION;
+
     await this.openHeaderMenu();
     await this.clickMenuItem('Cancel Policy');
     await this.expectWizard('Cancel Policy');
 
-    await this.pickOption('Cancellation Category', CANCELLATION.category);
-    await this.pickOption('Cancellation Instigated By', CANCELLATION.instigatedBy);
-    await this.pickOption('Cancellation Reason', CANCELLATION.reason);
-    await this.fillText('Cancellation Notes/Narrative', CANCELLATION.notes);
+    // Step 1 — "Cancel Policy": fill the cancellation details
+    await this.pickOption('Cancellation Category', data.category);
+    
+    // Cancellation Effective Date is only enabled/required for "Cancel the Policy Midterm" category
+    // It's a date picker field, so use fillOmniDate instead of fillText
+    // For midterm cancellation, use a future date that's greater than the auto-filled Effective Date
+    // (30 days from now ensures it's always after the policy's effective date)
+    if (data.category === 'Cancel the Policy Midterm') {
+      await this.page.waitForTimeout(500); // wait for field to become editable after category selection
+      const futureDate = new Date();
+      futureDate.setDate(futureDate.getDate() + 30); // 30 days from now
+      const cancellationEffectiveDate = `${String(futureDate.getDate()).padStart(2, '0')}-${String(futureDate.getMonth() + 1).padStart(2, '0')}-${futureDate.getFullYear()}`;
+      await this.fillOmniDate('Cancellation Effective Date', cancellationEffectiveDate);
+    }
+    
+    await this.pickOption('Cancellation Instigated By', data.instigatedBy);
+    await this.pickOption('Cancellation Reason', data.reason);
+    await this.fillText('Cancellation Notes/Narrative', data.notes);
 
     await this.page
       .getByRole('button', { name: 'Next', exact: true })
@@ -102,14 +132,108 @@ export class PolicyActionsPage {
       .click();
     await waitForSpinners(this.page);
 
-    // Step 2 — "Enter Premiums": the only editable control is the
-    // "Return FULL Premium" picklist; coverage rows are read-only.
+    // Step 2 — "Enter Premiums": handle "Return FULL Premium" field if present
+    // (some products like CARA may not have this field on cancellation)
     await this.expectWizard('Enter Premiums');
-    await this.pickOption('Return FULL Premium', CANCELLATION.returnFullPremium);
+    
+    // Try to find and set "Return FULL Premium" field if present
+    const returnPremiumField = this.page
+      .getByLabel('Return FULL Premium')
+      .filter({ visible: true })
+      .first();
+    
+    const premiumFieldExists = await returnPremiumField.isVisible({ timeout: 5_000 }).catch(() => false);
+    console.log('[cancelPolicy] premiumFieldExists:', premiumFieldExists);
+    if (premiumFieldExists) {
+      console.log('[cancelPolicy] Setting "Return FULL Premium" to:', data.returnFullPremium);
+      await this.pickOption('Return FULL Premium', data.returnFullPremium);
+      await this.page.waitForTimeout(1000);
+    }
+    
+    // Try to find and set "Do you want to return fee(s)?" field if present and provided in data
+    const returnFees = cancellationData?.returnFees;
+    console.log('[cancelPolicy] returnFees value:', returnFees);
+    
+    if (returnFees) {
+      console.log('[cancelPolicy] Looking for "Do you want to return fee(s)?" field with value:', returnFees);
+      
+      // Find the container that has the text "Do you want to return fee(s)?"
+      const feeFieldContainer = this.page
+        .locator('text=/do you want to return fee/i')
+        .first();
+      
+      const feeContainerExists = await feeFieldContainer.isVisible({ timeout: 3_000 }).catch(() => false);
+      console.log(`[cancelPolicy] feeContainerExists: ${feeContainerExists}`);
+      
+      if (feeContainerExists) {
+        try {
+          // Find the combobox/button within or near this container
+          const combobox = feeFieldContainer
+            .locator('..')  // parent
+            .locator('button[role="combobox"], [role="combobox"], lightning-combobox button')
+            .filter({ visible: true })
+            .first();
+          
+          const comboboxExists = await combobox.isVisible({ timeout: 3_000 }).catch(() => false);
+          console.log(`[cancelPolicy] comboboxExists: ${comboboxExists}`);
+          
+          if (comboboxExists) {
+            console.log('[cancelPolicy] Clicking returnFees combobox');
+            await combobox.click();
+            await this.page.waitForTimeout(500);
+            
+            // Find and click the option (Yes/No)
+            const option = this.page
+              .getByRole('option', { name: returnFees, exact: true })
+              .or(this.page.getByText(returnFees, { exact: true }))
+              .filter({ visible: true })
+              .first();
+            
+            console.log(`[cancelPolicy] Clicking option: ${returnFees}`);
+            await expect(option).toBeVisible({ timeout: 10_000 });
+            await option.click();
+            await this.page.waitForTimeout(500);
+            console.log('[cancelPolicy] Successfully set returnFees field');
+          } else {
+            console.warn('[cancelPolicy] WARNING: Combobox for returnFees field not found');
+          }
+        } catch (err) {
+          console.error('[cancelPolicy] Error setting returnFees:', err);
+          throw err;
+        }
+      } else {
+        console.warn('[cancelPolicy] WARNING: "Do you want to return fee(s)?" field not found');
+      }
+    }
+    
+    console.log('[cancelPolicy] Submitting wizard form');
     await this.submitWizard();
 
     // Back on the InsurancePolicy record (path advances to "Cancelled").
-    await this.page.waitForURL(/\/InsurancePolicy\//, { timeout: 120_000 });
+    // For some products (like Renovation), the navigation might not happen automatically,
+    // so we try to wait first, and if it times out, we manually navigate using the context ID
+    try {
+      await this.page.waitForURL(/\/InsurancePolicy\//, { timeout: 30_000 });
+    } catch (e) {
+      console.log('[cancelPolicy] Automatic navigation to policy record timed out, manually extracting and navigating');
+      
+      // Extract policy ID from URL context
+      const currentUrl = this.page.url();
+      const ctxMatch = currentUrl.match(/c__ContextId=([a-zA-Z0-9]+)/);
+      
+      if (ctxMatch?.[1]) {
+        const policyId = ctxMatch[1];
+        console.log(`[cancelPolicy] Extracted policy ID: ${policyId}, navigating...`);
+        await this.page.goto(`/lightning/r/InsurancePolicy/${policyId}/view`);
+        await waitForSpinners(this.page);
+        await this.page.waitForTimeout(1000); // extra delay to ensure page fully renders
+      } else {
+        console.log('[cancelPolicy] Could not extract policy ID from URL, trying page reload');
+        await this.page.reload();
+        await waitForSpinners(this.page);
+      }
+    }
+    
     await waitForSpinners(this.page);
   }
 
