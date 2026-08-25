@@ -118,6 +118,11 @@ export function getSalesforceJwtConfig(): SalesforceJwtConfig | null {
   };
 }
 
+export function getSalesforceJwtUsername(): string | undefined {
+  const envName = normalizeEnvName(process.env.TEST_ENV);
+  return getOptionalEnvValue(getJwtVarCandidates(envName, 'JWT_USERNAME'));
+}
+
 export function getMlisPortalUrl(): string {
   return getEnvConfig().mlisPortalUrl;
 }

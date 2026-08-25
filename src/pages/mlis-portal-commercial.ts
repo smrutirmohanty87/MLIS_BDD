@@ -346,6 +346,13 @@ export class CommercialQuotesPage {
   async selectFirstQuote() {
     await this.page.getByRole('button', { name: 'Select quote' }).first().click();
   }
+
+  async selectQuoteByIndex(index: number) {
+    const selectQuoteButtons = this.page.getByRole('button', { name: 'Select quote' });
+    await expect(selectQuoteButtons.nth(index)).toBeVisible({ timeout: 20000 });
+    await expect(selectQuoteButtons.nth(index)).toBeEnabled({ timeout: 20000 });
+    await selectQuoteButtons.nth(index).click();
+  }
 }
 
 export class CommercialFinalPolicyDetailsPage {

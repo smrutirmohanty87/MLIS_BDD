@@ -111,7 +111,7 @@ test.describe('@sanity | E2E | BDX | BDE | Cancel and Reissue | Cancellation', (
     // Login to Salesforce Portal
     await salesforce.goto();
     const sfCreds = getSalesforceCredentials();
-    await salesforce.login(sfCreds.username, sfCreds.password);
+    await salesforce.login(sfCreds.username, sfCreds.password, { useJwt: true, fast: true });
 
     // Global Search → open the exact policy number from the results grid.
     // Test-local retry for transient Salesforce search UI loading issues.

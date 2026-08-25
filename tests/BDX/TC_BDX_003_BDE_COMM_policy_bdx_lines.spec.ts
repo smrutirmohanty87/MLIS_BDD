@@ -103,7 +103,7 @@ test.describe('@sanity | E2E | BDX | MLIS Policy | BDE Commission | NB>MTA>CNR',
     // Step 4: Login to Salesforce Portal
     await salesforce.goto();
     const sfCreds = getSalesforceCredentials();
-    await salesforce.login(sfCreds.username, sfCreds.password);
+    await salesforce.login(sfCreds.username, sfCreds.password, { useJwt: true, fast: true });
 
     // Step 5-6: Global Search → open the exact policy number from the results grid
     await salesforce.searchAndOpenExactFromGlobalSearchGrid(policyNumber);

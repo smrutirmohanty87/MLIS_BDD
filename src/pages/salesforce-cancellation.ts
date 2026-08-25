@@ -2,7 +2,7 @@
 import * as crypto from 'crypto';
 import * as fs from 'fs';
 import { expect, Locator, Page } from '@playwright/test';
-import { getSalesforceJwtConfig, getSalesforceLightningUrl } from '../config/env';
+import { getSalesforceJwtConfig, getSalesforceJwtUsername, getSalesforceLightningUrl } from '../config/env';
 
 type JwtSession = {
   accessToken: string;
@@ -297,7 +297,8 @@ export class SalesforcePortalPage {
 
     if (useJwt && getSalesforceJwtConfig()) {
       try {
-        await this.loginWithJwt(username);
+        const jwtUsername = getSalesforceJwtUsername() ?? username;
+        await this.loginWithJwt(jwtUsername);
         if (fast) {
           return;
         }

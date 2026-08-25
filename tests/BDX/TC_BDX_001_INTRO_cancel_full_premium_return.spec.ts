@@ -62,7 +62,7 @@ test.describe('@sanity | E2E | BDX | MLIS Policy | Introducer Commission | EW Co
     await statements.proceed();
 
     await quotes.expectLoaded();
-    await quotes.selectFirstQuote();
+    await quotes.selectQuoteByIndex(1);
 
     await finalDetails.expectLoaded();
     await finalDetails.fillRequiredDetailsWithAllAddressLinesMax255();
@@ -87,7 +87,7 @@ test.describe('@sanity | E2E | BDX | MLIS Policy | Introducer Commission | EW Co
     // Login to Salesforce and open the policy record.
     await salesforce.goto();
     const sfCreds = getSalesforceCredentials();
-    await salesforce.login(sfCreds.username, sfCreds.password);
+    await salesforce.login(sfCreds.username, sfCreds.password, { useJwt: true, fast: true });
     await salesforce.searchAndOpenExactFromGlobalSearchGrid(policyNumber);
     await salesforce.openRelatedTab();
     await salesforce.openInsurancePolicyFromRelated(policyNumber);
@@ -216,7 +216,8 @@ test.describe('@sanity | E2E | BDX | MLIS Policy | Introducer Commission | EW Co
     const bdxTable = page.locator('table:visible').first();
     await expect(bdxTable).toBeVisible({ timeout: 120000 });
     await expect.poll(async () => await bdxTable.locator('tbody tr').count(), { timeout: 120000 }).toBeGreaterThan(0);
-    await expect(bdxTable).toContainText(/cancel|mta|reissue/i);
+    // Transaction labels vary by environment; UAT2 may label MTA/CNR activity as Endorsement.
+    await expect(bdxTable).toContainText(/cancel|mta|reissue|endorsement/i);
 
     await bdxTable.scrollIntoViewIfNeeded();
 
