@@ -99,9 +99,9 @@ stages:
 
           - task: DownloadSecureFile@1
             name: salesforceJwtKey
-            displayName: 'Download Salesforce UAT2 JWT key'
+            displayName: 'Download secure file: automation_server.key'
             inputs:
-              secureFile: 'salesforce-uat2-jwt.key'
+              secureFile: 'automation_server.key'
 
           - script: |
               echo "##vso[task.setvariable variable=SALEFORCE_UAT2_JWT_PRIVATE_KEY_PATH]$(salesforceJwtKey.secureFilePath)"
@@ -195,9 +195,9 @@ stages:
 
           - task: DownloadSecureFile@1
             name: salesforceJwtKey
-            displayName: 'Download Salesforce UAT2 JWT key'
+            displayName: 'Download secure file: automation_server.key'
             inputs:
-              secureFile: 'salesforce-uat2-jwt.key'
+              secureFile: 'automation_server.key'
 
           - script: |
               echo "##vso[task.setvariable variable=SALEFORCE_UAT2_JWT_PRIVATE_KEY_PATH]$(salesforceJwtKey.secureFilePath)"
@@ -291,9 +291,9 @@ stages:
 
           - task: DownloadSecureFile@1
             name: salesforceJwtKey
-            displayName: 'Download Salesforce UAT2 JWT key'
+            displayName: 'Download secure file: automation_server.key'
             inputs:
-              secureFile: 'salesforce-uat2-jwt.key'
+              secureFile: 'automation_server.key'
 
           - script: |
               echo "##vso[task.setvariable variable=SALEFORCE_UAT2_JWT_PRIVATE_KEY_PATH]$(salesforceJwtKey.secureFilePath)"
@@ -372,9 +372,9 @@ stages:
 
           - task: DownloadSecureFile@1
             name: salesforceJwtKey
-            displayName: 'Download Salesforce UAT2 JWT key'
+            displayName: 'Download secure file: automation_server.key'
             inputs:
-              secureFile: 'salesforce-uat2-jwt.key'
+              secureFile: 'automation_server.key'
 
           - script: |
               echo "##vso[task.setvariable variable=SALEFORCE_UAT2_JWT_PRIVATE_KEY_PATH]$(salesforceJwtKey.secureFilePath)"
@@ -473,9 +473,9 @@ stages:
 
           - task: DownloadSecureFile@1
             name: salesforceJwtKey
-            displayName: 'Download Salesforce UAT2 JWT key'
+            displayName: 'Download secure file: automation_server.key'
             inputs:
-              secureFile: 'salesforce-uat2-jwt.key'
+              secureFile: 'automation_server.key'
 
           - script: |
               echo "##vso[task.setvariable variable=SALEFORCE_UAT2_JWT_PRIVATE_KEY_PATH]$(salesforceJwtKey.secureFilePath)"
@@ -554,9 +554,9 @@ stages:
 
           - task: DownloadSecureFile@1
             name: salesforceJwtKey
-            displayName: 'Download Salesforce UAT2 JWT key'
+            displayName: 'Download secure file: automation_server.key'
             inputs:
-              secureFile: 'salesforce-uat2-jwt.key'
+              secureFile: 'automation_server.key'
 
           - script: |
               echo "##vso[task.setvariable variable=SALEFORCE_UAT2_JWT_PRIVATE_KEY_PATH]$(salesforceJwtKey.secureFilePath)"
