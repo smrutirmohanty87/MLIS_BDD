@@ -108,6 +108,13 @@ stages:
               echo "##vso[task.setvariable variable=SALESFORCE_UAT2_JWT_PRIVATE_KEY_PATH]$(salesforceJwtKey.secureFilePath)"
             displayName: 'Set Salesforce UAT2 JWT key path'
 
+          - script: |
+              echo "JWT key path:"
+              echo "$SALESFORCE_UAT2_JWT_PRIVATE_KEY_PATH"
+              echo "JWT key exists:"
+              test -f "$SALESFORCE_UAT2_JWT_PRIVATE_KEY_PATH" && echo "YES" || echo "NO"
+            displayName: 'Verify Salesforce JWT key'
+
           - task: Cache@2
             displayName: 'Cache npm dependencies'
             inputs:
@@ -193,6 +200,13 @@ stages:
               echo "##vso[task.setvariable variable=SALEFORCE_UAT2_JWT_PRIVATE_KEY_PATH]$(salesforceJwtKey.secureFilePath)"
               echo "##vso[task.setvariable variable=SALESFORCE_UAT2_JWT_PRIVATE_KEY_PATH]$(salesforceJwtKey.secureFilePath)"
             displayName: 'Set Salesforce UAT2 JWT key path'
+
+          - script: |
+              echo "JWT key path:"
+              echo "$SALESFORCE_UAT2_JWT_PRIVATE_KEY_PATH"
+              echo "JWT key exists:"
+              test -f "$SALESFORCE_UAT2_JWT_PRIVATE_KEY_PATH" && echo "YES" || echo "NO"
+            displayName: 'Verify Salesforce JWT key'
 
           - task: Cache@2
             displayName: 'Cache npm dependencies'
@@ -280,6 +294,13 @@ stages:
               echo "##vso[task.setvariable variable=SALESFORCE_UAT2_JWT_PRIVATE_KEY_PATH]$(salesforceJwtKey.secureFilePath)"
             displayName: 'Set Salesforce UAT2 JWT key path'
 
+          - script: |
+              echo "JWT key path:"
+              echo "$SALESFORCE_UAT2_JWT_PRIVATE_KEY_PATH"
+              echo "JWT key exists:"
+              test -f "$SALESFORCE_UAT2_JWT_PRIVATE_KEY_PATH" && echo "YES" || echo "NO"
+            displayName: 'Verify Salesforce JWT key'
+
           - task: Cache@2
             displayName: 'Cache npm dependencies'
             inputs:
@@ -350,6 +371,13 @@ stages:
               echo "##vso[task.setvariable variable=SALEFORCE_UAT2_JWT_PRIVATE_KEY_PATH]$(salesforceJwtKey.secureFilePath)"
               echo "##vso[task.setvariable variable=SALESFORCE_UAT2_JWT_PRIVATE_KEY_PATH]$(salesforceJwtKey.secureFilePath)"
             displayName: 'Set Salesforce UAT2 JWT key path'
+
+          - script: |
+              echo "JWT key path:"
+              echo "$SALESFORCE_UAT2_JWT_PRIVATE_KEY_PATH"
+              echo "JWT key exists:"
+              test -f "$SALESFORCE_UAT2_JWT_PRIVATE_KEY_PATH" && echo "YES" || echo "NO"
+            displayName: 'Verify Salesforce JWT key'
 
           - task: Cache@2
             displayName: 'Cache npm dependencies'
@@ -442,6 +470,13 @@ stages:
               echo "##vso[task.setvariable variable=SALESFORCE_UAT2_JWT_PRIVATE_KEY_PATH]$(salesforceJwtKey.secureFilePath)"
             displayName: 'Set Salesforce UAT2 JWT key path'
 
+          - script: |
+              echo "JWT key path:"
+              echo "$SALESFORCE_UAT2_JWT_PRIVATE_KEY_PATH"
+              echo "JWT key exists:"
+              test -f "$SALESFORCE_UAT2_JWT_PRIVATE_KEY_PATH" && echo "YES" || echo "NO"
+            displayName: 'Verify Salesforce JWT key'
+
           - task: Cache@2
             displayName: 'Cache npm dependencies'
             inputs:
@@ -512,6 +547,13 @@ stages:
               echo "##vso[task.setvariable variable=SALEFORCE_UAT2_JWT_PRIVATE_KEY_PATH]$(salesforceJwtKey.secureFilePath)"
               echo "##vso[task.setvariable variable=SALESFORCE_UAT2_JWT_PRIVATE_KEY_PATH]$(salesforceJwtKey.secureFilePath)"
             displayName: 'Set Salesforce UAT2 JWT key path'
+
+          - script: |
+              echo "JWT key path:"
+              echo "$SALESFORCE_UAT2_JWT_PRIVATE_KEY_PATH"
+              echo "JWT key exists:"
+              test -f "$SALESFORCE_UAT2_JWT_PRIVATE_KEY_PATH" && echo "YES" || echo "NO"
+            displayName: 'Verify Salesforce JWT key'
 
           - task: Cache@2
             displayName: 'Cache npm dependencies'
