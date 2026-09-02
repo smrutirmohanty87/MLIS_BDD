@@ -98,7 +98,7 @@ function getSalesforcePasswordWithAlias(envName: string): string {
 /**
  * Centralized environment config resolver.
  *
- * Reads process.env.TEST_ENV (defaults to SIT2) and maps to the corresponding
+ * Reads process.env.TEST_ENV (defaults to SIT1) and maps to the corresponding
  * .env variable set, returning a structured config object.
  */
 export function getEnvConfig(): EnvConfig {

@@ -1,0 +1,66 @@
+{
+  "runId": "2026-08-31T15-33-38-621",
+  "createdAtIso": "2026-08-31T10:03:38.621Z",
+  "createdAtLabel": "08/31/2026, 03:33:38 PM",
+  "environment": "SIT1",
+  "status": "passed",
+  "totalDurationMs": 728691,
+  "projects": [
+    "chrome"
+  ],
+  "summary": {
+    "total": 5,
+    "passed": 5,
+    "failed": 0,
+    "skipped": 0,
+    "timedOut": 0,
+    "interrupted": 0
+  },
+  "tests": [
+    {
+      "id": "chrome:tests/sanity/TC_SAN_005_complete_full_commercial_ew_quote_journey.spec.ts:TC_SAN_005 | Complete full commercial England & Wales quote journey end-to-end",
+      "project": "MLIS",
+      "file": "tests/sanity/TC_SAN_005_complete_full_commercial_ew_quote_journey.spec.ts",
+      "title": "TC_SAN_005 | Complete full commercial England & Wales quote journey end-to-end",
+      "fullTitle": " › chrome › sanity\\TC_SAN_005_complete_full_commercial_ew_quote_journey.spec.ts › @sanity | E2E | Salesforce Quote Journey | Commercial E&W › TC_SAN_005 | Complete full commercial England & Wales quote journey end-to-end",
+      "status": "passed",
+      "durationMs": 110698
+    },
+    {
+      "id": "chrome:tests/sanity/TC_SAN_008_cancel_from_inception_full_premium_return.spec.ts:TC_SAN_008 | Cancel policy from inception (full premium return)",
+      "project": "MLIS",
+      "file": "tests/sanity/TC_SAN_008_cancel_from_inception_full_premium_return.spec.ts",
+      "title": "TC_SAN_008 | Cancel policy from inception (full premium return)",
+      "fullTitle": " › chrome › sanity\\TC_SAN_008_cancel_from_inception_full_premium_return.spec.ts › @sanity | E2E | Cancellation | From Inception › TC_SAN_008 | Cancel policy from inception (full premium return)",
+      "status": "passed",
+      "durationMs": 255953
+    },
+    {
+      "id": "chrome:tests/sanity/TC_SAN_011_residential_quick_quote_scotland_single_product_enter_manual_email_quotes.spec.ts:TC_SAN_011 | Residential quick quote Scotland (single product) + enter manually + email quotes + close dialog",
+      "project": "MLIS",
+      "file": "tests/sanity/TC_SAN_011_residential_quick_quote_scotland_single_product_enter_manual_email_quotes.spec.ts",
+      "title": "TC_SAN_011 | Residential quick quote Scotland (single product) + enter manually + email quotes + close dialog",
+      "fullTitle": " › chrome › sanity\\TC_SAN_011_residential_quick_quote_scotland_single_product_enter_manual_email_quotes.spec.ts › @sanity | E2E | Residential Quick Quote | Scotland › TC_SAN_011 | Residential quick quote Scotland (single product) + enter manually + email quotes + close dialog",
+      "status": "passed",
+      "durationMs": 14392
+    },
+    {
+      "id": "chrome:tests/sanity/TC_SAN_015_create_mta_mid_term_adjustment.spec.ts:TC_SAN_015 | Create MTA (Mid-Term Adjustment) on a live policy",
+      "project": "MLIS",
+      "file": "tests/sanity/TC_SAN_015_create_mta_mid_term_adjustment.spec.ts",
+      "title": "TC_SAN_015 | Create MTA (Mid-Term Adjustment) on a live policy",
+      "fullTitle": " › chrome › sanity\\TC_SAN_015_create_mta_mid_term_adjustment.spec.ts › @sanity | E2E | MTA › TC_SAN_015 | Create MTA (Mid-Term Adjustment) on a live policy",
+      "status": "passed",
+      "durationMs": 172720
+    },
+    {
+      "id": "chrome:tests/sanity/TC_SAN_016_cancel_and_reissue_live_policy.spec.ts:TC_SAN_016 | Cancel and reissue a live policy",
+      "project": "MLIS",
+      "file": "tests/sanity/TC_SAN_016_cancel_and_reissue_live_policy.spec.ts",
+      "title": "TC_SAN_016 | Cancel and reissue a live policy",
+      "fullTitle": " › chrome › sanity\\TC_SAN_016_cancel_and_reissue_live_policy.spec.ts › @sanity | E2E | Cancellation | Cancel and Reissue › TC_SAN_016 | Cancel and reissue a live policy",
+      "status": "passed",
+      "durationMs": 160561
+    }
+  ]
+}

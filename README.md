@@ -85,6 +85,20 @@ Create a file named `.env` in the project root with the following structure:
 
 ```dotenv
 # ============================================================
+# UAT1 Environment (UAT1_* prefixed keys)
+# ============================================================
+UAT1_MLIS_PORTAL_URL=https://dualgroup--uat1.sandbox.my.site.com/mlisportal/
+UAT1_SALESFORCE_LIGHTNING_URL=https://dualgroup--uat1.sandbox.my.salesforce.com/
+UAT1_BROKER_USERNAME=t-0111-mlis-uw-default-automated@mlis.uat1
+UAT1_BROKER_PASSWORD=<set-in-local-.env-or-pipeline-secret>
+UAT1_SALESFORCE_USERNAME=t-0116-mlis-uw-enhance-automated@mlis.uat1
+UAT1_SALESFORCE_PASSWORD=<set-in-local-.env-or-pipeline-secret>
+SALEFORCE_UAT1_NO_COMM_BROKERUSER=t-0111-mlis-uw-default-automated@mlis.uat1
+SALEFORCE_UAT1_NO_COMM_BROKERPASSWORD=<set-in-local-.env-or-pipeline-secret>
+SALEFORCE_UAT1_ENHANCEDUSER=t-0116-mlis-uw-enhance-automated@mlis.uat1
+SALEFORCE_UAT1_ENHANCEDUSER_PASSWORD=<set-in-local-.env-or-pipeline-secret>
+
+# ============================================================
 # ACTIVE ENVIRONMENT: UAT2 (unprefixed keys)
 # ============================================================
 MLIS_PORTAL_URL=https://dualgroup--uat2.sandbox.my.site.com/mlisportal/
@@ -109,6 +123,7 @@ SIT2_SALESFORCE_PASSWORD=your-sit2-sf-password
 
 | Environment | Variable Prefix | Example |
 |-------------|----------------|---------|
+| UAT1 | `UAT1_` | `UAT1_MLIS_PORTAL_URL` |
 | UAT2 (default) | *(none)* | `MLIS_PORTAL_URL` |
 | SIT2 | `SIT2_` | `SIT2_MLIS_PORTAL_URL` |
 
@@ -118,12 +133,14 @@ The environment resolver in `src/config/envManager.ts` reads the `TEST_ENV` shel
 
 ```powershell
 # PowerShell (Windows) — run before any test command
+$env:TEST_ENV = 'UAT1'   # uses UAT1_* prefixed keys
 $env:TEST_ENV = 'UAT2'   # default; uses unprefixed .env keys
 $env:TEST_ENV = 'SIT2'   # uses SIT2_* prefixed .env keys
 ```
 
 ```bash
 # Bash (macOS / Linux)
+export TEST_ENV=UAT1
 export TEST_ENV=UAT2
 export TEST_ENV=SIT2
 ```
@@ -320,14 +337,15 @@ TEST_ENV=SIT2 npx playwright test tests/BDX/TC_BDX_006_BDE_new_cancel_and_reissu
 
 ## Multi-Environment Support
 
-The framework supports switching between **UAT2** and **SIT2** environments at runtime without modifying any code.
+The framework supports switching between **UAT1**, **UAT2**, and **SIT2** environments at runtime without modifying any code.
 
 ### How It Works
 
 1. `src/config/envManager.ts` reads `process.env.TEST_ENV` at startup.
-2. If `TEST_ENV=UAT2` (or unset), it reads **unprefixed** `.env` keys (e.g., `MLIS_PORTAL_URL`).
-3. If `TEST_ENV=SIT2`, it reads **`SIT2_`-prefixed** `.env` keys (e.g., `SIT2_MLIS_PORTAL_URL`).
-4. The resolved config is cached for the duration of the test run and logged: `Running tests in UAT2 environment`.
+2. If `TEST_ENV=UAT1`, it reads **`UAT1_`-prefixed** `.env` keys (e.g., `UAT1_MLIS_PORTAL_URL`).
+3. If `TEST_ENV=UAT2` (or unset in legacy setup), it reads **unprefixed** `.env` keys (e.g., `MLIS_PORTAL_URL`).
+4. If `TEST_ENV=SIT2`, it reads **`SIT2_`-prefixed** `.env` keys (e.g., `SIT2_MLIS_PORTAL_URL`).
+5. The resolved config is cached for the duration of the test run and logged as: `Running tests in <ENV> environment`.
 
 ### Adding a New Environment
 

@@ -1,0 +1,30 @@
+{
+  "runId": "2026-08-31T17-15-37-362",
+  "createdAtIso": "2026-08-31T11:45:37.362Z",
+  "createdAtLabel": "08/31/2026, 05:15:37 PM",
+  "environment": "SIT1",
+  "status": "failed",
+  "totalDurationMs": 2857355,
+  "projects": [
+    "chrome"
+  ],
+  "summary": {
+    "total": 1,
+    "passed": 0,
+    "failed": 0,
+    "skipped": 0,
+    "timedOut": 1,
+    "interrupted": 0
+  },
+  "tests": [
+    {
+      "id": "chrome:tests/regression/TC_REG_034_create_claim_on_live_commercial_policy.spec.ts:TC_REG_034_COMM | Create Claim on a live commercial policy and submit mandatory details",
+      "project": "MLIS",
+      "file": "tests/regression/TC_REG_034_create_claim_on_live_commercial_policy.spec.ts",
+      "title": "TC_REG_034_COMM | Create Claim on a live commercial policy and submit mandatory details",
+      "fullTitle": " › chrome › regression\\TC_REG_034_create_claim_on_live_commercial_policy.spec.ts › @regression | E2E | Claims | Commercial › TC_REG_034_COMM | Create Claim on a live commercial policy and submit mandatory details",
+      "status": "timedOut",
+      "durationMs": 2845476
+    }
+  ]
+}

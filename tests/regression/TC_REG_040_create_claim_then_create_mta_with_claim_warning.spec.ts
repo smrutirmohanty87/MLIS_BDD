@@ -75,30 +75,17 @@ test.describe('@regression | E2E | Claims | MTA', () => {
     // Open policy in Salesforce.
     await salesforce.goto();
     const sfCreds = getSalesforceCredentials();
-    await salesforce.login(sfCreds.username, sfCreds.password, { useJwt: true, fast: true });
-
-    const searchAndOpenPolicyWithRetry = async (ref: string, attempts = 2) => {
-      let lastError: unknown;
-      for (let attempt = 1; attempt <= attempts; attempt += 1) {
-        try {
-          await salesforce.searchAndOpenExactFromGlobalSearchGrid(ref);
-          await salesforce.openRelatedTab();
-          await salesforce.openInsurancePolicyFromRelated(ref);
-          return;
-        } catch (error) {
-          lastError = error;
-          if (attempt < attempts) {
-            await page.reload({ waitUntil: 'domcontentloaded' });
-            await page.waitForTimeout(3000);
-          }
-        }
-      }
-      throw lastError;
-    };
-
-    await searchAndOpenPolicyWithRetry(policyNumber);
+    await salesforce.login(sfCreds.username, sfCreds.password, { useJwt: false, fast: true });
 
     // Create claim from policy.
+    await salesforce.searchAndOpenExactFromGlobalSearchGrid(policyNumber);
+    await salesforce.openRelatedTab();
+    await salesforce.openInsurancePolicyFromRelated(policyNumber, {
+      requireCreateMTA: false,
+      requireNewNote: false,
+      requireShowMoreActions: false,
+    });
+
     await salesforce.openCreateClaimDialog();
     await salesforce.selectClaimCoverage();
     await salesforce.completeClaimPostCreationFlowAndAssertIncurred();

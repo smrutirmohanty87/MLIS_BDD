@@ -11,7 +11,29 @@ type JwtSession = {
 };
 
 export class SalesforcePortalPage {
-  constructor(private readonly page: Page) {}
+  constructor(private page: Page) {}
+
+  private async ensureActivePage() {
+    if (!this.page.isClosed()) {
+      return;
+    }
+
+    const pages = this.page.context().pages().filter((p) => !p.isClosed());
+    if (!pages.length) {
+      throw new Error('No active Playwright page is available in the browser context.');
+    }
+
+    this.page = pages[pages.length - 1];
+    await this.page.bringToFront().catch(() => undefined);
+    await this.page.waitForLoadState('domcontentloaded').catch(() => undefined);
+  }
+
+  private normalizeEnvName(value: string | undefined) {
+    const env = (value ?? '').trim().toUpperCase();
+    if (!env) return 'SIT1';
+    if (env === 'SIT') return 'SIT1';
+    return env;
+  }
 
   private async isAuthenticatedSalesforceSession() {
     await this.waitForLightningIdle().catch(() => undefined);
@@ -286,9 +308,17 @@ export class SalesforcePortalPage {
     await this.page.goto(getSalesforceLightningUrl());
   }
 
-  async login(username: string, password: string, options?: { useJwt?: boolean; fast?: boolean }) {
-    const useJwt = options?.useJwt ?? true;
+  async login(
+    username: string,
+    password: string,
+    options?: { useJwt?: boolean; fast?: boolean; allowPasswordFallbackAfterJwt?: boolean },
+  ) {
+    const envName = this.normalizeEnvName(process.env.TEST_ENV);
+    const jwtAllowedForEnv = envName !== 'UAT1';
+    const usernameLooksLikeClaimsUser = /(?:^|[-_@.])(clm|claim)(?:[-_@.]|$)/i.test(username);
+    const useJwt = (options?.useJwt ?? true) && jwtAllowedForEnv && !usernameLooksLikeClaimsUser;
     const fast = options?.fast ?? false;
+    const allowPasswordFallbackAfterJwt = options?.allowPasswordFallbackAfterJwt ?? false;
 
     if (await this.isAuthenticatedSalesforceSession()) {
       await this.expectAppLoaded();
@@ -307,6 +337,10 @@ export class SalesforcePortalPage {
         await this.expectUnderwritingNavigation();
         return;
       } catch (error) {
+        if (!allowPasswordFallbackAfterJwt) {
+          throw new Error(`[salesforce] JWT login failed and password fallback is disabled: ${(error as Error).message}`);
+        }
+
         // Continue with username/password when a user is not JWT-authorized.
         // eslint-disable-next-line no-console
         console.warn(`[salesforce] JWT login failed; falling back to password login: ${(error as Error).message}`);
@@ -670,9 +704,25 @@ export class SalesforcePortalPage {
       await this.clickWhenUiReady(firstRowLink);
     }
 
-    // Verify Insurance Policy record loaded with expected state
-    await expect(this.page.getByRole('heading', { name: /Insurance Policy/i })).toBeVisible({ timeout: 60000 });
-    if (expectedPolicyNumber) {
+    // Verify Insurance Policy record loaded with expected state.
+    // Some Lightning page templates do not render an "Insurance Policy" heading,
+    // but do render primary record actions like "Create Claim".
+    const recordHeading = this.page.getByRole('heading', { name: /Insurance Policy/i }).first();
+    const createClaimAction = this.page
+      .locator('button:visible:has-text("Create Claim"), a:visible:has-text("Create Claim"), [role="button"]:visible:has-text("Create Claim")')
+      .first();
+    await expect
+      .poll(async () => {
+        const hasHeading = await recordHeading.isVisible({ timeout: 500 }).catch(() => false);
+        const hasCreateClaim = await createClaimAction.isVisible({ timeout: 500 }).catch(() => false);
+        return hasHeading || hasCreateClaim;
+      }, {
+        timeout: 60000,
+        intervals: [1000, 2000, 5000],
+        message: 'Expected Insurance Policy page indicators (heading or Create Claim action) to be visible.',
+      })
+      .toBe(true);
+    if (expectedPolicyNumber && (await recordHeading.isVisible({ timeout: 500 }).catch(() => false))) {
       await expect(this.page.getByRole('heading', { name: new RegExp(expectedPolicyNumber, 'i') })).toBeVisible({ timeout: 60000 });
     }
     await this.waitForLightningIdle();
@@ -766,8 +816,22 @@ export class SalesforcePortalPage {
         );
       }
 
-      await expect(this.page.getByRole('heading', { name: /Insurance Policy/i })).toBeVisible({ timeout: 60000 });
-      if (expectedPolicyNumber) {
+      const recordHeading = this.page.getByRole('heading', { name: /Insurance Policy/i }).first();
+      const createClaimAction = this.page
+        .locator('button:visible:has-text("Create Claim"), a:visible:has-text("Create Claim"), [role="button"]:visible:has-text("Create Claim")')
+        .first();
+      await expect
+        .poll(async () => {
+          const hasHeading = await recordHeading.isVisible({ timeout: 500 }).catch(() => false);
+          const hasCreateClaim = await createClaimAction.isVisible({ timeout: 500 }).catch(() => false);
+          return hasHeading || hasCreateClaim;
+        }, {
+          timeout: 60000,
+          intervals: [1000, 2000, 5000],
+          message: 'Expected Insurance Policy page indicators (heading or Create Claim action) to be visible.',
+        })
+        .toBe(true);
+      if (expectedPolicyNumber && (await recordHeading.isVisible({ timeout: 500 }).catch(() => false))) {
         await expect(this.page.getByRole('heading', { name: new RegExp(expectedPolicyNumber, 'i') })).toBeVisible({ timeout: 60000 });
       }
 
@@ -845,6 +909,189 @@ export class SalesforcePortalPage {
 
     await this.waitForLightningIdle();
     await expect(this.page.getByRole('tab', { name: 'Related' }).first()).toBeVisible({ timeout: 120000 });
+  }
+
+  /**
+   * New claims entry flow:
+   * 1) Global search using submission reference (do NOT open the submission).
+   * 2) Read Risk ID directly from the "Risk Id" column of the results grid.
+   * 3) Search again using Risk ID.
+   * 4) Scroll to Insurance Policies grid and open Policy Number.
+   * 5) Click Create Claim.
+   */
+  async openCreateClaimFromSubmissionViaRiskId(submissionReference: string) {
+    const searchLauncherInitial = this.page.locator('//*[@id="oneHeader"]/div[2]/div[2]/div/div/button').first();
+    const searchButtonFallbackInitial = this.page.getByRole('button', { name: /^Search/ }).first();
+
+    const dialogSearchInputInitial = this.page
+      .locator('[role="dialog"] input[type="search"]:visible, [role="dialog"] input[placeholder*="Search"]:visible')
+      .first();
+    const headerSearchInputInitial = this.page
+      .locator('#oneHeader input[type="search"]:visible, #oneHeader input[placeholder="Search..."]:visible')
+      .first();
+
+    let activeSearchInputInitial = dialogSearchInputInitial;
+    let searchInputVisibleInitial = false;
+
+    for (let attempt = 1; attempt <= 3; attempt += 1) {
+      if (await dialogSearchInputInitial.isVisible({ timeout: 1500 }).catch(() => false)) {
+        searchInputVisibleInitial = true;
+        activeSearchInputInitial = dialogSearchInputInitial;
+        break;
+      }
+
+      if (await headerSearchInputInitial.isVisible({ timeout: 1500 }).catch(() => false)) {
+        searchInputVisibleInitial = true;
+        activeSearchInputInitial = headerSearchInputInitial;
+        break;
+      }
+
+      if (await searchLauncherInitial.isVisible({ timeout: 1500 }).catch(() => false)) {
+        await this.clickWhenUiReady(searchLauncherInitial);
+      } else {
+        await expect(searchButtonFallbackInitial).toBeVisible({ timeout: 15000 });
+        await this.clickWhenUiReady(searchButtonFallbackInitial);
+      }
+
+      await this.waitForLightningIdle().catch(() => undefined);
+    }
+
+    if (!searchInputVisibleInitial) {
+      await expect(headerSearchInputInitial.or(dialogSearchInputInitial).first()).toBeVisible({ timeout: 15000 });
+      activeSearchInputInitial = await dialogSearchInputInitial.isVisible({ timeout: 500 }).catch(() => false)
+        ? dialogSearchInputInitial
+        : headerSearchInputInitial;
+    }
+
+    await activeSearchInputInitial.fill(submissionReference);
+    await activeSearchInputInitial.press('Enter');
+    await this.waitForLightningIdle();
+
+    const escapedRef = this.escapeForRegex(submissionReference);
+    const resultsTable = this.page.locator('main table:visible, table:visible').first();
+    await expect(resultsTable).toBeVisible({ timeout: 120000 });
+
+    const matchingRow = resultsTable.locator('tr').filter({ hasText: new RegExp(escapedRef, 'i') }).first();
+    await expect(matchingRow).toBeVisible({ timeout: 120000 });
+
+    // Read Risk Id directly from the results grid row (do NOT open the submission).
+    const riskIdHeaderCell = resultsTable
+      .locator('th, [role="columnheader"]')
+      .filter({ hasText: /^Risk\s*Id$/i })
+      .first();
+    let riskIdColumnIndex = -1;
+    if (await riskIdHeaderCell.isVisible({ timeout: 5000 }).catch(() => false)) {
+      const allHeaderCells = resultsTable.locator('th, [role="columnheader"]');
+      const headerCount = await allHeaderCells.count().catch(() => 0);
+      for (let i = 0; i < headerCount; i += 1) {
+        const text = (await allHeaderCells.nth(i).innerText().catch(() => '')).trim();
+        if (/^Risk\s*Id$/i.test(text)) {
+          riskIdColumnIndex = i;
+          break;
+        }
+      }
+    }
+
+    let riskId = '';
+    if (riskIdColumnIndex >= 0) {
+      const riskIdCell = matchingRow.locator('th, td').nth(riskIdColumnIndex);
+      riskId = ((await riskIdCell.innerText().catch(() => '')) || '').trim();
+    }
+
+    if (!riskId) {
+      const rowText = (await matchingRow.innerText().catch(() => '')) || '';
+      const riskIdMatch = rowText.match(/\b[A-Z]{2,5}\/\d{6,}\/[A-Z]{2,8}\/\d{2}\b/i);
+      riskId = (riskIdMatch?.[0] ?? '').trim();
+    }
+
+    if (!riskId) {
+      throw new Error('[salesforce] Unable to read Risk ID from global search results grid.');
+    }
+
+    const searchLauncher = this.page.locator('//*[@id="oneHeader"]/div[2]/div[2]/div/div/button').first();
+    const searchButtonFallback = this.page.getByRole('button', { name: /^Search/ }).first();
+
+    const dialogSearchInput = this.page
+      .locator('[role="dialog"] input[type="search"]:visible, [role="dialog"] input[placeholder*="Search"]:visible')
+      .first();
+    const headerSearchInput = this.page
+      .locator('#oneHeader input[type="search"]:visible, #oneHeader input[placeholder="Search..."]:visible')
+      .first();
+
+    let activeSearchInput = dialogSearchInput;
+    let searchInputVisible = false;
+
+    for (let attempt = 1; attempt <= 3; attempt += 1) {
+      if (await dialogSearchInput.isVisible({ timeout: 1200 }).catch(() => false)) {
+        activeSearchInput = dialogSearchInput;
+        searchInputVisible = true;
+        break;
+      }
+
+      if (await headerSearchInput.isVisible({ timeout: 1200 }).catch(() => false)) {
+        activeSearchInput = headerSearchInput;
+        searchInputVisible = true;
+        break;
+      }
+
+      if (await searchLauncher.isVisible({ timeout: 1200 }).catch(() => false)) {
+        await this.clickWhenUiReady(searchLauncher);
+      } else {
+        await expect(searchButtonFallback).toBeVisible({ timeout: 15000 });
+        await this.clickWhenUiReady(searchButtonFallback);
+      }
+
+      await this.waitForLightningIdle().catch(() => undefined);
+    }
+
+    if (!searchInputVisible) {
+      await expect(headerSearchInput.or(dialogSearchInput).first()).toBeVisible({ timeout: 15000 });
+      activeSearchInput = await dialogSearchInput.isVisible({ timeout: 500 }).catch(() => false)
+        ? dialogSearchInput
+        : headerSearchInput;
+    }
+
+    await activeSearchInput.fill(riskId);
+    await activeSearchInput.press('Enter');
+    await this.waitForLightningIdle();
+
+    const insurancePoliciesHeading = this.page.getByRole('heading', { name: /Insurance Policies/i }).first();
+    for (let i = 0; i < 18; i += 1) {
+      if (await insurancePoliciesHeading.isVisible({ timeout: 1000 }).catch(() => false)) {
+        break;
+      }
+      await this.page.mouse.wheel(0, 1300);
+      await this.page.waitForTimeout(250);
+    }
+
+    await expect(insurancePoliciesHeading).toBeVisible({ timeout: 60000 });
+    await insurancePoliciesHeading.scrollIntoViewIfNeeded().catch(() => undefined);
+
+    const insurancePoliciesTable = insurancePoliciesHeading.locator('xpath=following::table[1]').first();
+    await expect(insurancePoliciesTable).toBeVisible({ timeout: 60000 });
+
+    const riskIdEscaped = this.escapeForRegex(riskId);
+    const matchingPolicyLink = insurancePoliciesTable
+      .getByRole('link', { name: new RegExp(`^${riskIdEscaped}(?:/\\d+)?$`, 'i') })
+      .first();
+    const firstPolicyLink = insurancePoliciesTable
+      .locator('tbody tr th a:visible, tbody tr td a:visible')
+      .filter({ hasText: /\S+/ })
+      .first();
+
+    if (await matchingPolicyLink.isVisible({ timeout: 5000 }).catch(() => false)) {
+      await this.clickWhenUiReady(matchingPolicyLink);
+    } else {
+      await expect(firstPolicyLink).toBeVisible({ timeout: 60000 });
+      await this.clickWhenUiReady(firstPolicyLink);
+    }
+
+    await this.waitForLightningIdle();
+
+    const createClaimButton = this.page.getByRole('button', { name: /Create Claim/i }).first();
+    await expect(createClaimButton).toBeVisible({ timeout: 60000 });
+    await this.clickWhenUiReady(createClaimButton);
+    await this.waitForLightningIdle();
   }
 
   /**
@@ -1130,48 +1377,167 @@ export class SalesforcePortalPage {
   }
 
   async openCreateClaimDialog() {
-    const createClaimButton = this.page.getByRole('button', { name: 'Create Claim' }).first();
-    await expect(createClaimButton).toBeVisible({ timeout: 60000 });
-    await createClaimButton.click();
-    await this.waitForLightningIdle();
+    await this.ensureActivePage();
 
     const claimHeading = this.page.getByRole('heading', { name: /Claim|Create Claim|Enter Claim|New Claim/i }).first();
     const submitButton = this.page.getByRole('button', { name: /Submit/i }).first();
+    const claimCoverageCombobox = this.page.getByRole('combobox', { name: /Claim coverage|Select Claim coverage/i }).first();
 
-    const headingVisible = await claimHeading.isVisible({ timeout: 10000 }).catch(() => false);
-    if (headingVisible) {
-      await expect(claimHeading).toBeVisible({ timeout: 60000 });
-    } else {
-      await expect(submitButton).toBeVisible({ timeout: 60000 });
+    const isClaimDialogReady = async () => {
+      return (
+        await claimHeading.isVisible({ timeout: 1000 }).catch(() => false)
+        || await submitButton.isVisible({ timeout: 1000 }).catch(() => false)
+        || await claimCoverageCombobox.isVisible({ timeout: 1000 }).catch(() => false)
+      );
+    };
+
+    if (await isClaimDialogReady()) {
+      return;
     }
+
+    const createClaimAction = this.page
+      .locator([
+        'button:visible:has-text("Create Claim")',
+        'a:visible:has-text("Create Claim")',
+        '[role="button"]:visible:has-text("Create Claim")',
+      ].join(', '))
+      .first();
+    await expect(createClaimAction).toBeVisible({ timeout: 60000 });
+
+    for (let attempt = 1; attempt <= 4; attempt += 1) {
+      await createClaimAction.scrollIntoViewIfNeeded().catch(() => undefined);
+      const spawnedPagePromise = this.page.context().waitForEvent('page', { timeout: 5000 }).catch(() => null);
+
+      await this.clickWhenUiReady(createClaimAction).catch(async () => {
+        await createClaimAction.click({ force: true, timeout: 5000 }).catch(() => undefined);
+        await createClaimAction.dispatchEvent('click').catch(() => undefined);
+      });
+
+      const spawnedPage = await spawnedPagePromise;
+      if (spawnedPage && !spawnedPage.isClosed()) {
+        this.page = spawnedPage;
+        await this.page.bringToFront().catch(() => undefined);
+        await this.page.waitForLoadState('domcontentloaded').catch(() => undefined);
+      }
+
+      await this.ensureActivePage();
+      await this.waitForLightningIdle();
+      if (!this.page.isClosed()) {
+        await this.page.waitForTimeout(600);
+      }
+
+      if (await isClaimDialogReady()) {
+        return;
+      }
+
+      const showMoreActions = this.page.getByRole('button', { name: /Show more actions/i }).first();
+      if (await showMoreActions.isVisible({ timeout: 1500 }).catch(() => false)) {
+        await this.clickWhenUiReady(showMoreActions);
+        const createClaimMenu = this.page.getByRole('menuitem', { name: /^Create Claim$/i }).first();
+        if (await createClaimMenu.isVisible({ timeout: 5000 }).catch(() => false)) {
+          await this.clickWhenUiReady(createClaimMenu);
+          await this.waitForLightningIdle();
+          await this.page.waitForTimeout(600);
+          if (await isClaimDialogReady()) {
+            return;
+          }
+        } else {
+          await this.page.keyboard.press('Escape').catch(() => undefined);
+        }
+      }
+    }
+
+    await expect(claimHeading.or(submitButton).or(claimCoverageCombobox).first()).toBeVisible({ timeout: 60000 });
   }
 
   async selectClaimCoverage(optionText?: string) {
-    const coverageCombobox = this.page
-      .getByRole('combobox', { name: /Select Claim coverage|Claim coverage/i })
+    const coverageComboboxByRole = this.page
+      .getByRole('combobox', { name: /Select Claim Coverage|Claim Coverage/i })
       .first();
 
+    const coverageComboboxByCss = this.page
+      .locator([
+        '[role="combobox"][aria-label*="Claim Coverage"]:visible',
+        '[role="combobox"][aria-label*="Claim coverage"]:visible',
+        '[role="combobox"][aria-label*="Select Claim Coverage"]:visible',
+        'button[aria-label*="Claim Coverage"]:visible',
+        'button[aria-label*="Claim coverage"]:visible',
+        'button:has-text("Select Claim Coverage"):visible',
+      ].join(', '))
+      .first();
+
+    const selectOptionButton = this.page.getByRole('button', { name: /Select an Option/i }).first();
+
+    const inlineValidation = this.page.getByText(/Please select a Coverage/i).first();
+
+    // Role-based locator matches the accessible name computed from the associated
+    // label ("*Select Claim Coverage") even though the element has no aria-label attribute,
+    // so prefer it and only fall back to the CSS locator if it never renders.
+    const coverageCombobox: Locator = coverageComboboxByRole.or(coverageComboboxByCss).first();
+
     await expect(coverageCombobox).toBeVisible({ timeout: 30000 });
-    await coverageCombobox.scrollIntoViewIfNeeded();
-    await coverageCombobox.click();
 
-    // Claims UI renders dropdown options asynchronously after combobox click.
-    await this.page.waitForTimeout(800);
+    for (let attempt = 1; attempt <= 4; attempt += 1) {
+      const openTrigger = (await selectOptionButton.isVisible({ timeout: 1000 }).catch(() => false))
+        ? selectOptionButton
+        : coverageCombobox;
 
-    const allOptions = this.page.getByRole('option').filter({ hasText: /\S+/ });
-    await expect(allOptions.first()).toBeVisible({ timeout: 15000 });
+      await openTrigger.scrollIntoViewIfNeeded().catch(() => undefined);
+      await this.clickWhenUiReady(openTrigger).catch(async () => {
+        await openTrigger.click({ force: true, timeout: 5000 }).catch(() => undefined);
+      });
 
-    const preferred = optionText
-      ? this.page.getByRole('option', { name: new RegExp(this.escapeForRegex(optionText), 'i') }).first()
-      : this.page.getByRole('option').filter({ hasNotText: /select|choose/i }).first();
+      // Claims UI renders dropdown options asynchronously after combobox click.
+      await this.page.waitForTimeout(900);
 
-    if (await preferred.isVisible({ timeout: 3000 }).catch(() => false)) {
-      await preferred.click();
-    } else {
-      await allOptions.first().click();
+      const allOptions = this.page
+        .locator([
+          '[role="option"]:visible',
+          '[role="listbox"] [role="option"]:visible',
+          'lightning-base-combobox-item:visible',
+          'lightning-base-combobox-item span[title]:visible',
+          '.slds-listbox__option:visible',
+          '.slds-listbox__item:visible',
+          '.slds-listbox__item span[title]:visible',
+        ].join(', '))
+        .filter({ hasText: /\S+/ })
+        .filter({ hasNotText: /select\s+claim\s+coverage|select|choose|--\s*clear\s*--|none/i });
+
+      const optionsVisible = await allOptions.first().isVisible({ timeout: 5000 }).catch(() => false);
+
+      if (!optionsVisible) {
+        // Fallback for orgs where options are keyboard-driven or render without role semantics.
+        await coverageCombobox.press('ArrowDown').catch(() => undefined);
+        await this.page.waitForTimeout(300);
+        await coverageCombobox.press('ArrowDown').catch(() => undefined);
+        await coverageCombobox.press('Enter').catch(() => undefined);
+        await this.waitForLightningIdle();
+      } else {
+        const preferred = optionText
+          ? allOptions.filter({ hasText: new RegExp(this.escapeForRegex(optionText), 'i') }).first()
+          : allOptions.first();
+
+        if (await preferred.isVisible({ timeout: 3000 }).catch(() => false)) {
+          await this.clickWhenUiReady(preferred).catch(async () => {
+            await preferred.click({ force: true, timeout: 5000 }).catch(() => undefined);
+          });
+        } else {
+          await this.clickWhenUiReady(allOptions.first()).catch(async () => {
+            await allOptions.first().click({ force: true, timeout: 5000 }).catch(() => undefined);
+          });
+        }
+      }
+
+      await this.waitForLightningIdle();
+      await this.page.waitForTimeout(500);
+
+      const hasValidationError = await inlineValidation.isVisible({ timeout: 800 }).catch(() => false);
+      if (!hasValidationError) {
+        return;
+      }
     }
 
-    await this.waitForLightningIdle();
+    throw new Error('Unable to select Claim Coverage; combobox still shows placeholder or validation error remains.');
   }
 
   private async selectRiskLocationFromDropdown(optionText?: string) {

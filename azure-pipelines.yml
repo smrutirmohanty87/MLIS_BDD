@@ -1,7 +1,13 @@
-﻿# =============================================================================
-# MLIS Test Automation Framework — Azure DevOps Pipeline
+# =============================================================================
+# MLIS Test Automation Framework � Azure DevOps Pipeline
 #
 # Prerequisites (set as pipeline secret variables in Azure DevOps UI):
+#
+#   UAT1 (UAT1_* prefixed keys):
+#     UAT1_MLIS_PORTAL_URL, UAT1_SALESFORCE_LIGHTNING_URL,
+#     SALEFORCE_UAT1_NO_COMM_BROKERUSER, SALEFORCE_UAT1_NO_COMM_BROKERPASSWORD,
+#     SALEFORCE_UAT1_ENHANCEDUSER, SALEFORCE_UAT1_ENHANCEDUSER_PASSWORD,
+#     SALESFORCE_UAT1_JWT_CLIENT_ID, SALESFORCE_UAT1_JWT_LOGIN_URL
 #
 #   UAT2 (active / unprefixed keys):
 #     MLIS_PORTAL_URL, SALESFORCE_LIGHTNING_URL,
@@ -42,6 +48,7 @@ parameters:
     type: string
     default: 'UAT2'
     values:
+      - UAT1
       - UAT2
       - SIT2
 
@@ -76,7 +83,7 @@ variables:
 
 stages:
   # ---------------------------------------------------------------------------
-  # STAGE 1 — Sanity Tests (12 tests)
+  # STAGE 1 � Sanity Tests (12 tests)
   # ---------------------------------------------------------------------------
   - stage: Sanity_Tests
     displayName: 'Sanity Tests (12 tests)'
@@ -87,7 +94,7 @@ stages:
       )
     jobs:
       - job: RunSanityTests
-        displayName: 'Run Sanity Tests — $(TEST_ENV)'
+        displayName: 'Run Sanity Tests � $(TEST_ENV)'
         pool:
           vmImage: 'ubuntu-latest'
         timeoutInMinutes: 60
@@ -104,9 +111,11 @@ stages:
               secureFile: 'automation_server.key'
 
           - script: |
+              echo "##vso[task.setvariable variable=SALEFORCE_UAT1_JWT_PRIVATE_KEY_PATH]$(salesforceJwtKey.secureFilePath)"
+              echo "##vso[task.setvariable variable=SALESFORCE_UAT1_JWT_PRIVATE_KEY_PATH]$(salesforceJwtKey.secureFilePath)"
               echo "##vso[task.setvariable variable=SALEFORCE_UAT2_JWT_PRIVATE_KEY_PATH]$(salesforceJwtKey.secureFilePath)"
               echo "##vso[task.setvariable variable=SALESFORCE_UAT2_JWT_PRIVATE_KEY_PATH]$(salesforceJwtKey.secureFilePath)"
-            displayName: 'Set Salesforce UAT2 JWT key path'
+            displayName: 'Set Salesforce JWT key path'
 
           - script: |
               echo "JWT key path:"
@@ -137,6 +146,15 @@ stages:
               TEST_BROKER_PROFILE: $(TEST_BROKER_PROFILE)
               MLIS_PORTAL_URL: $(MLIS_PORTAL_URL)
               SALESFORCE_LIGHTNING_URL: $(SALESFORCE_LIGHTNING_URL)
+              UAT1_MLIS_PORTAL_URL: $(UAT1_MLIS_PORTAL_URL)
+              UAT1_SALESFORCE_LIGHTNING_URL: $(UAT1_SALESFORCE_LIGHTNING_URL)
+              SALEFORCE_UAT1_NO_COMM_BROKERUSER: $(SALEFORCE_UAT1_NO_COMM_BROKERUSER)
+              SALEFORCE_UAT1_NO_COMM_BROKERPASSWORD: $(SALEFORCE_UAT1_NO_COMM_BROKERPASSWORD)
+              SALEFORCE_UAT1_ENHANCEDUSER: $(SALEFORCE_UAT1_ENHANCEDUSER)
+              SALEFORCE_UAT1_ENHANCEDUSER_PASSWORD: $(SALEFORCE_UAT1_ENHANCEDUSER_PASSWORD)
+              SALESFORCE_UAT1_JWT_CLIENT_ID: $(SALESFORCE_UAT1_JWT_CLIENT_ID)
+              SALESFORCE_UAT1_JWT_LOGIN_URL: $(SALESFORCE_UAT1_JWT_LOGIN_URL)
+              SALESFORCE_UAT1_JWT_PRIVATE_KEY_PATH: $(SALESFORCE_UAT1_JWT_PRIVATE_KEY_PATH)
               SALEFORCE_UAT2_NO_COMM_BROKERUSER: $(SALEFORCE_UAT2_NO_COMM_BROKERUSER)
               SALEFORCE_UAT2_NO_COMM_BROKERPASSWORD: $(SALEFORCE_UAT2_NO_COMM_BROKERPASSWORD)
               SALEFORCE_UAT2_ENHANCEDUSER: $(SALEFORCE_UAT2_ENHANCEDUSER)
@@ -168,7 +186,7 @@ stages:
               publishLocation: 'pipeline'
 
   # ---------------------------------------------------------------------------
-  # STAGE 2 — Regression Tests (19 tests)
+  # STAGE 2 � Regression Tests (19 tests)
   # ---------------------------------------------------------------------------
   - stage: Regression_Tests
     displayName: 'Regression Tests (19 tests)'
@@ -183,7 +201,7 @@ stages:
       )
     jobs:
       - job: RunRegressionTests
-        displayName: 'Run Regression Tests — $(TEST_ENV)'
+        displayName: 'Run Regression Tests � $(TEST_ENV)'
         pool:
           vmImage: 'ubuntu-latest'
         timeoutInMinutes: 150
@@ -200,9 +218,11 @@ stages:
               secureFile: 'automation_server.key'
 
           - script: |
+              echo "##vso[task.setvariable variable=SALEFORCE_UAT1_JWT_PRIVATE_KEY_PATH]$(salesforceJwtKey.secureFilePath)"
+              echo "##vso[task.setvariable variable=SALESFORCE_UAT1_JWT_PRIVATE_KEY_PATH]$(salesforceJwtKey.secureFilePath)"
               echo "##vso[task.setvariable variable=SALEFORCE_UAT2_JWT_PRIVATE_KEY_PATH]$(salesforceJwtKey.secureFilePath)"
               echo "##vso[task.setvariable variable=SALESFORCE_UAT2_JWT_PRIVATE_KEY_PATH]$(salesforceJwtKey.secureFilePath)"
-            displayName: 'Set Salesforce UAT2 JWT key path'
+            displayName: 'Set Salesforce JWT key path'
 
           - script: |
               echo "JWT key path:"
@@ -233,6 +253,15 @@ stages:
               TEST_BROKER_PROFILE: $(TEST_BROKER_PROFILE)
               MLIS_PORTAL_URL: $(MLIS_PORTAL_URL)
               SALESFORCE_LIGHTNING_URL: $(SALESFORCE_LIGHTNING_URL)
+              UAT1_MLIS_PORTAL_URL: $(UAT1_MLIS_PORTAL_URL)
+              UAT1_SALESFORCE_LIGHTNING_URL: $(UAT1_SALESFORCE_LIGHTNING_URL)
+              SALEFORCE_UAT1_NO_COMM_BROKERUSER: $(SALEFORCE_UAT1_NO_COMM_BROKERUSER)
+              SALEFORCE_UAT1_NO_COMM_BROKERPASSWORD: $(SALEFORCE_UAT1_NO_COMM_BROKERPASSWORD)
+              SALEFORCE_UAT1_ENHANCEDUSER: $(SALEFORCE_UAT1_ENHANCEDUSER)
+              SALEFORCE_UAT1_ENHANCEDUSER_PASSWORD: $(SALEFORCE_UAT1_ENHANCEDUSER_PASSWORD)
+              SALESFORCE_UAT1_JWT_CLIENT_ID: $(SALESFORCE_UAT1_JWT_CLIENT_ID)
+              SALESFORCE_UAT1_JWT_LOGIN_URL: $(SALESFORCE_UAT1_JWT_LOGIN_URL)
+              SALESFORCE_UAT1_JWT_PRIVATE_KEY_PATH: $(SALESFORCE_UAT1_JWT_PRIVATE_KEY_PATH)
               SALEFORCE_UAT2_NO_COMM_BROKERUSER: $(SALEFORCE_UAT2_NO_COMM_BROKERUSER)
               SALEFORCE_UAT2_NO_COMM_BROKERPASSWORD: $(SALEFORCE_UAT2_NO_COMM_BROKERPASSWORD)
               SALEFORCE_UAT2_ENHANCEDUSER: $(SALEFORCE_UAT2_ENHANCEDUSER)
@@ -264,10 +293,10 @@ stages:
               publishLocation: 'pipeline'
 
   # ---------------------------------------------------------------------------
-  # STAGE 3a — BDX Core Tests (TC_BDX_001–004)
+  # STAGE 3a � BDX Core Tests (TC_BDX_001�004)
   # ---------------------------------------------------------------------------
   - stage: BDX_Core_Tests
-    displayName: 'BDX Core Tests (TC_BDX_001–004)'
+    displayName: 'BDX Core Tests (TC_BDX_001�004)'
     dependsOn: Regression_Tests
     condition: |
       and(
@@ -279,7 +308,7 @@ stages:
       )
     jobs:
       - job: RunBDX_001
-        displayName: 'TC_BDX_001 — INTRO Cancel Full Premium Return'
+        displayName: 'TC_BDX_001 � INTRO Cancel Full Premium Return'
         pool:
           vmImage: 'ubuntu-latest'
         timeoutInMinutes: 30
@@ -296,9 +325,11 @@ stages:
               secureFile: 'automation_server.key'
 
           - script: |
+              echo "##vso[task.setvariable variable=SALEFORCE_UAT1_JWT_PRIVATE_KEY_PATH]$(salesforceJwtKey.secureFilePath)"
+              echo "##vso[task.setvariable variable=SALESFORCE_UAT1_JWT_PRIVATE_KEY_PATH]$(salesforceJwtKey.secureFilePath)"
               echo "##vso[task.setvariable variable=SALEFORCE_UAT2_JWT_PRIVATE_KEY_PATH]$(salesforceJwtKey.secureFilePath)"
               echo "##vso[task.setvariable variable=SALESFORCE_UAT2_JWT_PRIVATE_KEY_PATH]$(salesforceJwtKey.secureFilePath)"
-            displayName: 'Set Salesforce UAT2 JWT key path'
+            displayName: 'Set Salesforce JWT key path'
 
           - script: |
               echo "JWT key path:"
@@ -329,6 +360,15 @@ stages:
               TEST_BROKER_PROFILE: $(TEST_BROKER_PROFILE)
               MLIS_PORTAL_URL: $(MLIS_PORTAL_URL)
               SALESFORCE_LIGHTNING_URL: $(SALESFORCE_LIGHTNING_URL)
+              UAT1_MLIS_PORTAL_URL: $(UAT1_MLIS_PORTAL_URL)
+              UAT1_SALESFORCE_LIGHTNING_URL: $(UAT1_SALESFORCE_LIGHTNING_URL)
+              SALEFORCE_UAT1_NO_COMM_BROKERUSER: $(SALEFORCE_UAT1_NO_COMM_BROKERUSER)
+              SALEFORCE_UAT1_NO_COMM_BROKERPASSWORD: $(SALEFORCE_UAT1_NO_COMM_BROKERPASSWORD)
+              SALEFORCE_UAT1_ENHANCEDUSER: $(SALEFORCE_UAT1_ENHANCEDUSER)
+              SALEFORCE_UAT1_ENHANCEDUSER_PASSWORD: $(SALEFORCE_UAT1_ENHANCEDUSER_PASSWORD)
+              SALESFORCE_UAT1_JWT_CLIENT_ID: $(SALESFORCE_UAT1_JWT_CLIENT_ID)
+              SALESFORCE_UAT1_JWT_LOGIN_URL: $(SALESFORCE_UAT1_JWT_LOGIN_URL)
+              SALESFORCE_UAT1_JWT_PRIVATE_KEY_PATH: $(SALESFORCE_UAT1_JWT_PRIVATE_KEY_PATH)
               SALEFORCE_UAT2_NO_COMM_BROKERUSER: $(SALEFORCE_UAT2_NO_COMM_BROKERUSER)
               SALEFORCE_UAT2_NO_COMM_BROKERPASSWORD: $(SALEFORCE_UAT2_NO_COMM_BROKERPASSWORD)
               SALEFORCE_UAT2_ENHANCEDUSER: $(SALEFORCE_UAT2_ENHANCEDUSER)
@@ -360,7 +400,7 @@ stages:
               publishLocation: 'pipeline'
 
       - job: RunBDX_002_003_004
-        displayName: 'TC_BDX_002–004 — INTER / BDE / NO COMM Policy BDX Lines'
+        displayName: 'TC_BDX_002�004 � INTER / BDE / NO COMM Policy BDX Lines'
         pool:
           vmImage: 'ubuntu-latest'
         timeoutInMinutes: 60
@@ -377,9 +417,11 @@ stages:
               secureFile: 'automation_server.key'
 
           - script: |
+              echo "##vso[task.setvariable variable=SALEFORCE_UAT1_JWT_PRIVATE_KEY_PATH]$(salesforceJwtKey.secureFilePath)"
+              echo "##vso[task.setvariable variable=SALESFORCE_UAT1_JWT_PRIVATE_KEY_PATH]$(salesforceJwtKey.secureFilePath)"
               echo "##vso[task.setvariable variable=SALEFORCE_UAT2_JWT_PRIVATE_KEY_PATH]$(salesforceJwtKey.secureFilePath)"
               echo "##vso[task.setvariable variable=SALESFORCE_UAT2_JWT_PRIVATE_KEY_PATH]$(salesforceJwtKey.secureFilePath)"
-            displayName: 'Set Salesforce UAT2 JWT key path'
+            displayName: 'Set Salesforce JWT key path'
 
           - script: |
               echo "JWT key path:"
@@ -415,6 +457,15 @@ stages:
               TEST_BROKER_PROFILE: $(TEST_BROKER_PROFILE)
               MLIS_PORTAL_URL: $(MLIS_PORTAL_URL)
               SALESFORCE_LIGHTNING_URL: $(SALESFORCE_LIGHTNING_URL)
+              UAT1_MLIS_PORTAL_URL: $(UAT1_MLIS_PORTAL_URL)
+              UAT1_SALESFORCE_LIGHTNING_URL: $(UAT1_SALESFORCE_LIGHTNING_URL)
+              SALEFORCE_UAT1_NO_COMM_BROKERUSER: $(SALEFORCE_UAT1_NO_COMM_BROKERUSER)
+              SALEFORCE_UAT1_NO_COMM_BROKERPASSWORD: $(SALEFORCE_UAT1_NO_COMM_BROKERPASSWORD)
+              SALEFORCE_UAT1_ENHANCEDUSER: $(SALEFORCE_UAT1_ENHANCEDUSER)
+              SALEFORCE_UAT1_ENHANCEDUSER_PASSWORD: $(SALEFORCE_UAT1_ENHANCEDUSER_PASSWORD)
+              SALESFORCE_UAT1_JWT_CLIENT_ID: $(SALESFORCE_UAT1_JWT_CLIENT_ID)
+              SALESFORCE_UAT1_JWT_LOGIN_URL: $(SALESFORCE_UAT1_JWT_LOGIN_URL)
+              SALESFORCE_UAT1_JWT_PRIVATE_KEY_PATH: $(SALESFORCE_UAT1_JWT_PRIVATE_KEY_PATH)
               SALEFORCE_UAT2_NO_COMM_BROKERUSER: $(SALEFORCE_UAT2_NO_COMM_BROKERUSER)
               SALEFORCE_UAT2_NO_COMM_BROKERPASSWORD: $(SALEFORCE_UAT2_NO_COMM_BROKERPASSWORD)
               SALEFORCE_UAT2_ENHANCEDUSER: $(SALEFORCE_UAT2_ENHANCEDUSER)
@@ -446,10 +497,10 @@ stages:
               publishLocation: 'pipeline'
 
   # ---------------------------------------------------------------------------
-  # STAGE 3b — BDX Advanced Tests (TC_BDX_005–006)
+  # STAGE 3b � BDX Advanced Tests (TC_BDX_005�006)
   # ---------------------------------------------------------------------------
   - stage: BDX_Advanced_Tests
-    displayName: 'BDX Advanced Tests (TC_BDX_005–006)'
+    displayName: 'BDX Advanced Tests (TC_BDX_005�006)'
     dependsOn: BDX_Core_Tests
     condition: |
       and(
@@ -461,7 +512,7 @@ stages:
       )
     jobs:
       - job: RunBDX_005
-        displayName: 'TC_BDX_005 — NB MTA Cancellation Mid-Term Adjustment'
+        displayName: 'TC_BDX_005 � NB MTA Cancellation Mid-Term Adjustment'
         pool:
           vmImage: 'ubuntu-latest'
         timeoutInMinutes: 30
@@ -478,9 +529,11 @@ stages:
               secureFile: 'automation_server.key'
 
           - script: |
+              echo "##vso[task.setvariable variable=SALEFORCE_UAT1_JWT_PRIVATE_KEY_PATH]$(salesforceJwtKey.secureFilePath)"
+              echo "##vso[task.setvariable variable=SALESFORCE_UAT1_JWT_PRIVATE_KEY_PATH]$(salesforceJwtKey.secureFilePath)"
               echo "##vso[task.setvariable variable=SALEFORCE_UAT2_JWT_PRIVATE_KEY_PATH]$(salesforceJwtKey.secureFilePath)"
               echo "##vso[task.setvariable variable=SALESFORCE_UAT2_JWT_PRIVATE_KEY_PATH]$(salesforceJwtKey.secureFilePath)"
-            displayName: 'Set Salesforce UAT2 JWT key path'
+            displayName: 'Set Salesforce JWT key path'
 
           - script: |
               echo "JWT key path:"
@@ -504,13 +557,22 @@ stages:
             displayName: 'Install Playwright browsers'
 
           - script: npx playwright test tests/BDX/TC_BDX_005_NB_MTA_Cancellation_mid_term_adjustment.spec.ts --project=$(BROWSER) --workers=1 --reporter=list,html
-            displayName: 'Run TC_BDX_005 — NB MTA Cancellation'
+            displayName: 'Run TC_BDX_005 � NB MTA Cancellation'
             env:
               CI: $(CI)
               TEST_ENV: $(TEST_ENV)
               TEST_BROKER_PROFILE: $(TEST_BROKER_PROFILE)
               MLIS_PORTAL_URL: $(MLIS_PORTAL_URL)
               SALESFORCE_LIGHTNING_URL: $(SALESFORCE_LIGHTNING_URL)
+              UAT1_MLIS_PORTAL_URL: $(UAT1_MLIS_PORTAL_URL)
+              UAT1_SALESFORCE_LIGHTNING_URL: $(UAT1_SALESFORCE_LIGHTNING_URL)
+              SALEFORCE_UAT1_NO_COMM_BROKERUSER: $(SALEFORCE_UAT1_NO_COMM_BROKERUSER)
+              SALEFORCE_UAT1_NO_COMM_BROKERPASSWORD: $(SALEFORCE_UAT1_NO_COMM_BROKERPASSWORD)
+              SALEFORCE_UAT1_ENHANCEDUSER: $(SALEFORCE_UAT1_ENHANCEDUSER)
+              SALEFORCE_UAT1_ENHANCEDUSER_PASSWORD: $(SALEFORCE_UAT1_ENHANCEDUSER_PASSWORD)
+              SALESFORCE_UAT1_JWT_CLIENT_ID: $(SALESFORCE_UAT1_JWT_CLIENT_ID)
+              SALESFORCE_UAT1_JWT_LOGIN_URL: $(SALESFORCE_UAT1_JWT_LOGIN_URL)
+              SALESFORCE_UAT1_JWT_PRIVATE_KEY_PATH: $(SALESFORCE_UAT1_JWT_PRIVATE_KEY_PATH)
               SALEFORCE_UAT2_NO_COMM_BROKERUSER: $(SALEFORCE_UAT2_NO_COMM_BROKERUSER)
               SALEFORCE_UAT2_NO_COMM_BROKERPASSWORD: $(SALEFORCE_UAT2_NO_COMM_BROKERPASSWORD)
               SALEFORCE_UAT2_ENHANCEDUSER: $(SALEFORCE_UAT2_ENHANCEDUSER)
@@ -542,7 +604,7 @@ stages:
               publishLocation: 'pipeline'
 
       - job: RunBDX_006
-        displayName: 'TC_BDX_006 — BDE Cancel & Reissue Then Cancel'
+        displayName: 'TC_BDX_006 � BDE Cancel & Reissue Then Cancel'
         pool:
           vmImage: 'ubuntu-latest'
         timeoutInMinutes: 30
@@ -559,9 +621,11 @@ stages:
               secureFile: 'automation_server.key'
 
           - script: |
+              echo "##vso[task.setvariable variable=SALEFORCE_UAT1_JWT_PRIVATE_KEY_PATH]$(salesforceJwtKey.secureFilePath)"
+              echo "##vso[task.setvariable variable=SALESFORCE_UAT1_JWT_PRIVATE_KEY_PATH]$(salesforceJwtKey.secureFilePath)"
               echo "##vso[task.setvariable variable=SALEFORCE_UAT2_JWT_PRIVATE_KEY_PATH]$(salesforceJwtKey.secureFilePath)"
               echo "##vso[task.setvariable variable=SALESFORCE_UAT2_JWT_PRIVATE_KEY_PATH]$(salesforceJwtKey.secureFilePath)"
-            displayName: 'Set Salesforce UAT2 JWT key path'
+            displayName: 'Set Salesforce JWT key path'
 
           - script: |
               echo "JWT key path:"
@@ -585,13 +649,22 @@ stages:
             displayName: 'Install Playwright browsers'
 
           - script: npx playwright test tests/BDX/TC_BDX_006_BDE_new_cancel_and_reissue_then_cancel_policy.spec.ts --project=$(BROWSER) --workers=1 --reporter=list,html
-            displayName: 'Run TC_BDX_006 — BDE Cancel & Reissue then Cancel'
+            displayName: 'Run TC_BDX_006 � BDE Cancel & Reissue then Cancel'
             env:
               CI: $(CI)
               TEST_ENV: $(TEST_ENV)
               TEST_BROKER_PROFILE: $(TEST_BROKER_PROFILE)
               MLIS_PORTAL_URL: $(MLIS_PORTAL_URL)
               SALESFORCE_LIGHTNING_URL: $(SALESFORCE_LIGHTNING_URL)
+              UAT1_MLIS_PORTAL_URL: $(UAT1_MLIS_PORTAL_URL)
+              UAT1_SALESFORCE_LIGHTNING_URL: $(UAT1_SALESFORCE_LIGHTNING_URL)
+              SALEFORCE_UAT1_NO_COMM_BROKERUSER: $(SALEFORCE_UAT1_NO_COMM_BROKERUSER)
+              SALEFORCE_UAT1_NO_COMM_BROKERPASSWORD: $(SALEFORCE_UAT1_NO_COMM_BROKERPASSWORD)
+              SALEFORCE_UAT1_ENHANCEDUSER: $(SALEFORCE_UAT1_ENHANCEDUSER)
+              SALEFORCE_UAT1_ENHANCEDUSER_PASSWORD: $(SALEFORCE_UAT1_ENHANCEDUSER_PASSWORD)
+              SALESFORCE_UAT1_JWT_CLIENT_ID: $(SALESFORCE_UAT1_JWT_CLIENT_ID)
+              SALESFORCE_UAT1_JWT_LOGIN_URL: $(SALESFORCE_UAT1_JWT_LOGIN_URL)
+              SALESFORCE_UAT1_JWT_PRIVATE_KEY_PATH: $(SALESFORCE_UAT1_JWT_PRIVATE_KEY_PATH)
               SALEFORCE_UAT2_NO_COMM_BROKERUSER: $(SALEFORCE_UAT2_NO_COMM_BROKERUSER)
               SALEFORCE_UAT2_NO_COMM_BROKERPASSWORD: $(SALEFORCE_UAT2_NO_COMM_BROKERPASSWORD)
               SALEFORCE_UAT2_ENHANCEDUSER: $(SALEFORCE_UAT2_ENHANCEDUSER)
@@ -623,7 +696,7 @@ stages:
               publishLocation: 'pipeline'
 
   # ---------------------------------------------------------------------------
-  # STAGE 4 — Publish Consolidated Results
+  # STAGE 4 � Publish Consolidated Results
   # ---------------------------------------------------------------------------
   - stage: Publish_Results
     displayName: 'Publish Consolidated Results'
@@ -647,7 +720,7 @@ stages:
 
           - script: |
               echo "========================================"
-              echo "  MLIS Test Automation — Run Summary"
+              echo "  MLIS Test Automation � Run Summary"
               echo "========================================"
               echo "  Environment : $(TEST_ENV)"
               echo "  Browser     : $(BROWSER)"

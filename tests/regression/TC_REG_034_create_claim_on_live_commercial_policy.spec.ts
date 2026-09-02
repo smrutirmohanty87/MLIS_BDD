@@ -89,18 +89,10 @@ test.describe('@regression | E2E | Claims | Commercial', () => {
 
     await salesforce.goto();
     const sfCreds = getClaimUserCredentials();
-    await salesforce.login(sfCreds.username, sfCreds.password, { useJwt: true, fast: true });
+    await salesforce.login(sfCreds.username, sfCreds.password, { useJwt: false, fast: true });
     await salesforce.closeAllWorkspaceTabs();
 
-    await salesforce.searchAndOpenExactFromGlobalSearchGrid(policyNumber);
-    await salesforce.openRelatedTab();
-    await salesforce.openInsurancePolicyFromRelated(policyNumber, {
-      requireCreateMTA: false,
-      requireNewNote: false,
-      requireShowMoreActions: false,
-    });
-
-    await salesforce.openCreateClaimDialog();
+    await salesforce.openCreateClaimFromSubmissionViaRiskId(policyNumber);
     await salesforce.selectClaimCoverage();
     await salesforce.completeClaimPostCreationFlowAndAssertIncurred();
 

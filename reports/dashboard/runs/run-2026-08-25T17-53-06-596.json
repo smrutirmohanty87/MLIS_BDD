@@ -1,0 +1,30 @@
+{
+  "runId": "2026-08-25T17-53-06-596",
+  "createdAtIso": "2026-08-25T12:23:06.596Z",
+  "createdAtLabel": "08/25/2026, 05:53:06 PM",
+  "environment": "SIT1",
+  "status": "passed",
+  "totalDurationMs": 205871,
+  "projects": [
+    "chrome"
+  ],
+  "summary": {
+    "total": 1,
+    "passed": 1,
+    "failed": 0,
+    "skipped": 0,
+    "timedOut": 0,
+    "interrupted": 0
+  },
+  "tests": [
+    {
+      "id": "chrome:tests/sanity/TC_SAN_024_complete_full_commercial_ew_quote_journey_with_cancellation.spec.ts:TC_SAN_024 | Complete full commercial England & Wales quote journey and perform cancellation",
+      "project": "MLIS",
+      "file": "tests/sanity/TC_SAN_024_complete_full_commercial_ew_quote_journey_with_cancellation.spec.ts",
+      "title": "TC_SAN_024 | Complete full commercial England & Wales quote journey and perform cancellation",
+      "fullTitle": " › chrome › sanity\\TC_SAN_024_complete_full_commercial_ew_quote_journey_with_cancellation.spec.ts › @sanity | E2E | Salesforce Quote Journey | Commercial E&W | Cancellation › TC_SAN_024 | Complete full commercial England & Wales quote journey and perform cancellation",
+      "status": "passed",
+      "durationMs": 200351
+    }
+  ]
+}

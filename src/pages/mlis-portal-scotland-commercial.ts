@@ -10,9 +10,32 @@ export class ScotlandCommercialLoginPage {
   }
 
   async login(email: string, password: string) {
+    if (await this.isQuoteManagerVisible()) {
+      return;
+    }
+
     await this.page.getByRole('textbox', { name: 'Email address' }).fill(email);
     await this.page.getByRole('textbox', { name: 'Password' }).fill(password);
-    await this.page.getByRole('link', { name: 'Login' }).click();
+
+    const loginLink = this.page.getByRole('link', { name: /^Login$/i }).first();
+    const loginButton = this.page.getByRole('button', { name: /^Login$/i }).first();
+    if (await loginLink.isVisible({ timeout: 5000 }).catch(() => false)) {
+      await loginLink.click();
+    } else {
+      await loginButton.click();
+    }
+
+    await this.page.waitForLoadState('domcontentloaded');
+  }
+
+  private async isQuoteManagerVisible() {
+    const quoteManagerHeading = this.page.getByRole('heading', { name: /Quote manager/i }).first();
+    const startQuoteLink = this.page.getByRole('link', { name: /Start quote/i }).first();
+
+    return (
+      await quoteManagerHeading.isVisible({ timeout: 1500 }).catch(() => false)
+      || await startQuoteLink.isVisible({ timeout: 1500 }).catch(() => false)
+    );
   }
 }
 
