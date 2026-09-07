@@ -14,6 +14,31 @@ import { BrokerPortalPage } from '../../src/pages/broker-portal-policy';
 import { SalesforcePortalPage } from '../../src/pages/salesforce-cancellation';
 import { getBrokerCredentials, getSalesforceCredentials } from '../../src/config/env';
 
+const assertBdxAsFields = async (page: import('@playwright/test').Page, status: 'Paid' | 'Written') => {
+  const as0023Field = page
+    .locator('records-record-layout-item:visible, .slds-form-element:visible')
+    .filter({ hasText: /AS0023/i })
+    .first();
+  const as0028Field = page
+    .locator('records-record-layout-item:visible, .slds-form-element:visible')
+    .filter({ hasText: /AS0028|AS00228/i })
+    .first();
+
+  await expect(as0023Field).toBeVisible({ timeout: 120000 });
+  await expect(as0028Field).toBeVisible({ timeout: 120000 });
+
+  const as0023Text = (await as0023Field.innerText()).replace(/\s+/g, ' ').trim();
+  const as0028Text = (await as0028Field.innerText()).replace(/\s+/g, ' ').trim();
+
+  console.log(`[BDX ASSERT] ${status} line AS0023 field value: ${as0023Text}`);
+  console.log(`[BDX ASSERT] ${status} line AS0028 field value: ${as0028Text}`);
+
+  expect(as0023Text).toMatch(/AS0023/i);
+  expect(as0023Text.replace(/AS0023/i, '').trim().length).toBeGreaterThan(0);
+  expect(as0028Text).toMatch(/AS0028|AS00228/i);
+  expect(as0028Text.replace(/AS0028|AS00228/i, '').trim().length).toBeGreaterThan(0);
+};
+
 test.describe('@regression | E2E | MTA | Cancel and Reissue | Cancellation', () => {
   test('TC_REG_018 | Create MTA then cancel and reissue then cancel the policy', async ({ page }) => {
     test.setTimeout(900000);
@@ -140,5 +165,39 @@ test.describe('@regression | E2E | MTA | Cancel and Reissue | Cancellation', () 
     // Step 13: Click Next and wait for cancellation status/page
     // await salesforce.submitCancellation();
     await salesforce.expectPolicyStatusCancelled();
+
+    await salesforce.openRelatedTab();
+    const bdxCard = page.locator('article:visible').filter({ hasText: /\bBDX\b/i }).first();
+    await bdxCard.scrollIntoViewIfNeeded();
+    await expect(bdxCard).toBeVisible({ timeout: 120000 });
+
+    const viewAll = bdxCard.getByRole('link', { name: /^View All/i }).first();
+    const bdxHeader = bdxCard.getByRole('link', { name: /\bBDX\b/i }).first();
+    if (await viewAll.isVisible({ timeout: 3000 }).catch(() => false)) {
+      await viewAll.click();
+    } else if (await bdxHeader.isVisible({ timeout: 3000 }).catch(() => false)) {
+      await bdxHeader.click();
+    }
+
+    const bdxTable = page.locator('table:visible').filter({ hasText: /BDX-/i }).first();
+    await expect(bdxTable).toBeVisible({ timeout: 120000 });
+    await expect.poll(async () => bdxTable.locator('tbody tr').count(), { timeout: 120000 }).toBeGreaterThan(0);
+
+    const openBdxLine = async (lineStatus: 'Paid' | 'Written') => {
+      const row = bdxTable
+        .locator('tbody tr:visible')
+        .filter({ hasText: /endorsement\s+cancellation|cancel|cancelled/i })
+        .filter({ hasText: lineStatus })
+        .first();
+      const rowLink = row.locator('th[scope="row"] a:visible, td a:visible').first();
+      await expect(rowLink).toBeVisible({ timeout: 120000 });
+      await rowLink.click();
+      await assertBdxAsFields(page, lineStatus);
+    };
+
+    await openBdxLine('Paid');
+    await page.goBack({ waitUntil: 'domcontentloaded' });
+    await salesforce.openRelatedTab().catch(() => undefined);
+    await openBdxLine('Written');
   });
 });

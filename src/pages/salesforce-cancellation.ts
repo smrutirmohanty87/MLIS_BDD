@@ -969,7 +969,18 @@ export class SalesforcePortalPage {
 
     const escapedRef = this.escapeForRegex(submissionReference);
     const resultsTable = this.page.locator('main table:visible, table:visible').first();
-    await expect(resultsTable).toBeVisible({ timeout: 120000 });
+
+    // Salesforce indexing can lag behind Broker Portal issuance; re-issue the search
+    // a few times before giving up so we don't fail on a transient sync delay.
+    let resultsTableVisible = await resultsTable.isVisible({ timeout: 120000 }).catch(() => false);
+    for (let syncAttempt = 1; syncAttempt <= 3 && !resultsTableVisible; syncAttempt += 1) {
+      await this.page.waitForTimeout(5000);
+      await activeSearchInputInitial.fill(submissionReference).catch(() => undefined);
+      await activeSearchInputInitial.press('Enter').catch(() => undefined);
+      await this.waitForLightningIdle().catch(() => undefined);
+      resultsTableVisible = await resultsTable.isVisible({ timeout: 60000 }).catch(() => false);
+    }
+    await expect(resultsTable).toBeVisible({ timeout: 30000 });
 
     const matchingRow = resultsTable.locator('tr').filter({ hasText: new RegExp(escapedRef, 'i') }).first();
     await expect(matchingRow).toBeVisible({ timeout: 120000 });

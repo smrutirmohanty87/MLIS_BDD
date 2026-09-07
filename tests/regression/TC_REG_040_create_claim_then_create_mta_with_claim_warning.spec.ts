@@ -12,7 +12,7 @@ import {
 } from '../../src/pages/mlis-portal';
 import { BrokerPortalPage } from '../../src/pages/broker-portal-policy';
 import { SalesforcePortalPage } from '../../src/pages/salesforce-cancellation';
-import { getBrokerCredentials, getSalesforceCredentials } from '../../src/config/env';
+import { getBrokerCredentials } from '../../src/config/env';
 
 test.describe('@regression | E2E | Claims | MTA', () => {
   test('TC_REG_040 | Create claim then create MTA from Risk ID and assert claim warning text', async ({ page }) => {
@@ -33,6 +33,23 @@ test.describe('@regression | E2E | Claims | MTA', () => {
 
     const brokerPortal = new BrokerPortalPage(page);
     const salesforce = new SalesforcePortalPage(page);
+
+    const getClaimUserCredentials = () => {
+      const rawEnv = (process.env.TEST_ENV ?? 'SIT1').trim().toUpperCase();
+      const envName = rawEnv === 'SIT' ? 'SIT1' : rawEnv;
+      const usernameVar = `SALEFORCE_${envName}_CLAIMUSER`;
+      const passwordVar = `SALEFORCE_${envName}_CLAIMUSER_PASSWORD`;
+
+      const username = process.env[usernameVar]?.trim();
+      const password = process.env[passwordVar]?.trim();
+      if (username && password) {
+        return { username, password };
+      }
+
+      throw new Error(
+        `Missing claim user credentials for ${envName}. Set ${usernameVar} and ${passwordVar} in .env for claims flow.`,
+      );
+    };
 
     // Create fresh policy in Broker Portal.
     await brokerLogin.goto();
@@ -74,19 +91,12 @@ test.describe('@regression | E2E | Claims | MTA', () => {
 
     // Open policy in Salesforce.
     await salesforce.goto();
-    const sfCreds = getSalesforceCredentials();
+    const sfCreds = getClaimUserCredentials();
     await salesforce.login(sfCreds.username, sfCreds.password, { useJwt: false, fast: true });
+    await salesforce.closeAllWorkspaceTabs();
 
     // Create claim from policy.
-    await salesforce.searchAndOpenExactFromGlobalSearchGrid(policyNumber);
-    await salesforce.openRelatedTab();
-    await salesforce.openInsurancePolicyFromRelated(policyNumber, {
-      requireCreateMTA: false,
-      requireNewNote: false,
-      requireShowMoreActions: false,
-    });
-
-    await salesforce.openCreateClaimDialog();
+    await salesforce.openCreateClaimFromSubmissionViaRiskId(policyNumber);
     await salesforce.selectClaimCoverage();
     await salesforce.completeClaimPostCreationFlowAndAssertIncurred();
 
