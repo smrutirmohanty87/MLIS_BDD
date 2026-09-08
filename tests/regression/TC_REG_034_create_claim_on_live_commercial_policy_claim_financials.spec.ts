@@ -15,7 +15,7 @@ import { SalesforcePortalPage } from '../../src/pages/salesforce-cancellation';
 import { getBrokerCredentials } from '../../src/config/env';
 
 test.describe('@regression | E2E | Claims | Commercial', () => {
-  test('TC_REG_034_COMM | Create Claim on a live commercial policy and submit mandatory details', async ({ page }) => {
+  test('TC_REG_034_COMM_FIN | Create claim and update Claim Loss Amounts (Estimates) then save', async ({ page }) => {
     test.setTimeout(900000);
     test.slow();
 
@@ -94,5 +94,8 @@ test.describe('@regression | E2E | Claims | Commercial', () => {
     await salesforce.openCreateClaimFromSubmissionViaRiskId(policyNumber);
     await salesforce.selectClaimCoverage();
     await salesforce.completeClaimPostCreationFlowAndAssertIncurred();
+
+    await salesforce.updateClaimFinancialsEstimateSectionAndSave();
+    console.log('SUCCESS: Claim Financials estimates updated and saved.');
   });
 });

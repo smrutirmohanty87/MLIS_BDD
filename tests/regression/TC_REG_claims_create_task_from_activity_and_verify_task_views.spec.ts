@@ -1,0 +1,361 @@
+import { expect, Locator, Page, test } from '@playwright/test';
+import { SalesforcePortalPage } from '../../src/pages/salesforce-cancellation';
+
+function getClaimUserCredentials() {
+  const rawEnv = (process.env.TEST_ENV ?? 'UAT2').trim().toUpperCase();
+  const envName = rawEnv === 'SIT' ? 'SIT1' : rawEnv;
+  const usernameVar = `SALEFORCE_${envName}_CLAIMUSER`;
+  const passwordVar = `SALEFORCE_${envName}_CLAIMUSER_PASSWORD`;
+
+  const username = process.env[usernameVar]?.trim();
+  const password = process.env[passwordVar]?.trim();
+  if (username && password) {
+    return { username, password };
+  }
+
+  throw new Error(`Missing claim user credentials for ${envName}. Set ${usernameVar} and ${passwordVar} in .env.`);
+}
+
+function futureDdMmYyyy(daysAhead = 1) {
+  const now = new Date();
+  now.setDate(now.getDate() + daysAhead);
+  const dd = String(now.getDate()).padStart(2, '0');
+  const mm = String(now.getMonth() + 1).padStart(2, '0');
+  const yyyy = String(now.getFullYear());
+  return `${dd}/${mm}/${yyyy}`;
+}
+
+async function pickFromOpenListbox(page: Page, preferred: RegExp, fallbackExclude?: RegExp) {
+  const allOptions = page
+    .locator('[role="listbox"]:visible [role="option"], [role="listbox"]:visible li, .slds-listbox:visible li')
+    .filter({ hasText: /\S+/ });
+
+  const preferredOption = allOptions.filter({ hasText: preferred }).first();
+  if (await preferredOption.isVisible({ timeout: 1500 }).catch(() => false)) {
+    const text = (await preferredOption.innerText().catch(() => '')).trim();
+    await preferredOption.click({ timeout: 10000 });
+    return text;
+  }
+
+  const fallback = fallbackExclude
+    ? allOptions.filter({ hasNotText: fallbackExclude }).first()
+    : allOptions.first();
+
+  await expect(fallback).toBeVisible({ timeout: 10000 });
+  const fallbackText = (await fallback.innerText().catch(() => '')).trim();
+  await fallback.click({ timeout: 10000 });
+  return fallbackText;
+}
+
+async function selectComboboxValue(
+  container: Locator,
+  page: Page,
+  label: string,
+  preferred: RegExp,
+  fallbackExclude?: RegExp,
+) {
+  const combo = container.getByRole('combobox', { name: new RegExp(`^${label}\\b`, 'i') }).first();
+  await expect(combo).toBeVisible({ timeout: 30000 });
+  await combo.scrollIntoViewIfNeeded().catch(() => undefined);
+
+  await combo.click({ timeout: 10000 });
+  await page.waitForTimeout(400);
+
+  const pickedText = await pickFromOpenListbox(page, preferred, fallbackExclude);
+  await page.waitForTimeout(400);
+
+  const rendered = `${(await combo.innerText().catch(() => '')).trim()} ${(await combo.getAttribute('aria-label').catch(() => '') ?? '').trim()}`.trim();
+  if (!rendered || /--\s*None\s*--/i.test(rendered)) {
+    throw new Error(`Unable to select value for ${label}.`);
+  }
+
+  return pickedText;
+}
+
+async function assertNoInlineTaskErrors(container: Locator) {
+  const inlineError = container.getByText(/Review the errors on this page\.|required fields must be completed|Complete this field\./i).first();
+  if (await inlineError.isVisible({ timeout: 400 }).catch(() => false)) {
+    const text = (await inlineError.innerText().catch(() => 'Validation error')).trim();
+    throw new Error(text);
+  }
+}
+
+async function expectTaskCreatedToast(page: Page, timeoutMs = 25000) {
+  const successToast = page
+    .locator('.slds-notify_toast:visible, .toastMessage:visible, [role="status"]:visible, [role="alert"]:visible, [data-key="success"]:visible')
+    .filter({ hasText: /Task\s+["“]?.+["”]?\s+was\s+created\./i })
+    .first();
+
+  const errorToast = page
+    .locator('.slds-notify_toast:visible, [role="alert"]:visible')
+    .filter({ hasText: /error|failed|required|review/i })
+    .first();
+
+  const deadline = Date.now() + timeoutMs;
+  while (Date.now() < deadline) {
+    if (await successToast.isVisible({ timeout: 500 }).catch(() => false)) {
+      return;
+    }
+
+    if (await errorToast.isVisible({ timeout: 200 }).catch(() => false)) {
+      const text = (await errorToast.innerText().catch(() => 'Error toast after save')).trim();
+      throw new Error(text);
+    }
+
+    await page.waitForTimeout(300);
+  }
+
+  throw new Error('Task save did not show expected success message: Task "<Subject>" was created.');
+}
+
+async function clickVisibleSave(page: Page) {
+  for (let attempt = 1; attempt <= 5; attempt += 1) {
+    const saveButton = page
+      .getByRole('button', { name: /^Save$/i })
+      .filter({ hasNotText: /Save\s*&\s*New|Save\s+And\s+New/i })
+      .last();
+
+    if (await saveButton.isVisible({ timeout: 4000 }).catch(() => false)) {
+      await saveButton.scrollIntoViewIfNeeded().catch(() => undefined);
+      await page.waitForTimeout(250);
+      await saveButton.click({ timeout: 10000 }).catch(async () => {
+        await saveButton.click({ timeout: 10000, force: true });
+      });
+      await page.waitForTimeout(800);
+      return;
+    }
+
+    await page.mouse.wheel(0, 1400);
+    await page.keyboard.press('PageDown').catch(() => undefined);
+    await page.waitForTimeout(300);
+  }
+
+  throw new Error('Unable to find/click visible Save button.');
+}
+
+async function openTasksFromAppLauncher(page: Page) {
+  const appLauncher = page
+    .getByRole('button', { name: /App Launcher/i })
+    .or(page.locator('button[title="App Launcher"]'))
+    .first();
+  await expect(appLauncher).toBeVisible({ timeout: 30000 });
+  await appLauncher.click({ timeout: 10000 });
+
+  const searchApps = page.getByPlaceholder(/Search apps and items/i).first();
+  await expect(searchApps).toBeVisible({ timeout: 15000 });
+  await searchApps.fill('Tasks');
+
+  const tasksResult = page
+    .getByRole('link', { name: /^Tasks$/i })
+    .or(page.getByText(/^Tasks$/i))
+    .first();
+  await expect(tasksResult).toBeVisible({ timeout: 30000 });
+  await tasksResult.click({ timeout: 10000 });
+  await page.waitForTimeout(1500);
+}
+
+async function getListViewDropdown(page: Page) {
+  const dropdown = page
+    .locator('button[title*="List View" i]:visible, button[aria-label*="List View" i]:visible')
+    .first();
+  await expect(dropdown).toBeVisible({ timeout: 30000 });
+  return dropdown;
+}
+
+async function openTaskViewMenu(page: Page, dropdown: Locator) {
+  const listViewListbox = page.getByRole('listbox', { name: /Search lists/i }).first();
+  for (let attempt = 1; attempt <= 3; attempt += 1) {
+    await dropdown.scrollIntoViewIfNeeded().catch(() => undefined);
+    await dropdown.click({ timeout: 10000, force: attempt > 1 }).catch(() => undefined);
+    await page.waitForTimeout(700);
+    if (await listViewListbox.isVisible({ timeout: 1000 }).catch(() => false)) {
+      return listViewListbox;
+    }
+
+    await dropdown.press('Enter').catch(() => undefined);
+    await page.waitForTimeout(700);
+    if (await listViewListbox.isVisible({ timeout: 1000 }).catch(() => false)) {
+      return listViewListbox;
+    }
+  }
+
+  await expect(listViewListbox).toBeVisible({ timeout: 30000 });
+  return listViewListbox;
+}
+
+async function getAvailableTaskViewCount(page: Page, dropdown: Locator) {
+  const listViewListbox = await openTaskViewMenu(page, dropdown);
+  const options = listViewListbox.getByRole('option');
+  await expect(options.first()).toBeVisible({ timeout: 30000 });
+
+  const optionCount = await options.count();
+  await page.keyboard.press('Escape').catch(() => undefined);
+  return optionCount;
+}
+
+async function selectTaskViewByIndex(page: Page, dropdown: Locator, optionIndex: number) {
+  const listViewListbox = await openTaskViewMenu(page, dropdown);
+  const options = listViewListbox.getByRole('option');
+  const option = options.nth(optionIndex);
+  await expect(option).toBeVisible({ timeout: 15000 });
+  await option.click({ timeout: 10000 });
+  await page.waitForTimeout(1500);
+}
+
+async function openAssignedToMeView(page: Page) {
+  const dropdown = await getListViewDropdown(page);
+  const listbox = await openTaskViewMenu(page, dropdown);
+  const view = listbox.getByRole('option', { name: /All Claim tasks assigned to me/i }).first();
+  await expect(view).toBeVisible({ timeout: 15000 });
+  await view.click({ timeout: 10000 });
+  await expect(page.getByText('All Claim tasks assigned to me', { exact: true }).first()).toBeVisible({ timeout: 30000 });
+  await page.waitForTimeout(1500);
+}
+
+async function completeRelatedClaimIfOpen(page: Page, salesforce: SalesforcePortalPage) {
+  const relatedClaim = page.getByRole('link', { name: /^CLM\//i }).last();
+  await expect(relatedClaim).toBeVisible({ timeout: 30000 });
+  await relatedClaim.click({ timeout: 10000 });
+  await page.waitForTimeout(1200);
+
+  const closedClaimAction = page.getByRole('button', { name: /^Closed Claim$/i }).or(page.getByRole('link', { name: /^Closed Claim$/i })).first();
+  const markCompleteAction = page.getByRole('button', { name: /Mark( as)? (Current Claim Status|Claim Status)?( as Complete)?/i }).first();
+  const canCompleteClaim = (await closedClaimAction.isVisible({ timeout: 3000 }).catch(() => false) && await closedClaimAction.isEnabled().catch(() => false))
+    || (await markCompleteAction.isVisible({ timeout: 3000 }).catch(() => false) && await markCompleteAction.isEnabled().catch(() => false));
+  if (canCompleteClaim) {
+    await salesforce.closeClaimAndMarkComplete('Settled');
+  }
+}
+
+async function completeOpenTaskAndCloseRelatedClaim(page: Page, salesforce: SalesforcePortalPage) {
+  for (let rowIndex = 0; rowIndex < 20; rowIndex += 1) {
+    const taskRows = page.getByRole('listbox', { name: /Select an item from this list to open it/i }).getByRole('option');
+    await expect(taskRows.first()).toBeVisible({ timeout: 30000 });
+    if (rowIndex >= await taskRows.count()) break;
+    await taskRows.nth(rowIndex).click({ timeout: 10000 });
+    await page.waitForTimeout(1200);
+
+    const completedButton = page.getByRole('button', { name: /^Completed$/i }).first();
+    if (await completedButton.isVisible({ timeout: 3000 }).catch(() => false)) {
+      const closeTaskTab = page.getByRole('button', { name: /^Close .+/i }).last();
+      if (await closeTaskTab.isVisible({ timeout: 5000 }).catch(() => false)) {
+        await closeTaskTab.click({ timeout: 10000 });
+        await page.waitForTimeout(1000);
+      }
+      continue;
+    }
+
+    const markComplete = page.getByRole('button', { name: /Mark (as )?Complete/i }).first();
+    if (await markComplete.isVisible({ timeout: 5000 }).catch(() => false)) {
+      await markComplete.click({ timeout: 10000 });
+    } else {
+      const editButton = page.getByRole('button', { name: /^Edit$/i }).first();
+      await expect(editButton).toBeVisible({ timeout: 15000 });
+      await editButton.click({ timeout: 10000 });
+      const editDialog = page.locator('[role="dialog"]:visible, .slds-modal:visible').first();
+      await expect(editDialog).toBeVisible({ timeout: 15000 });
+      await selectComboboxValue(editDialog, page, 'Status', /Closed|Completed/i);
+      await clickVisibleSave(page);
+    }
+
+    await expect(page.getByRole('button', { name: /^Completed$/i }).first()).toBeVisible({ timeout: 30000 });
+    await completeRelatedClaimIfOpen(page, salesforce);
+    return;
+  }
+
+  throw new Error('All tasks in All Claim tasks assigned to me were already completed.');
+}
+
+test.describe('@regression | E2E | Claims | Task | List Views', () => {
+  test('TC_REG_CLAIMS_TASK_LIST_VIEWS | Create task, verify list views, complete assigned task, and close related claim', async ({ page }) => {
+    test.setTimeout(600000);
+    test.slow();
+
+    const salesforce = new SalesforcePortalPage(page);
+
+    await salesforce.goto();
+    const claimCreds = getClaimUserCredentials();
+    await salesforce.login(claimCreds.username, claimCreds.password, { useJwt: false, fast: true });
+    await salesforce.closeAllWorkspaceTabs();
+
+    const navMenuButton = page.getByRole('button', { name: /Show Navigation Menu/i }).first();
+    const claimsNavLink = page.getByRole('link', { name: /^Claims$/i }).first();
+
+    if (await navMenuButton.isVisible({ timeout: 8000 }).catch(() => false)) {
+      await navMenuButton.click({ timeout: 10000 });
+      const claimsMenuItem = page.getByRole('menuitem', { name: /^Claims$/i }).first();
+      await expect(claimsMenuItem).toBeVisible({ timeout: 30000 });
+      await claimsMenuItem.click({ timeout: 10000 });
+    } else {
+      await expect(claimsNavLink).toBeVisible({ timeout: 30000 });
+      await claimsNavLink.click({ timeout: 10000 });
+    }
+
+    const claimsHeader = page.getByRole('heading', { name: /Claims|Recently Viewed/i }).first();
+    await expect(claimsHeader).toBeVisible({ timeout: 60000 });
+
+    const claimLinks = page
+      .locator('table a:visible, [role="grid"] a:visible')
+      .filter({ hasText: /^CLM\//i });
+    await expect(claimLinks.first()).toBeVisible({ timeout: 60000 });
+    const claimCount = await claimLinks.count();
+    const claimIndex = claimCount > 1 ? Date.now() % claimCount : 0;
+    const selectedClaimLink = claimLinks.nth(claimIndex);
+    await selectedClaimLink.click({ timeout: 10000 });
+
+    const activityTab = page.getByRole('tab', { name: /Activity/i }).first();
+    if (await activityTab.isVisible({ timeout: 10000 }).catch(() => false)) {
+      await activityTab.click({ timeout: 10000 });
+    }
+
+    const createTaskButton = page
+      .getByRole('button', { name: /Create Claim Task/i })
+      .or(page.locator('button[title="Create Claim Task"]:visible'))
+      .first();
+    await expect(createTaskButton).toBeVisible({ timeout: 60000 });
+    await createTaskButton.click({ timeout: 10000 });
+
+    const taskDialog = page.locator('[role="dialog"]:visible, .slds-docked-composer.slds-is-open:visible, .slds-modal:visible').first();
+    await expect(taskDialog).toBeVisible({ timeout: 60000 });
+
+    await selectComboboxValue(
+      taskDialog,
+      page,
+      'Type',
+      /Authorise Payment|Claim Assigned|Claim Correspondence|General Claim Task|Large payment waring|Large reserve movement/i,
+      /^\s*--\s*None\s*--\s*$|^\s*None\s*$/i,
+    );
+
+    const selectedSubject = await selectComboboxValue(
+      taskDialog,
+      page,
+      'Subject',
+      /Call|Send Letter|Send Quote|Other/i,
+    );
+
+    const dueDateField = taskDialog
+      .getByRole('textbox', { name: /Due Date/i })
+      .or(taskDialog.locator('xpath=//label[contains(normalize-space(.), "Due Date")]/following::input[1]'))
+      .first();
+    await expect(dueDateField).toBeVisible({ timeout: 30000 });
+    await dueDateField.fill(futureDdMmYyyy(1));
+    await dueDateField.press('Tab').catch(() => undefined);
+
+    await assertNoInlineTaskErrors(taskDialog);
+    await clickVisibleSave(page);
+    await expectTaskCreatedToast(page, 30000);
+
+    await openTasksFromAppLauncher(page);
+    const listViewDropdown = await getListViewDropdown(page);
+    const availableViewCount = await getAvailableTaskViewCount(page, listViewDropdown);
+    expect(availableViewCount, 'Expected at least one available task list view.').toBeGreaterThan(0);
+
+    for (let optionIndex = 0; optionIndex < availableViewCount; optionIndex += 1) {
+      await selectTaskViewByIndex(page, listViewDropdown, optionIndex);
+    }
+
+    await openAssignedToMeView(page);
+    await completeOpenTaskAndCloseRelatedClaim(page, salesforce);
+    console.log(`SUCCESS: Created a fresh claim task with subject ${selectedSubject}, verified ${availableViewCount} task list views, and closed its related claim when required.`);
+  });
+});

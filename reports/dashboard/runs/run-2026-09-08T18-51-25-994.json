@@ -1,0 +1,18 @@
+{
+  "runId": "2026-09-08T18-51-25-994",
+  "createdAtIso": "2026-09-08T13:21:25.994Z",
+  "createdAtLabel": "09/08/2026, 06:51:25 PM",
+  "environment": "UAT2",
+  "status": "passed",
+  "totalDurationMs": 31,
+  "projects": [],
+  "summary": {
+    "total": 0,
+    "passed": 0,
+    "failed": 0,
+    "skipped": 0,
+    "timedOut": 0,
+    "interrupted": 0
+  },
+  "tests": []
+}

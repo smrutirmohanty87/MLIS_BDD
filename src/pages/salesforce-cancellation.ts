@@ -968,22 +968,53 @@ export class SalesforcePortalPage {
     await this.waitForLightningIdle();
 
     const escapedRef = this.escapeForRegex(submissionReference);
-    const resultsTable = this.page.locator('main table:visible, table:visible').first();
+    const resultsTables = this.page.locator('main table:visible, table:visible');
 
     // Salesforce indexing can lag behind Broker Portal issuance; re-issue the search
     // a few times before giving up so we don't fail on a transient sync delay.
-    let resultsTableVisible = await resultsTable.isVisible({ timeout: 120000 }).catch(() => false);
+    let resultsTableVisible = await resultsTables.first().isVisible({ timeout: 120000 }).catch(() => false);
     for (let syncAttempt = 1; syncAttempt <= 3 && !resultsTableVisible; syncAttempt += 1) {
       await this.page.waitForTimeout(5000);
-      await activeSearchInputInitial.fill(submissionReference).catch(() => undefined);
-      await activeSearchInputInitial.press('Enter').catch(() => undefined);
-      await this.waitForLightningIdle().catch(() => undefined);
-      resultsTableVisible = await resultsTable.isVisible({ timeout: 60000 }).catch(() => false);
-    }
-    await expect(resultsTable).toBeVisible({ timeout: 30000 });
 
-    const matchingRow = resultsTable.locator('tr').filter({ hasText: new RegExp(escapedRef, 'i') }).first();
-    await expect(matchingRow).toBeVisible({ timeout: 120000 });
+      let retrySearchInput = dialogSearchInputInitial;
+      if (await dialogSearchInputInitial.isVisible({ timeout: 500 }).catch(() => false)) {
+        retrySearchInput = dialogSearchInputInitial;
+      } else if (await headerSearchInputInitial.isVisible({ timeout: 500 }).catch(() => false)) {
+        retrySearchInput = headerSearchInputInitial;
+      } else if (await searchLauncherInitial.isVisible({ timeout: 1000 }).catch(() => false)) {
+        await this.clickWhenUiReady(searchLauncherInitial).catch(() => undefined);
+      } else if (await searchButtonFallbackInitial.isVisible({ timeout: 1000 }).catch(() => false)) {
+        await this.clickWhenUiReady(searchButtonFallbackInitial).catch(() => undefined);
+      }
+
+      if (!(await retrySearchInput.isVisible({ timeout: 1000 }).catch(() => false))) {
+        retrySearchInput = headerSearchInputInitial;
+      }
+
+      await retrySearchInput.fill(submissionReference).catch(() => undefined);
+      await retrySearchInput.press('Enter').catch(() => undefined);
+      await this.waitForLightningIdle().catch(() => undefined);
+      resultsTableVisible = await resultsTables.first().isVisible({ timeout: 60000 }).catch(() => false);
+    }
+    await expect(resultsTables.first()).toBeVisible({ timeout: 30000 });
+
+    let resultsTable = resultsTables.first();
+    let matchingRow: Locator | null = null;
+    const tableCount = await resultsTables.count().catch(() => 0);
+    for (let tableIndex = 0; tableIndex < tableCount; tableIndex += 1) {
+      const candidateTable = resultsTables.nth(tableIndex);
+      const candidateRow = candidateTable.locator('tr').filter({ hasText: new RegExp(escapedRef, 'i') }).first();
+      if (await candidateRow.isVisible({ timeout: 1500 }).catch(() => false)) {
+        resultsTable = candidateTable;
+        matchingRow = candidateRow;
+        break;
+      }
+    }
+
+    if (!matchingRow) {
+      matchingRow = resultsTable.locator('tr').filter({ hasText: new RegExp(escapedRef, 'i') }).first();
+      await expect(matchingRow).toBeVisible({ timeout: 120000 });
+    }
 
     // Read Risk Id directly from the results grid row (do NOT open the submission).
     const riskIdHeaderCell = resultsTable
@@ -1799,6 +1830,68 @@ export class SalesforcePortalPage {
     await this.waitForLightningIdle();
   }
 
+  async updateClaimFinancialsEstimateSectionAndSave() {
+    const claimFinancialsTab = this.page.getByRole('tab', { name: /Claim Financials/i }).first();
+    const claimFinancialsLink = this.page.getByRole('link', { name: /Claim Financials/i }).first();
+    const claimFinancialsButton = this.page.getByRole('button', { name: /Claim Financials/i }).first();
+
+    if (await claimFinancialsTab.isVisible({ timeout: 8000 }).catch(() => false)) {
+      await this.clickWhenUiReady(claimFinancialsTab);
+    } else if (await claimFinancialsLink.isVisible({ timeout: 8000 }).catch(() => false)) {
+      await this.clickWhenUiReady(claimFinancialsLink);
+    } else {
+      await expect(claimFinancialsButton).toBeVisible({ timeout: 15000 });
+      await this.clickWhenUiReady(claimFinancialsButton);
+    }
+
+    await this.waitForLightningIdle();
+
+    const estimatesHeading = this.page
+      .getByText(/Claim\s*Loss\s*Amounts\s*\(\s*Estimates\s*\)/i)
+      .first();
+    await expect(estimatesHeading).toBeVisible({ timeout: 60000 });
+    await estimatesHeading.scrollIntoViewIfNeeded().catch(() => undefined);
+    await this.page.waitForTimeout(400);
+
+    await this.clickSectionEditIcon('Claim Loss Amounts (Estimates)');
+
+    const estimateFields: Array<{ label: string; value: string }> = [
+      { label: 'Amount Claimed by Insured', value: '1000' },
+      { label: 'Claim Limit', value: '250000' },
+      { label: 'Claim Excess', value: '500' },
+      { label: 'Probable Maximum Loss', value: '100000' },
+      { label: 'Estimated Maximum Loss', value: '120000' },
+    ];
+
+    for (const field of estimateFields) {
+      const bySpinButton = this.page.getByRole('spinbutton', { name: new RegExp(this.escapeForRegex(field.label), 'i') }).first();
+      const byTextBox = this.page.getByRole('textbox', { name: new RegExp(this.escapeForRegex(field.label), 'i') }).first();
+      const byLabel = this.page
+        .locator(`xpath=//label[contains(normalize-space(.), "${field.label}")]/following::input[1]`)
+        .first();
+
+      let inputLocator = bySpinButton;
+      if (await bySpinButton.isVisible({ timeout: 1200 }).catch(() => false)) {
+        inputLocator = bySpinButton;
+      } else if (await byTextBox.isVisible({ timeout: 1200 }).catch(() => false)) {
+        inputLocator = byTextBox;
+      } else {
+        inputLocator = byLabel;
+      }
+
+      await expect(inputLocator).toBeVisible({ timeout: 30000 });
+      await inputLocator.scrollIntoViewIfNeeded().catch(() => undefined);
+      await inputLocator.click({ timeout: 10000 }).catch(() => undefined);
+      await inputLocator.fill('');
+      await inputLocator.type(field.value, { delay: 20 });
+    }
+
+    const saveButton = this.page.getByRole('button', { name: /^Save$/i }).first();
+    await expect(saveButton).toBeVisible({ timeout: 60000 });
+    await this.clickWhenUiReady(saveButton);
+    await this.waitForLightningIdle();
+  }
+
   private async scrollToSectionByLabel(label: string | RegExp) {
     const locator = typeof label === 'string'
       ? this.page.getByText(new RegExp(this.escapeForRegex(label), 'i')).first()
@@ -2039,12 +2132,15 @@ export class SalesforcePortalPage {
       await this.waitForLightningIdle();
       await this.page.waitForTimeout(1200);
 
-      const dialogOptions = this.page.locator('[role="listbox"] [role="option"], lightning-base-combobox-item, .slds-listbox__option, .slds-combobox__item, .slds-dropdown__item').filter({ hasText: /\S+/ });
+      const dialogOptions = this.page.locator('[role="listbox"]:visible [role="option"]:visible, lightning-base-combobox-item:visible, .slds-listbox__option:visible, .slds-combobox__item:visible, .slds-dropdown__item:visible').filter({ hasText: /\S+/ });
       const option = optionText
         ? dialogOptions.filter({ hasText: new RegExp(this.escapeForRegex(optionText), 'i') }).first()
         : dialogOptions.filter({ hasNotText: /select|choose|none|--none--/i }).first();
 
       await expect(option).toBeVisible({ timeout: 15000 });
+      if (/none/i.test((await option.innerText()).trim())) {
+        throw new Error('Claim Sub Status selection resolved to None; expected a real available option.');
+      }
       await option.scrollIntoViewIfNeeded();
       await option.click({ timeout: 10000 });
       await this.waitForLightningIdle();
@@ -2082,12 +2178,15 @@ export class SalesforcePortalPage {
     await this.waitForLightningIdle();
     await this.page.waitForTimeout(1200);
 
-    const dialogOptions = dialog.locator('[role="listbox"] [role="option"], lightning-base-combobox-item, .slds-listbox__option, .slds-combobox__item, .slds-dropdown__item').filter({ hasText: /\S+/ });
+    const dialogOptions = dialog.locator('[role="listbox"]:visible [role="option"]:visible, lightning-base-combobox-item:visible, .slds-listbox__option:visible, .slds-combobox__item:visible, .slds-dropdown__item:visible').filter({ hasText: /\S+/ });
     const option = optionText
       ? dialogOptions.filter({ hasText: new RegExp(this.escapeForRegex(optionText), 'i') }).first()
       : dialogOptions.filter({ hasNotText: /select|choose|none|--none--/i }).first();
 
     await expect(option).toBeVisible({ timeout: 15000 });
+    if (/none/i.test((await option.innerText()).trim())) {
+      throw new Error('Claim Sub Status selection resolved to None; expected a real available option.');
+    }
     await option.scrollIntoViewIfNeeded();
     await option.click({ timeout: 10000 });
     await this.waitForLightningIdle();

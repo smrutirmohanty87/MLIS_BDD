@@ -1,0 +1,30 @@
+{
+  "runId": "2026-09-08T19-17-07-203",
+  "createdAtIso": "2026-09-08T13:47:07.203Z",
+  "createdAtLabel": "09/08/2026, 07:17:07 PM",
+  "environment": "UAT2",
+  "status": "failed",
+  "totalDurationMs": 76068,
+  "projects": [
+    "chrome"
+  ],
+  "summary": {
+    "total": 1,
+    "passed": 0,
+    "failed": 1,
+    "skipped": 0,
+    "timedOut": 0,
+    "interrupted": 0
+  },
+  "tests": [
+    {
+      "id": "chrome:tests/regression/TC_REG_claims_reopen_completed_task_edit.spec.ts:TC_REG_CLAIMS_TASK_REOPEN_EDIT | Reopen completed task through Edit, save, and complete again",
+      "project": "MLIS",
+      "file": "tests/regression/TC_REG_claims_reopen_completed_task_edit.spec.ts",
+      "title": "TC_REG_CLAIMS_TASK_REOPEN_EDIT | Reopen completed task through Edit, save, and complete again",
+      "fullTitle": " › chrome › regression\\TC_REG_claims_reopen_completed_task_edit.spec.ts › @regression | E2E | Claims | Task | Edit Reopen › TC_REG_CLAIMS_TASK_REOPEN_EDIT | Reopen completed task through Edit, save, and complete again",
+      "status": "failed",
+      "durationMs": 68782
+    }
+  ]
+}

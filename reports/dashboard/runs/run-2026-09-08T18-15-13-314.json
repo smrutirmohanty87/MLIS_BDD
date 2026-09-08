@@ -1,0 +1,30 @@
+{
+  "runId": "2026-09-08T18-15-13-314",
+  "createdAtIso": "2026-09-08T12:45:13.314Z",
+  "createdAtLabel": "09/08/2026, 06:15:13 PM",
+  "environment": "UAT2",
+  "status": "failed",
+  "totalDurationMs": 52755,
+  "projects": [
+    "chrome"
+  ],
+  "summary": {
+    "total": 1,
+    "passed": 0,
+    "failed": 1,
+    "skipped": 0,
+    "timedOut": 0,
+    "interrupted": 0
+  },
+  "tests": [
+    {
+      "id": "chrome:tests/regression/TC_REG_claims_create_task_from_activity_and_verify_task_views.spec.ts:TC_REG_CLAIMS_TASK_LIST_VIEWS | Create task, open Tasks from App Launcher, verify every task list view",
+      "project": "MLIS",
+      "file": "tests/regression/TC_REG_claims_create_task_from_activity_and_verify_task_views.spec.ts",
+      "title": "TC_REG_CLAIMS_TASK_LIST_VIEWS | Create task, open Tasks from App Launcher, verify every task list view",
+      "fullTitle": " › chrome › regression\\TC_REG_claims_create_task_from_activity_and_verify_task_views.spec.ts › @regression | E2E | Claims | Task | List Views › TC_REG_CLAIMS_TASK_LIST_VIEWS | Create task, open Tasks from App Launcher, verify every task list view",
+      "status": "failed",
+      "durationMs": 45441
+    }
+  ]
+}
