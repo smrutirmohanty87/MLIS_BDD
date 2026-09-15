@@ -1810,7 +1810,7 @@ export class SalesforcePortalPage {
     throw new Error('Unable to locate Claim Information tab or section.');
   }
 
-  async fillClaimInformationAndSave(lossNarrative = 'Automated Loss Narrative.') {
+  async fillClaimInformation(lossNarrative = 'Automated Loss Narrative.') {
     await this.openClaimInformationTab();
 
     await this.scrollToSectionByLabel('Claim Classification');
@@ -1823,7 +1823,10 @@ export class SalesforcePortalPage {
 
     await this.scrollToSectionByLabel(/Date of FNOL Acknowledgement|FNOL Acknowledgement/i);
     await this.fillDateFieldWithToday(/Date of FNOL Acknowledgement/i);
+  }
 
+  async fillClaimInformationAndSave(lossNarrative = 'Automated Loss Narrative.') {
+    await this.fillClaimInformation(lossNarrative);
     const saveButton = this.page.getByRole('button', { name: /^Save$/i }).first();
     await expect(saveButton).toBeVisible({ timeout: 60000 });
     await this.clickWhenUiReady(saveButton);

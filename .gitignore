@@ -9,3 +9,11 @@ node_modules/
 
 # Local environment variables (credentials/URLs)
 .env
+# Stray plaintext credentials file (use .env instead)
+/env
+
+# Generated report artefacts (dashboard output, raw result dumps, run logs)
+/reports/dashboard/
+/reports/*.json
+/reports/*.txt
+/reports/*.log

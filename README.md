@@ -192,8 +192,7 @@ Agentic-AI-MLIS-Framework/
 ├── playwright.config.ts            # Playwright configuration
 ├── package.json                    # Dependencies and NPM scripts
 ├── .env                            # Local secrets (NOT in source control)
-├── azure-pipelines.yml             # Azure DevOps pipeline
-├── Jenkinsfile                     # Jenkins pipeline
+├── pipelines/                      # CI/CD pipeline definitions (Azure DevOps, Jenkins, GitLab)
 ├── docs/                           # Framework documentation and test-plans
 │   ├── guides/                     # User-facing documentation
 │   └── test-plans/                 # Test case and plan documents
@@ -432,7 +431,7 @@ This regenerates `docs/test-plans/Test_Cases_Documentation.csv` from the source 
 
 ### Azure DevOps
 
-Configuration: `azure-pipelines.yml`
+Configuration: `pipelines/azure-pipelines.yml`
 
 ```yaml
 trigger:
@@ -462,7 +461,7 @@ Store all credentials as **pipeline secret variables** in Azure DevOps — never
 
 ### Jenkins
 
-Configuration: `Jenkinsfile`
+Configuration: `pipelines/Jenkinsfile`
 
 See [PIPELINE.md](PIPELINE.md) for the full Jenkins setup.
 

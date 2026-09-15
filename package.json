@@ -13,6 +13,7 @@
     "test:regression:chrome": "npx playwright test tests/regression/ --project=chrome --headed --workers=1",
     "test:regression:chromium": "npx playwright test tests/regression/ --project=chrome --headed --workers=1",
     "test:regression:edge": "npx playwright test tests/regression/ --project=chrome --headed --workers=1",
+    "test:claims": "npx playwright test tests/claims/ --project=chrome --headed --workers=1",
     "test:bdx:intro": "npx playwright test tests/BDX/TC_BDX_001_INTRO_cancel_full_premium_return.spec.ts --project=chrome --headed --workers=1",
     "test:bdx:rest": "npx playwright test tests/BDX/TC_BDX_002_INTER_COMM_policy_bdx_lines.spec.ts tests/BDX/TC_BDX_003_BDE_COMM_policy_bdx_lines.spec.ts tests/BDX/TC_BDX_004_NO_COMM_policy_bdx_lines.spec.ts --project=chrome --headed --workers=1",
     "test:bdx:all": "npx playwright test tests/BDX/ --project=chrome --headed --workers=1",

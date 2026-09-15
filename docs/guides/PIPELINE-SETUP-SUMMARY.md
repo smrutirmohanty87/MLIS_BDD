@@ -94,19 +94,19 @@
 
 ### 4. CI/CD Platform Configurations
 
-#### Azure DevOps - `azure-pipelines.yml`
+#### Azure DevOps - `pipelines/azure-pipelines.yml`
 - ✅ Separate stages for BDX INTRO and BDX REST
 - ✅ Browser matrix support
 - ✅ Artifact publishing
 - ✅ Parameterized execution
 
-#### Jenkins - `Jenkinsfile`
+#### Jenkins - `pipelines/Jenkinsfile`
 - ✅ Separate stages for Sanity, Regression, and BDX
 - ✅ Parameterized builds (TEST_TYPE, BROWSER)
 - ✅ HTML report publishing
 - ✅ Artifact archiving
 
-#### GitLab CI - `.gitlab-ci.yml`
+#### GitLab CI - `pipelines/.gitlab-ci.yml`
 - ✅ Multi-stage pipeline (install, test-intro, test-rest, report)
 - ✅ Browser matrix jobs
 - ✅ Scheduled runs support
@@ -207,9 +207,9 @@ npm test                               # Everything
 ✅ `scripts/run-bdx-tests.sh` (Already existed)
 
 ### New CI/CD Files (3)
-✅ `azure-pipelines.yml`  
-✅ `Jenkinsfile`  
-✅ `.gitlab-ci.yml`
+✅ `pipelines/azure-pipelines.yml`  
+✅ `pipelines/Jenkinsfile`  
+✅ `pipelines/.gitlab-ci.yml`
 
 ### New Documentation Files (2)
 ✅ `README.md`  

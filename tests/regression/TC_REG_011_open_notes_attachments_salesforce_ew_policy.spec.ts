@@ -11,7 +11,7 @@ import {
   SummaryPage,
 } from '../../src/pages/mlis-portal';
 import { SalesforceNotesAttachmentsEwPage } from '../../src/pages/salesforce-notes-attachments-ew';
-import { getBrokerCredentials, getSalesforceCredentials } from '../../src/config/env';
+import { getBrokerCredentials, getSalesforceCredentials, getSalesforceJwtUsername } from '../../src/config/env';
 
 test.describe('@regression | E2E | Notes & Attachments | England & Wales', () => {
   test('TC_REG_011 | Open Notes & Attachments in Salesforce (England & Wales policy)', async ({ page }) => {
@@ -69,7 +69,12 @@ test.describe('@regression | E2E | Notes & Attachments | England & Wales', () =>
     // Step 4: Login to Salesforce Portal
     await salesforce.goto();
     const sfCreds = getSalesforceCredentials();
-    await salesforce.login(sfCreds.username, sfCreds.password, { useJwt: true, fast: true });
+    const jwtUsername = getSalesforceJwtUsername();
+    await salesforce.login(sfCreds.username, sfCreds.password, {
+      useJwt: true,
+      fast: true,
+      jwtUsername,
+    });
 
     // Step 5-6: Global Search and open policy from grid by policy number
     await salesforce.searchPolicyAndOpenFromGlobalSearchGrid(policyNumber);

@@ -162,7 +162,7 @@ Test failed?
 - Check pipeline status: `ado/pipelines_get_build_status`, `ado/pipelines_get_builds`
 - Trigger a run: `ado/pipelines_run_pipeline`
 - Diagnose pipeline failure: `ado/pipelines_get_build_log` + `ado/pipelines_get_build_log_by_id`
-- YAML files: `azure-pipelines.yml`, `mlis-test-pipeline.yml`, `Jenkinsfile`
+- YAML files: `pipelines/azure-pipelines.yml`, `pipelines/mlis-test-pipeline.yml`, `pipelines/Jenkinsfile`
 
 ### Branch and PR Management
 - Working branch: `MLIS_PW`

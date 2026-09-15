@@ -63,13 +63,13 @@ npm run test:bdx:all:chrome
 
 ### Azure DevOps
 **Setup:**
-1. Import `azure-pipelines.yml`
+1. Import `pipelines/azure-pipelines.yml`
 2. Configure pipeline in Azure DevOps
 3. Pipeline runs automatically on commits
 
 ### Jenkins
 **Setup:**
-1. Import `Jenkinsfile`
+1. Import `pipelines/Jenkinsfile`
 2. Configure Jenkins job
 3. Parameters available:
    - TEST_TYPE: intro, rest, all
@@ -77,7 +77,7 @@ npm run test:bdx:all:chrome
 
 ### GitLab CI
 **Setup:**
-1. `.gitlab-ci.yml` is automatically detected
+1. `pipelines/.gitlab-ci.yml` (point the GitLab CI/CD config path at this file)
 2. Pipeline runs on push/MR
 3. Manual pipeline trigger available in GitLab UI
 

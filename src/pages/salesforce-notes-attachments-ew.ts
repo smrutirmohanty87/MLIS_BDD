@@ -1,5 +1,6 @@
 import { expect, Page } from '@playwright/test';
 import { getSalesforceLightningUrl } from '../config/env';
+import { SalesforcePortalPage } from './salesforce-cancellation';
 
 export class SalesforceNotesAttachmentsEwPage {
   constructor(private readonly page: Page) {}
@@ -22,30 +23,13 @@ export class SalesforceNotesAttachmentsEwPage {
     await this.page.goto(getSalesforceLightningUrl());
   }
 
-  async login(username: string, password: string) {
-    const usernameField = this.page.getByRole('textbox', { name: 'Username' }).first();
-    const passwordField = this.page.getByRole('textbox', { name: 'Password' }).first();
-    const loginButton = this.page.getByRole('button', { name: 'Log In' }).first();
-
-    await expect(usernameField).toBeVisible({ timeout: 60000 });
-    await usernameField.fill(username);
-
-    const passwordVisibleOnFirstStep = await passwordField.isVisible({ timeout: 1500 }).catch(() => false);
-    if (passwordVisibleOnFirstStep) {
-      // Backward-compatible flow: username and password on the same screen.
-      await passwordField.fill(password);
-      await loginButton.click();
-    } else {
-      // New flow: submit username first, then password appears.
-      await loginButton.click();
-      await expect(passwordField).toBeVisible({ timeout: 60000 });
-      await passwordField.fill(password);
-      await loginButton.click();
-    }
-
-    const appHeading = this.page.getByRole('heading', { name: /MLIS Underwriting/i }).first();
-    const navBar = this.page.locator('one-app-nav-bar, .slds-global-header').first();
-    await expect(appHeading.or(navBar).first()).toBeVisible({ timeout: 120000 });
+  async login(
+    username: string,
+    password: string,
+    options?: { useJwt?: boolean; fast?: boolean; jwtUsername?: string },
+  ) {
+    const salesforce = new SalesforcePortalPage(this.page);
+    await salesforce.login(username, password, options);
     await this.waitForLightningIdle();
   }
 
