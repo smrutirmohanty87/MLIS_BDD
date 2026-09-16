@@ -1,4 +1,5 @@
 import { expect, Locator, Page } from '@playwright/test';
+import { getQuoteJourneyFieldValues } from '../config/env';
 import { SalesforcePortalPage } from './salesforce-cancellation';
 
 export class SalesforceQuoteJourneyCommercialEWPage {
@@ -15,11 +16,13 @@ export class SalesforceQuoteJourneyCommercialEWPage {
   }
 
   async completeCommercialQuoteJourney(caseRef: string) {
-    await this.selectLookupOption('Broker Account', 'MLIS intermediary', 'MLIS Test Intermediary');
-    await this.selectLookupOption('Broker User', 'test', 'test');
-    await this.selectComboboxOption('Brand', 'My Legal Indemnity Shop');
+    const qjFields = getQuoteJourneyFieldValues();
+
+    await this.selectLookupOption('Broker Account', qjFields.brokerAccountQuery, qjFields.brokerAccountOption);
+    await this.selectLookupOption('Broker User', qjFields.brokerUserQuery, qjFields.brokerUserOption);
+    await this.selectComboboxOption('Brand', qjFields.brand);
     await this.selectComboboxOption('Quote Type', 'Commercial');
-    await this.selectComboboxOption('Jurisdiction', 'England and Wales');
+    await this.selectComboboxOption('Jurisdiction', qjFields.jurisdiction);
 
     const caseRefInput = await this.pickFirstVisible([
       this.page.getByRole('textbox', { name: /my case reference|case reference|file number/i }),

@@ -10,6 +10,15 @@ type SalesforceJwtConfig = {
   audience: string;
 };
 
+type QuoteJourneyFieldValues = {
+  brokerAccountQuery: string;
+  brokerAccountOption: string;
+  brokerUserQuery: string;
+  brokerUserOption: string;
+  brand: string;
+  jurisdiction: string;
+};
+
 type EnvConfig = {
   mlisPortalUrl: string;
   salesforceLightningUrl: string;
@@ -121,6 +130,30 @@ export function getSalesforceJwtConfig(): SalesforceJwtConfig | null {
 export function getSalesforceJwtUsername(): string | undefined {
   const envName = normalizeEnvName(process.env.TEST_ENV);
   return getOptionalEnvValue(getJwtVarCandidates(envName, 'JWT_USERNAME'));
+}
+
+export function getQuoteJourneyFieldValues(): QuoteJourneyFieldValues {
+  const envName = normalizeEnvName(process.env.TEST_ENV);
+
+  if (envName === 'UAT2') {
+    return {
+      brokerAccountQuery: 'MLP LAW LTD',
+      brokerAccountOption: 'MLP LAW LTD',
+      brokerUserQuery: 'Jonathan Chung',
+      brokerUserOption: 'Jonathan Chung',
+      brand: 'My Legal Indemnity Shop',
+      jurisdiction: 'England and Wales',
+    };
+  }
+
+  return {
+    brokerAccountQuery: 'MLIS intermediary',
+    brokerAccountOption: 'MLIS Test Intermediary',
+    brokerUserQuery: 'test',
+    brokerUserOption: 'test',
+    brand: 'My Legal Indemnity Shop',
+    jurisdiction: 'England and Wales',
+  };
 }
 
 export function getMlisPortalUrl(): string {

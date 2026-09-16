@@ -2,7 +2,7 @@
 // seed: tests/seed.spec.ts
 
 import { expect, Locator, Page, test } from '@playwright/test';
-import { getSalesforceCredentials } from '../../src/config/env';
+import { getQuoteJourneyFieldValues, getSalesforceCredentials } from '../../src/config/env';
 import { SalesforcePortalPage } from '../../src/pages/salesforce-cancellation';
 
 async function waitForLightningIdle(page: Page) {
@@ -103,6 +103,7 @@ test.describe('@sanity | E2E | Salesforce Quote Journey | Commercial E&W', () =>
 
     const caseRef = `SF-QJ-COM-E2E-${Date.now()}`;
     const sfCreds = getSalesforceCredentials();
+    const qjFields = getQuoteJourneyFieldValues();
     const salesforce = new SalesforcePortalPage(page);
 
     await salesforce.login(sfCreds.username, sfCreds.password, { useJwt: true, fast: true });
@@ -112,12 +113,12 @@ test.describe('@sanity | E2E | Salesforce Quote Journey | Commercial E&W', () =>
     await expect(page.getByRole('heading', { name: /quote journey/i })).toBeVisible({ timeout: 120000 });
     await expect(page.getByRole('heading', { name: /product selection/i }).first()).toBeVisible({ timeout: 120000 });
 
-    await selectLookupOption(page, 'Broker Account', 'MLIS intermediary', 'MLIS Test Intermediary');
-    await selectLookupOption(page, 'Broker User', 'test', 'test');
-    await selectComboboxOption(page, 'Brand', 'My Legal Indemnity Shop');
+    await selectLookupOption(page, 'Broker Account', qjFields.brokerAccountQuery, qjFields.brokerAccountOption);
+    await selectLookupOption(page, 'Broker User', qjFields.brokerUserQuery, qjFields.brokerUserOption);
+    await selectComboboxOption(page, 'Brand', qjFields.brand);
 
     await selectComboboxOption(page, 'Quote Type', 'Commercial');
-    await selectComboboxOption(page, 'Jurisdiction', 'England and Wales');
+    await selectComboboxOption(page, 'Jurisdiction', qjFields.jurisdiction);
 
     const caseRefInput = await pickFirstVisible([
       page.getByRole('textbox', { name: /my case reference|case reference|file number/i }),

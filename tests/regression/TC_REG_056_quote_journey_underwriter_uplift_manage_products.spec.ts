@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { getSalesforceCredentials } from '../../src/config/env';
+import { getQuoteJourneyFieldValues, getSalesforceCredentials } from '../../src/config/env';
 import { SalesforcePortalPage } from '../../src/pages/salesforce-cancellation';
 import { QuoteJourneyUnderwriterUpliftPage } from '../../src/pages/quote-journey-underwriter-uplift';
 
@@ -10,6 +10,7 @@ test.describe('@regression | E2E | Quote Journey | Underwriter Uplift | Manage P
 
     const caseRef = `REG-QJ-UPLIFT-MANAGE-${Date.now()}`;
     const sfCreds = getSalesforceCredentials();
+    const qjFields = getQuoteJourneyFieldValues();
 
     const salesforce = new SalesforcePortalPage(page);
     const quoteJourney = new QuoteJourneyUnderwriterUpliftPage(page);
@@ -17,11 +18,11 @@ test.describe('@regression | E2E | Quote Journey | Underwriter Uplift | Manage P
     await salesforce.login(sfCreds.username, sfCreds.password, { useJwt: true, fast: true });
 
     await quoteJourney.openQuoteJourney();
-    await quoteJourney.selectLookupOption('Broker Account', 'MLIS intermediary', 'MLIS Test Intermediary');
-    await quoteJourney.selectLookupOption('Broker User', 'test', 'test');
-    await quoteJourney.selectComboboxOption('Brand', 'My Legal Indemnity Shop');
+    await quoteJourney.selectLookupOption('Broker Account', qjFields.brokerAccountQuery, qjFields.brokerAccountOption);
+    await quoteJourney.selectLookupOption('Broker User', qjFields.brokerUserQuery, qjFields.brokerUserOption);
+    await quoteJourney.selectComboboxOption('Brand', qjFields.brand);
     await quoteJourney.selectComboboxOption('Quote Type', 'Commercial');
-    await quoteJourney.selectComboboxOption('Jurisdiction', 'England and Wales');
+    await quoteJourney.selectComboboxOption('Jurisdiction', qjFields.jurisdiction);
 
     await page.getByRole('textbox', { name: /my case reference|case reference|file number/i }).fill(caseRef);
     await page.getByRole('spinbutton', { name: /limit of indemnity/i }).fill('500000');
