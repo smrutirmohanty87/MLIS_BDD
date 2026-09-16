@@ -21,7 +21,7 @@ const policyData = require('../test-data/policy-creation.json') as {
   legalOfIndemnity: string;
 };
 
-test.describe('@sanity | E2E | BDX | MLIS Policy | Intermediary Commission | NB>MTA>MTA>CNR_MTA>Cancel from inception', () => {
+test.describe('@BDX | E2E | BDX | MLIS Policy | Intermediary Commission | NB>MTA>MTA>CNR_MTA>Cancel from inception', () => {
   test('TC_BDX_002_INTER_COMM | Create Residential NB policy, MTA1/MTA2, CNR_MTA and cancel from inception with BDX lines', async ({ page }) => {
     test.setTimeout(900000);
     test.slow();

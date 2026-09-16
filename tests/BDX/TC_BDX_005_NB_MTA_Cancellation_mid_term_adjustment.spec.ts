@@ -14,7 +14,7 @@ import { BrokerPortalPage } from '../../src/pages/broker-portal-policy';
 import { SalesforcePortalPage } from '../../src/pages/salesforce-cancellation';
 import { getBrokerCredentials, getSalesforceCredentials } from '../../src/config/env';
 
-test.describe('@sanity | E2E | BDX | NB_MTA', () => {
+test.describe('@BDX | E2E | BDX | NB_MTA', () => {
   test('TC_BDX_005_NB_MTA | Create NB-MTA (Mid-Term Adjustment) on a live policy', async ({ page }) => {
     test.setTimeout(900000);
     test.slow();

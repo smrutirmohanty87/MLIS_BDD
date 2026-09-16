@@ -25,7 +25,7 @@ const ADDRESS_LINE2_255 = 'B'.repeat(255);
 const ADDRESS_LINE3_255 = 'C'.repeat(255);
 const ADDRESS_LINE4_255 = 'D'.repeat(255);
 
-test.describe('@sanity | E2E | BDX | MLIS Policy | BDE Commission | NB>MTA>CNR', () => {
+test.describe('@BDX | E2E | BDX | MLIS Policy | BDE Commission | NB>MTA>CNR', () => {
   test('TC_BDX_003_BDE_COMM | Create Residential NB policy, MTA (350.67), CNR with reason and verify BDX lines', async ({ page }) => {
     test.setTimeout(900000);
     test.slow();

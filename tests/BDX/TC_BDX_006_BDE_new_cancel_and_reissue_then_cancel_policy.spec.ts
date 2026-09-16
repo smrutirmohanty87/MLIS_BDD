@@ -14,7 +14,7 @@ import { BrokerPortalPage } from '../../src/pages/broker-portal-policy';
 import { SalesforcePortalPage } from '../../src/pages/salesforce-cancellation';
 import { getBrokerCredentialsForProfile, getSalesforceCredentials } from '../../src/config/env';
 
-test.describe('@sanity | E2E | BDX | BDE | Cancel and Reissue | Cancellation', () => {
+test.describe('@BDX | E2E | BDX | BDE | Cancel and Reissue | Cancellation', () => {
   test('TC_BDX_006_BDE | BDE - Create new policy then cancel and reissue then cancel the policy', async ({ page }) => {
     test.setTimeout(900000);
     test.slow();

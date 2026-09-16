@@ -15,7 +15,7 @@ import { SalesforcePortalPage } from '../../src/pages/salesforce-cancellation';
 import { TCRegNiCommercialIntermediaryPage } from '../../src/pages/tc-reg-ni-commercial-intermediary';
 import { getBrokerCredentialsForProfile, getSalesforceCredentials } from '../../src/config/env';
 
-test.describe('@sanity | E2E | BDX | MLIS Policy | Introducer Commission | EW Commercial NB>CNR>MTA>Cancel only MTA', () => {
+test.describe('@BDX | E2E | BDX | MLIS Policy | Introducer Commission | EW Commercial NB>CNR>MTA>Cancel only MTA', () => {
   test('TC_BDX_001 | England & Wales Commercial NB policy, CNR, MTA future date premium 300, cancel only MTA', async ({ page }) => {
     test.setTimeout(900000);
     test.slow();

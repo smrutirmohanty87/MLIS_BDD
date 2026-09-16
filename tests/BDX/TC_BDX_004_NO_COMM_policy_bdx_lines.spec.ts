@@ -21,7 +21,7 @@ const policyData = require('../test-data/policy-creation-no-comm.json') as {
   legalOfIndemnity: string;
 };
 
-test.describe('@sanity | E2E | BDX | NO_COMM', () => {
+test.describe('@BDX | E2E | BDX | NO_COMM', () => {
   test('TC_BDX_004_NO_COMM | Verify BDX lines generated', async ({ page }) => {
     test.setTimeout(900000);
     test.slow();
