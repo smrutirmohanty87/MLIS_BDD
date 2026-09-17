@@ -53,6 +53,7 @@ parameters:
     values:
       - UAT1
       - UAT2
+      - SIT1
       - SIT2
 
   - name: testSuite
@@ -63,6 +64,7 @@ parameters:
       - all
       - sanity
       - regression
+      - claims
       - bdx
 
   - name: browser
@@ -168,6 +170,12 @@ stages:
               SALESFORCE_UAT2_JWT_PRIVATE_KEY_PATH: $(SALESFORCE_UAT2_JWT_PRIVATE_KEY_PATH)
               SALEFORCE_UAT2_CLAIMUSER: $(SALEFORCE_UAT2_CLAIMUSER)
               SALEFORCE_UAT2_CLAIMUSER_PASSWORD: $(SALEFORCE_UAT2_CLAIMUSER_PASSWORD)
+              SIT1_MLIS_PORTAL_URL: $(SIT1_MLIS_PORTAL_URL)
+              SIT1_SALESFORCE_LIGHTNING_URL: $(SIT1_SALESFORCE_LIGHTNING_URL)
+              SALEFORCE_SIT1_NO_COMM_BROKERUSER: $(SALEFORCE_SIT1_NO_COMM_BROKERUSER)
+              SALEFORCE_SIT1_NO_COMM_BROKERPASSWORD: $(SALEFORCE_SIT1_NO_COMM_BROKERPASSWORD)
+              SALEFORCE_SIT1_CLAIMUSER: $(SALEFORCE_SIT1_CLAIMUSER)
+              SALEFORCE_SIT1_CLAIMUSER_PASSWORD: $(SALEFORCE_SIT1_CLAIMUSER_PASSWORD)
               SIT2_MLIS_PORTAL_URL: $(SIT2_MLIS_PORTAL_URL)
               SIT2_SALESFORCE_LIGHTNING_URL: $(SIT2_SALESFORCE_LIGHTNING_URL)
               SALEFORCE_SIT2_NO_COMM_BROKERUSER: $(SALEFORCE_SIT2_NO_COMM_BROKERUSER)
@@ -278,6 +286,12 @@ stages:
               SALESFORCE_UAT2_JWT_PRIVATE_KEY_PATH: $(SALESFORCE_UAT2_JWT_PRIVATE_KEY_PATH)
               SALEFORCE_UAT2_CLAIMUSER: $(SALEFORCE_UAT2_CLAIMUSER)
               SALEFORCE_UAT2_CLAIMUSER_PASSWORD: $(SALEFORCE_UAT2_CLAIMUSER_PASSWORD)
+              SIT1_MLIS_PORTAL_URL: $(SIT1_MLIS_PORTAL_URL)
+              SIT1_SALESFORCE_LIGHTNING_URL: $(SIT1_SALESFORCE_LIGHTNING_URL)
+              SALEFORCE_SIT1_NO_COMM_BROKERUSER: $(SALEFORCE_SIT1_NO_COMM_BROKERUSER)
+              SALEFORCE_SIT1_NO_COMM_BROKERPASSWORD: $(SALEFORCE_SIT1_NO_COMM_BROKERPASSWORD)
+              SALEFORCE_SIT1_CLAIMUSER: $(SALEFORCE_SIT1_CLAIMUSER)
+              SALEFORCE_SIT1_CLAIMUSER_PASSWORD: $(SALEFORCE_SIT1_CLAIMUSER_PASSWORD)
               SIT2_MLIS_PORTAL_URL: $(SIT2_MLIS_PORTAL_URL)
               SIT2_SALESFORCE_LIGHTNING_URL: $(SIT2_SALESFORCE_LIGHTNING_URL)
               SALEFORCE_SIT2_NO_COMM_BROKERUSER: $(SALEFORCE_SIT2_NO_COMM_BROKERUSER)
@@ -302,11 +316,120 @@ stages:
               publishLocation: 'pipeline'
 
   # ---------------------------------------------------------------------------
+  # STAGE 2b - Claims Tests
+  # ---------------------------------------------------------------------------
+  - stage: Claims_Tests
+    displayName: 'Claims Tests'
+    dependsOn: Regression_Tests
+    condition: |
+      and(
+        succeededOrFailed(),
+        or(
+          eq('${{ parameters.testSuite }}', 'claims'),
+          eq('${{ parameters.testSuite }}', 'all')
+        )
+      )
+    jobs:
+      - job: RunClaimsTests
+        displayName: 'Run Claims Tests - $(TEST_ENV)'
+        pool:
+          vmImage: 'ubuntu-latest'
+        timeoutInMinutes: 180
+        steps:
+          - task: NodeTool@0
+            displayName: 'Install Node.js $(nodeVersion)'
+            inputs:
+              versionSpec: $(nodeVersion)
+
+          - task: DownloadSecureFile@1
+            name: salesforceJwtKey
+            displayName: 'Download secure file: automation_server.key'
+            inputs:
+              secureFile: 'automation_server.key'
+
+          - script: |
+              echo "##vso[task.setvariable variable=SALEFORCE_UAT1_JWT_PRIVATE_KEY_PATH]$(salesforceJwtKey.secureFilePath)"
+              echo "##vso[task.setvariable variable=SALESFORCE_UAT1_JWT_PRIVATE_KEY_PATH]$(salesforceJwtKey.secureFilePath)"
+              echo "##vso[task.setvariable variable=SALEFORCE_UAT2_JWT_PRIVATE_KEY_PATH]$(salesforceJwtKey.secureFilePath)"
+              echo "##vso[task.setvariable variable=SALESFORCE_UAT2_JWT_PRIVATE_KEY_PATH]$(salesforceJwtKey.secureFilePath)"
+            displayName: 'Set Salesforce JWT key path'
+
+          - task: Cache@2
+            displayName: 'Cache npm dependencies'
+            inputs:
+              key: 'npm | "$(Agent.OS)" | package-lock.json'
+              path: '$(System.DefaultWorkingDirectory)/node_modules'
+              restoreKeys: |
+                npm | "$(Agent.OS)"
+
+          - script: npm ci
+            displayName: 'Install Node dependencies'
+
+          - script: npx playwright install --with-deps $(BROWSER)
+            displayName: 'Install Playwright browsers'
+
+          - script: npx playwright test tests/claims/ --project=$(BROWSER) --workers=1 --reporter=list,html
+            displayName: 'Run Claims tests'
+            env:
+              CI: $(CI)
+              TEST_ENV: $(TEST_ENV)
+              TEST_BROKER_PROFILE: $(TEST_BROKER_PROFILE)
+              MLIS_PORTAL_URL: $(MLIS_PORTAL_URL)
+              SALESFORCE_LIGHTNING_URL: $(SALESFORCE_LIGHTNING_URL)
+              UAT1_MLIS_PORTAL_URL: $(UAT1_MLIS_PORTAL_URL)
+              UAT1_SALESFORCE_LIGHTNING_URL: $(UAT1_SALESFORCE_LIGHTNING_URL)
+              SALEFORCE_UAT1_NO_COMM_BROKERUSER: $(SALEFORCE_UAT1_NO_COMM_BROKERUSER)
+              SALEFORCE_UAT1_NO_COMM_BROKERPASSWORD: $(SALEFORCE_UAT1_NO_COMM_BROKERPASSWORD)
+              SALEFORCE_UAT1_ENHANCEDUSER: $(SALEFORCE_UAT1_ENHANCEDUSER)
+              SALEFORCE_UAT1_ENHANCEDUSER_PASSWORD: $(SALEFORCE_UAT1_ENHANCEDUSER_PASSWORD)
+              SALESFORCE_UAT1_JWT_CLIENT_ID: $(SALESFORCE_UAT1_JWT_CLIENT_ID)
+              SALESFORCE_UAT1_JWT_LOGIN_URL: $(SALESFORCE_UAT1_JWT_LOGIN_URL)
+              SALESFORCE_UAT1_JWT_PRIVATE_KEY_PATH: $(SALESFORCE_UAT1_JWT_PRIVATE_KEY_PATH)
+              SALEFORCE_UAT2_NO_COMM_BROKERUSER: $(SALEFORCE_UAT2_NO_COMM_BROKERUSER)
+              SALEFORCE_UAT2_NO_COMM_BROKERPASSWORD: $(SALEFORCE_UAT2_NO_COMM_BROKERPASSWORD)
+              SALEFORCE_UAT2_ENHANCEDUSER: $(SALEFORCE_UAT2_ENHANCEDUSER)
+              SALEFORCE_UAT2_ENHANCEDUSER_PASSWORD: $(SALEFORCE_UAT2_ENHANCEDUSER_PASSWORD)
+              SALESFORCE_UAT2_JWT_CLIENT_ID: $(SALESFORCE_UAT2_JWT_CLIENT_ID)
+              SALESFORCE_UAT2_JWT_USERNAME: $(SALESFORCE_UAT2_JWT_USERNAME)
+              SALESFORCE_UAT2_JWT_LOGIN_URL: $(SALESFORCE_UAT2_JWT_LOGIN_URL)
+              SALESFORCE_UAT2_JWT_PRIVATE_KEY_PATH: $(SALESFORCE_UAT2_JWT_PRIVATE_KEY_PATH)
+              SALEFORCE_UAT2_CLAIMUSER: $(SALEFORCE_UAT2_CLAIMUSER)
+              SALEFORCE_UAT2_CLAIMUSER_PASSWORD: $(SALEFORCE_UAT2_CLAIMUSER_PASSWORD)
+              SIT1_MLIS_PORTAL_URL: $(SIT1_MLIS_PORTAL_URL)
+              SIT1_SALESFORCE_LIGHTNING_URL: $(SIT1_SALESFORCE_LIGHTNING_URL)
+              SALEFORCE_SIT1_NO_COMM_BROKERUSER: $(SALEFORCE_SIT1_NO_COMM_BROKERUSER)
+              SALEFORCE_SIT1_NO_COMM_BROKERPASSWORD: $(SALEFORCE_SIT1_NO_COMM_BROKERPASSWORD)
+              SALEFORCE_SIT1_CLAIMUSER: $(SALEFORCE_SIT1_CLAIMUSER)
+              SALEFORCE_SIT1_CLAIMUSER_PASSWORD: $(SALEFORCE_SIT1_CLAIMUSER_PASSWORD)
+              SIT2_MLIS_PORTAL_URL: $(SIT2_MLIS_PORTAL_URL)
+              SIT2_SALESFORCE_LIGHTNING_URL: $(SIT2_SALESFORCE_LIGHTNING_URL)
+              SALEFORCE_SIT2_NO_COMM_BROKERUSER: $(SALEFORCE_SIT2_NO_COMM_BROKERUSER)
+              SALEFORCE_SIT2_NO_COMM_BROKERPASSWORD: $(SALEFORCE_SIT2_NO_COMM_BROKERPASSWORD)
+              SALEFORCE_SIT2_ENHANCEDUSER: $(SALEFORCE_SIT2_ENHANCEDUSER)
+              SALEFORCE_SIT2_ENHANCEDUSER_PASSWORD: $(SALEFORCE_SIT2_ENHANCEDUSER_PASSWORD)
+
+          - task: PublishPipelineArtifact@1
+            displayName: 'Publish Claims HTML Report'
+            condition: always()
+            inputs:
+              targetPath: 'playwright-report'
+              artifact: 'claims-report-$(TEST_ENV)-$(BROWSER)'
+              publishLocation: 'pipeline'
+
+          - task: PublishPipelineArtifact@1
+            displayName: 'Publish Claims Test Results'
+            condition: always()
+            inputs:
+              targetPath: 'test-results'
+              artifact: 'claims-results-$(TEST_ENV)-$(BROWSER)'
+              publishLocation: 'pipeline'
+
+  # ---------------------------------------------------------------------------
   # STAGE 3a � BDX Core Tests (TC_BDX_001�004)
   # ---------------------------------------------------------------------------
   - stage: BDX_Core_Tests
     displayName: 'BDX Core Tests (TC_BDX_001�004)'
-    dependsOn: Regression_Tests
+    dependsOn: Claims_Tests
     condition: |
       and(
         succeededOrFailed(),

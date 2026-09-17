@@ -76,12 +76,14 @@ parameters:
     values:
       - UAT1
       - UAT2
+      - SIT1
       - SIT2
       - DURQA
 
   # Select tests by the @tag used in test.describe() blocks.
   # @sanity     â†’ runs TC_SAN_001â€“012  (tests/sanity/)
   # @regression â†’ runs TC_REG_001â€“019  (tests/regression/)
+  # @claims     â†’ runs claims suite      (tests/claims/)
   # @bdx        â†’ runs TC_BDX_001â€“006  (tests/BDX/)
   # all         â†’ runs every suite in sequence
   - name: tag
@@ -92,6 +94,7 @@ parameters:
       - all
       - '@sanity'
       - '@regression'
+      - '@claims'
       - '@bdx'
 
   - name: browser
@@ -204,6 +207,12 @@ stages:
               SALESFORCE_UAT2_JWT_USERNAME: $(SALESFORCE_UAT2_JWT_USERNAME)
               SALESFORCE_UAT2_JWT_LOGIN_URL: $(SALESFORCE_UAT2_JWT_LOGIN_URL)
               SALESFORCE_UAT2_JWT_PRIVATE_KEY_PATH: $(SALESFORCE_UAT2_JWT_PRIVATE_KEY_PATH)
+              SIT1_MLIS_PORTAL_URL: $(SIT1_MLIS_PORTAL_URL)
+              SIT1_SALESFORCE_LIGHTNING_URL: $(SIT1_SALESFORCE_LIGHTNING_URL)
+              SALEFORCE_SIT1_NO_COMM_BROKERUSER: $(SALEFORCE_SIT1_NO_COMM_BROKERUSER)
+              SALEFORCE_SIT1_NO_COMM_BROKERPASSWORD: $(SALEFORCE_SIT1_NO_COMM_BROKERPASSWORD)
+              SALEFORCE_SIT1_CLAIMUSER: $(SALEFORCE_SIT1_CLAIMUSER)
+              SALEFORCE_SIT1_CLAIMUSER_PASSWORD: $(SALEFORCE_SIT1_CLAIMUSER_PASSWORD)
               SIT2_MLIS_PORTAL_URL: $(SIT2_MLIS_PORTAL_URL)
               SIT2_SALESFORCE_LIGHTNING_URL: $(SIT2_SALESFORCE_LIGHTNING_URL)
               SALEFORCE_SIT2_NO_COMM_BROKERUSER: $(SALEFORCE_SIT2_NO_COMM_BROKERUSER)
@@ -336,6 +345,12 @@ stages:
               SALESFORCE_UAT2_JWT_USERNAME: $(SALESFORCE_UAT2_JWT_USERNAME)
               SALESFORCE_UAT2_JWT_LOGIN_URL: $(SALESFORCE_UAT2_JWT_LOGIN_URL)
               SALESFORCE_UAT2_JWT_PRIVATE_KEY_PATH: $(SALESFORCE_UAT2_JWT_PRIVATE_KEY_PATH)
+              SIT1_MLIS_PORTAL_URL: $(SIT1_MLIS_PORTAL_URL)
+              SIT1_SALESFORCE_LIGHTNING_URL: $(SIT1_SALESFORCE_LIGHTNING_URL)
+              SALEFORCE_SIT1_NO_COMM_BROKERUSER: $(SALEFORCE_SIT1_NO_COMM_BROKERUSER)
+              SALEFORCE_SIT1_NO_COMM_BROKERPASSWORD: $(SALEFORCE_SIT1_NO_COMM_BROKERPASSWORD)
+              SALEFORCE_SIT1_CLAIMUSER: $(SALEFORCE_SIT1_CLAIMUSER)
+              SALEFORCE_SIT1_CLAIMUSER_PASSWORD: $(SALEFORCE_SIT1_CLAIMUSER_PASSWORD)
               SIT2_MLIS_PORTAL_URL: $(SIT2_MLIS_PORTAL_URL)
               SIT2_SALESFORCE_LIGHTNING_URL: $(SIT2_SALESFORCE_LIGHTNING_URL)
               SALEFORCE_SIT2_NO_COMM_BROKERUSER: $(SALEFORCE_SIT2_NO_COMM_BROKERUSER)
@@ -372,6 +387,116 @@ stages:
               publishLocation: pipeline
 
   # =========================================================================
+  # STAGE 2b â€” CLAIMS TESTS
+  # Triggered when tag == '@claims' or tag == 'all'
+  # =========================================================================
+  - stage: Claims_Tests
+    displayName: 'Stage 2b â€” Claims Tests [@claims]'
+    dependsOn: Regression_Tests
+    condition: |
+      and(
+        or(
+          eq('${{ parameters.tag }}', '@claims'),
+          eq('${{ parameters.tag }}', 'all')
+        ),
+        in(dependencies.Regression_Tests.result, 'Succeeded', 'SucceededWithIssues', 'Failed', 'Skipped')
+      )
+    jobs:
+      - job: RunClaims
+        displayName: 'Claims [@claims] â€” $(TEST_ENV) / $(BROWSER)'
+        pool:
+          vmImage: 'ubuntu-latest'
+        timeoutInMinutes: 120
+        steps:
+          - task: NodeTool@0
+            displayName: 'Install Node.js $(nodeVersion)'
+            inputs:
+              versionSpec: $(nodeVersion)
+
+          - task: Cache@2
+            displayName: 'Cache npm dependencies'
+            inputs:
+              key: 'npm | "$(Agent.OS)" | package-lock.json'
+              path: '$(System.DefaultWorkingDirectory)/node_modules'
+              restoreKeys: |
+                npm | "$(Agent.OS)"
+
+          - script: npm ci
+            displayName: 'Install dependencies'
+
+          - script: npx playwright install --with-deps $(BROWSER)
+            displayName: 'Install Playwright browser â€” $(BROWSER)'
+
+          - script: >
+              npx playwright test tests/claims/
+              --project=$(BROWSER)
+              --workers=1
+              --reporter=list,html
+            displayName: 'Run Claims tests (tests/claims/)'
+            env:
+              CI: $(CI)
+              TEST_ENV: $(TEST_ENV)
+              TEST_BROKER_PROFILE: $(TEST_BROKER_PROFILE)
+              MLIS_PORTAL_URL: $(MLIS_PORTAL_URL)
+              SALESFORCE_LIGHTNING_URL: $(SALESFORCE_LIGHTNING_URL)
+              UAT1_MLIS_PORTAL_URL: $(UAT1_MLIS_PORTAL_URL)
+              UAT1_SALESFORCE_LIGHTNING_URL: $(UAT1_SALESFORCE_LIGHTNING_URL)
+              SALEFORCE_UAT1_NO_COMM_BROKERUSER: $(SALEFORCE_UAT1_NO_COMM_BROKERUSER)
+              SALEFORCE_UAT1_NO_COMM_BROKERPASSWORD: $(SALEFORCE_UAT1_NO_COMM_BROKERPASSWORD)
+              SALEFORCE_UAT1_ENHANCEDUSER: $(SALEFORCE_UAT1_ENHANCEDUSER)
+              SALEFORCE_UAT1_ENHANCEDUSER_PASSWORD: $(SALEFORCE_UAT1_ENHANCEDUSER_PASSWORD)
+              SALEFORCE_UAT2_NO_COMM_BROKERUSER: $(SALEFORCE_UAT2_NO_COMM_BROKERUSER)
+              SALEFORCE_UAT2_NO_COMM_BROKERPASSWORD: $(SALEFORCE_UAT2_NO_COMM_BROKERPASSWORD)
+              SALEFORCE_UAT2_ENHANCEDUSER: $(SALEFORCE_UAT2_ENHANCEDUSER)
+              SALEFORCE_UAT2_ENHANCEDUSER_PASSWORD: $(SALEFORCE_UAT2_ENHANCEDUSER_PASSWORD)
+              SALEFORCE_UAT2_CLAIMUSER: $(SALEFORCE_UAT2_CLAIMUSER)
+              SALEFORCE_UAT2_CLAIMUSER_PASSWORD: $(SALEFORCE_UAT2_CLAIMUSER_PASSWORD)
+              SALESFORCE_UAT2_JWT_CLIENT_ID: $(SALESFORCE_UAT2_JWT_CLIENT_ID)
+              SALESFORCE_UAT2_JWT_USERNAME: $(SALESFORCE_UAT2_JWT_USERNAME)
+              SALESFORCE_UAT2_JWT_LOGIN_URL: $(SALESFORCE_UAT2_JWT_LOGIN_URL)
+              SALESFORCE_UAT2_JWT_PRIVATE_KEY_PATH: $(SALESFORCE_UAT2_JWT_PRIVATE_KEY_PATH)
+              SIT1_MLIS_PORTAL_URL: $(SIT1_MLIS_PORTAL_URL)
+              SIT1_SALESFORCE_LIGHTNING_URL: $(SIT1_SALESFORCE_LIGHTNING_URL)
+              SALEFORCE_SIT1_NO_COMM_BROKERUSER: $(SALEFORCE_SIT1_NO_COMM_BROKERUSER)
+              SALEFORCE_SIT1_NO_COMM_BROKERPASSWORD: $(SALEFORCE_SIT1_NO_COMM_BROKERPASSWORD)
+              SALEFORCE_SIT1_CLAIMUSER: $(SALEFORCE_SIT1_CLAIMUSER)
+              SALEFORCE_SIT1_CLAIMUSER_PASSWORD: $(SALEFORCE_SIT1_CLAIMUSER_PASSWORD)
+              SIT2_MLIS_PORTAL_URL: $(SIT2_MLIS_PORTAL_URL)
+              SIT2_SALESFORCE_LIGHTNING_URL: $(SIT2_SALESFORCE_LIGHTNING_URL)
+              SALEFORCE_SIT2_NO_COMM_BROKERUSER: $(SALEFORCE_SIT2_NO_COMM_BROKERUSER)
+              SALEFORCE_SIT2_NO_COMM_BROKERPASSWORD: $(SALEFORCE_SIT2_NO_COMM_BROKERPASSWORD)
+              SALEFORCE_SIT2_ENHANCEDUSER: $(SALEFORCE_SIT2_ENHANCEDUSER)
+              SALEFORCE_SIT2_ENHANCEDUSER_PASSWORD: $(SALEFORCE_SIT2_ENHANCEDUSER_PASSWORD)
+              DURQA_MLIS_PORTAL_URL: $(DURQA_MLIS_PORTAL_URL)
+              DURQA_SALESFORCE_LIGHTNING_URL: $(DURQA_SALESFORCE_LIGHTNING_URL)
+              SALEFORCE_DURQA_NO_COMM_BROKERUSER: $(SALEFORCE_DURQA_NO_COMM_BROKERUSER)
+              SALEFORCE_DURQA_NO_COMM_BROKERPASSWORD: $(SALEFORCE_DURQA_NO_COMM_BROKERPASSWORD)
+              SALEFORCE_DURQA_INTER_COMM_BROKERUSER: $(SALEFORCE_DURQA_INTER_COMM_BROKERUSER)
+              SALEFORCE_DURQA_INTER_COMM_BROKERPASSWORD: $(SALEFORCE_DURQA_INTER_COMM_BROKERPASSWORD)
+              SALEFORCE_DURQA_BDE_COMM_BROKERUSER: $(SALEFORCE_DURQA_BDE_COMM_BROKERUSER)
+              SALEFORCE_DURQA_BDE_COMM_BROKERPASSWORD: $(SALEFORCE_DURQA_BDE_COMM_BROKERPASSWORD)
+              SALEFORCE_DURQA_INTRO_COMM_BROKERUSER: $(SALEFORCE_DURQA_INTRO_COMM_BROKERUSER)
+              SALEFORCE_DURQA_INTRO_COMM_BROKERPASSWORD: $(SALEFORCE_DURQA_INTRO_COMM_BROKERPASSWORD)
+              SALEFORCE_DURQA_ENHANCEDUSER: $(SALEFORCE_DURQA_ENHANCEDUSER)
+              SALEFORCE_DURQA_ENHANCEDUSER_PASSWORD: $(SALEFORCE_DURQA_ENHANCEDUSER_PASSWORD)
+
+          - task: PublishPipelineArtifact@1
+            displayName: 'Publish Claims HTML report'
+            condition: always()
+            inputs:
+              targetPath: 'playwright-report'
+              artifact: 'claims-report-$(TEST_ENV)-$(BROWSER)'
+              publishLocation: pipeline
+
+          - task: PublishPipelineArtifact@1
+            displayName: 'Publish Claims test results'
+            condition: always()
+            inputs:
+              targetPath: 'test-results'
+              artifact: 'claims-results-$(TEST_ENV)-$(BROWSER)'
+              publishLocation: pipeline
+
+  # =========================================================================
   # STAGE 3 â€” BDX TESTS  (6 test cases)
   # Tag filter: --grep "@sanity"  scoped to tests/BDX/
   #   (BDX specs use @sanity tag + "BDX" in their describe name;
@@ -380,14 +505,14 @@ stages:
   # =========================================================================
   - stage: BDX_Tests
     displayName: 'Stage 3 â€” BDX Tests [@bdx] (6 tests)'
-    dependsOn: Regression_Tests
+    dependsOn: Claims_Tests
     condition: |
       and(
         or(
           eq('${{ parameters.tag }}', '@bdx'),
           eq('${{ parameters.tag }}', 'all')
         ),
-        in(dependencies.Regression_Tests.result, 'Succeeded', 'SucceededWithIssues', 'Failed', 'Skipped')
+        in(dependencies.Claims_Tests.result, 'Succeeded', 'SucceededWithIssues', 'Failed', 'Skipped')
       )
     jobs:
 
@@ -451,6 +576,12 @@ stages:
               SALESFORCE_UAT2_JWT_USERNAME: $(SALESFORCE_UAT2_JWT_USERNAME)
               SALESFORCE_UAT2_JWT_LOGIN_URL: $(SALESFORCE_UAT2_JWT_LOGIN_URL)
               SALESFORCE_UAT2_JWT_PRIVATE_KEY_PATH: $(SALESFORCE_UAT2_JWT_PRIVATE_KEY_PATH)
+              SIT1_MLIS_PORTAL_URL: $(SIT1_MLIS_PORTAL_URL)
+              SIT1_SALESFORCE_LIGHTNING_URL: $(SIT1_SALESFORCE_LIGHTNING_URL)
+              SALEFORCE_SIT1_NO_COMM_BROKERUSER: $(SALEFORCE_SIT1_NO_COMM_BROKERUSER)
+              SALEFORCE_SIT1_NO_COMM_BROKERPASSWORD: $(SALEFORCE_SIT1_NO_COMM_BROKERPASSWORD)
+              SALEFORCE_SIT1_CLAIMUSER: $(SALEFORCE_SIT1_CLAIMUSER)
+              SALEFORCE_SIT1_CLAIMUSER_PASSWORD: $(SALEFORCE_SIT1_CLAIMUSER_PASSWORD)
               SIT2_MLIS_PORTAL_URL: $(SIT2_MLIS_PORTAL_URL)
               SIT2_SALESFORCE_LIGHTNING_URL: $(SIT2_SALESFORCE_LIGHTNING_URL)
               SALEFORCE_SIT2_NO_COMM_BROKERUSER: $(SALEFORCE_SIT2_NO_COMM_BROKERUSER)
@@ -547,6 +678,12 @@ stages:
               SALESFORCE_UAT2_JWT_USERNAME: $(SALESFORCE_UAT2_JWT_USERNAME)
               SALESFORCE_UAT2_JWT_LOGIN_URL: $(SALESFORCE_UAT2_JWT_LOGIN_URL)
               SALESFORCE_UAT2_JWT_PRIVATE_KEY_PATH: $(SALESFORCE_UAT2_JWT_PRIVATE_KEY_PATH)
+              SIT1_MLIS_PORTAL_URL: $(SIT1_MLIS_PORTAL_URL)
+              SIT1_SALESFORCE_LIGHTNING_URL: $(SIT1_SALESFORCE_LIGHTNING_URL)
+              SALEFORCE_SIT1_NO_COMM_BROKERUSER: $(SALEFORCE_SIT1_NO_COMM_BROKERUSER)
+              SALEFORCE_SIT1_NO_COMM_BROKERPASSWORD: $(SALEFORCE_SIT1_NO_COMM_BROKERPASSWORD)
+              SALEFORCE_SIT1_CLAIMUSER: $(SALEFORCE_SIT1_CLAIMUSER)
+              SALEFORCE_SIT1_CLAIMUSER_PASSWORD: $(SALEFORCE_SIT1_CLAIMUSER_PASSWORD)
               SIT2_MLIS_PORTAL_URL: $(SIT2_MLIS_PORTAL_URL)
               SIT2_SALESFORCE_LIGHTNING_URL: $(SIT2_SALESFORCE_LIGHTNING_URL)
               SALEFORCE_SIT2_NO_COMM_BROKERUSER: $(SALEFORCE_SIT2_NO_COMM_BROKERUSER)
@@ -642,6 +779,12 @@ stages:
               SALESFORCE_UAT2_JWT_USERNAME: $(SALESFORCE_UAT2_JWT_USERNAME)
               SALESFORCE_UAT2_JWT_LOGIN_URL: $(SALESFORCE_UAT2_JWT_LOGIN_URL)
               SALESFORCE_UAT2_JWT_PRIVATE_KEY_PATH: $(SALESFORCE_UAT2_JWT_PRIVATE_KEY_PATH)
+              SIT1_MLIS_PORTAL_URL: $(SIT1_MLIS_PORTAL_URL)
+              SIT1_SALESFORCE_LIGHTNING_URL: $(SIT1_SALESFORCE_LIGHTNING_URL)
+              SALEFORCE_SIT1_NO_COMM_BROKERUSER: $(SALEFORCE_SIT1_NO_COMM_BROKERUSER)
+              SALEFORCE_SIT1_NO_COMM_BROKERPASSWORD: $(SALEFORCE_SIT1_NO_COMM_BROKERPASSWORD)
+              SALEFORCE_SIT1_CLAIMUSER: $(SALEFORCE_SIT1_CLAIMUSER)
+              SALEFORCE_SIT1_CLAIMUSER_PASSWORD: $(SALEFORCE_SIT1_CLAIMUSER_PASSWORD)
               SIT2_MLIS_PORTAL_URL: $(SIT2_MLIS_PORTAL_URL)
               SIT2_SALESFORCE_LIGHTNING_URL: $(SIT2_SALESFORCE_LIGHTNING_URL)
               SALEFORCE_SIT2_NO_COMM_BROKERUSER: $(SALEFORCE_SIT2_NO_COMM_BROKERUSER)
@@ -733,6 +876,12 @@ stages:
               SALESFORCE_UAT2_JWT_USERNAME: $(SALESFORCE_UAT2_JWT_USERNAME)
               SALESFORCE_UAT2_JWT_LOGIN_URL: $(SALESFORCE_UAT2_JWT_LOGIN_URL)
               SALESFORCE_UAT2_JWT_PRIVATE_KEY_PATH: $(SALESFORCE_UAT2_JWT_PRIVATE_KEY_PATH)
+              SIT1_MLIS_PORTAL_URL: $(SIT1_MLIS_PORTAL_URL)
+              SIT1_SALESFORCE_LIGHTNING_URL: $(SIT1_SALESFORCE_LIGHTNING_URL)
+              SALEFORCE_SIT1_NO_COMM_BROKERUSER: $(SALEFORCE_SIT1_NO_COMM_BROKERUSER)
+              SALEFORCE_SIT1_NO_COMM_BROKERPASSWORD: $(SALEFORCE_SIT1_NO_COMM_BROKERPASSWORD)
+              SALEFORCE_SIT1_CLAIMUSER: $(SALEFORCE_SIT1_CLAIMUSER)
+              SALEFORCE_SIT1_CLAIMUSER_PASSWORD: $(SALEFORCE_SIT1_CLAIMUSER_PASSWORD)
               SIT2_MLIS_PORTAL_URL: $(SIT2_MLIS_PORTAL_URL)
               SIT2_SALESFORCE_LIGHTNING_URL: $(SIT2_SALESFORCE_LIGHTNING_URL)
               SALEFORCE_SIT2_NO_COMM_BROKERUSER: $(SALEFORCE_SIT2_NO_COMM_BROKERUSER)
@@ -776,6 +925,7 @@ stages:
     dependsOn:
       - Sanity_Tests
       - Regression_Tests
+      - Claims_Tests
       - BDX_Tests
     condition: always()
     jobs:
@@ -802,13 +952,15 @@ stages:
               echo "  Tag â†’ Stage mapping:"
               echo "    @sanity     â†’ Stage 1 â€” TC_SAN_001â€“012  (12 tests)"
               echo "    @regression â†’ Stage 2 â€” TC_REG_001â€“019  (19 tests)"
+              echo "    @claims     â†’ Stage 2b â€” tests/claims/"
               echo "    @bdx        â†’ Stage 3 â€” TC_BDX_001â€“006  ( 6 tests)"
-              echo "    all         â†’ All stages (37 tests total)"
+              echo "    all         â†’ All stages"
               echo "============================================"
               echo ""
               echo "  Equivalent local commands:"
               echo "    npx playwright test --grep \"@sanity\"     tests/sanity/"
               echo "    npx playwright test --grep \"@regression\" tests/regression/"
+              echo "    npx playwright test                      tests/claims/"
               echo "    npx playwright test --grep \"@sanity\"     tests/BDX/"
               echo "============================================"
             displayName: 'Display run summary'
