@@ -1,0 +1,32 @@
+{
+  "run": {
+    "runId": "2026-09-17T15-21-13-221",
+    "timestamp": "2026-09-17T09:51:13.221Z",
+    "environment": "SIT1",
+    "project": "chrome",
+    "suite": "Regression",
+    "status": "passed",
+    "totalTests": 1,
+    "passed": 1,
+    "failed": 0,
+    "skipped": 0,
+    "timedOut": 0,
+    "interrupted": 0,
+    "passRate": 100,
+    "durationSeconds": 217
+  },
+  "tests": [
+    {
+      "runId": "2026-09-17T15-21-13-221",
+      "timestamp": "2026-09-17T09:51:13.221Z",
+      "testId": "TC_REG_034",
+      "testName": "TC_REG_034 | Create Claim on a live policy, fill claim info, and complete Closed Circumstance status",
+      "status": "passed",
+      "durationSeconds": 209.41,
+      "environment": "SIT1",
+      "suite": "Regression",
+      "project": "MLIS",
+      "file": "tests/regression/TC_REG_034_change_claim_status_to_closed_circumstance_on_live_policy.spec.ts"
+    }
+  ]
+}

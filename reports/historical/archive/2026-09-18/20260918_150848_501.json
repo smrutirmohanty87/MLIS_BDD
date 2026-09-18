@@ -1,0 +1,92 @@
+{
+  "run": {
+    "runId": "20260918_150848_501",
+    "timestamp": "2026-09-18T09:38:48.501Z",
+    "environment": "UAT1",
+    "project": "chrome",
+    "suite": "Other",
+    "status": "passed",
+    "totalTests": 6,
+    "passed": 6,
+    "failed": 0,
+    "skipped": 0,
+    "timedOut": 0,
+    "interrupted": 0,
+    "passRate": 100,
+    "durationSeconds": 4.18
+  },
+  "tests": [
+    {
+      "runId": "20260918_150848_501",
+      "timestamp": "2026-09-18T09:38:48.501Z",
+      "testId": "historical-analytics",
+      "testName": "createUniqueRunId avoids duplicates",
+      "status": "passed",
+      "durationSeconds": 0.01,
+      "environment": "UAT1",
+      "suite": "Other",
+      "project": "chrome",
+      "file": "tests/reporter/historical-analytics.spec.ts"
+    },
+    {
+      "runId": "20260918_150848_501",
+      "timestamp": "2026-09-18T09:38:48.501Z",
+      "testId": "historical-analytics",
+      "testName": "persistHistoricalRun appends runs without overwrite",
+      "status": "passed",
+      "durationSeconds": 0.03,
+      "environment": "UAT1",
+      "suite": "Other",
+      "project": "chrome",
+      "file": "tests/reporter/historical-analytics.spec.ts"
+    },
+    {
+      "runId": "20260918_150848_501",
+      "timestamp": "2026-09-18T09:38:48.501Z",
+      "testId": "historical-analytics",
+      "testName": "analytics supports filtering and stability aggregation",
+      "status": "passed",
+      "durationSeconds": 0.01,
+      "environment": "UAT1",
+      "suite": "Other",
+      "project": "chrome",
+      "file": "tests/reporter/historical-analytics.spec.ts"
+    },
+    {
+      "runId": "20260918_150848_501",
+      "timestamp": "2026-09-18T09:38:48.501Z",
+      "testId": "historical-analytics",
+      "testName": "historical html renders no-data state text",
+      "status": "passed",
+      "durationSeconds": 0,
+      "environment": "UAT1",
+      "suite": "Other",
+      "project": "chrome",
+      "file": "tests/reporter/historical-analytics.spec.ts"
+    },
+    {
+      "runId": "20260918_150848_501",
+      "timestamp": "2026-09-18T09:38:48.501Z",
+      "testId": "historical-analytics",
+      "testName": "historical persistence failure is non-throwing",
+      "status": "passed",
+      "durationSeconds": 0,
+      "environment": "UAT1",
+      "suite": "Other",
+      "project": "chrome",
+      "file": "tests/reporter/historical-analytics.spec.ts"
+    },
+    {
+      "runId": "20260918_150848_501",
+      "timestamp": "2026-09-18T09:38:48.501Z",
+      "testId": "historical-analytics",
+      "testName": "syncFromDashboardRuns imports legacy environments and keeps append-only records",
+      "status": "passed",
+      "durationSeconds": 0.03,
+      "environment": "UAT1",
+      "suite": "Other",
+      "project": "chrome",
+      "file": "tests/reporter/historical-analytics.spec.ts"
+    }
+  ]
+}

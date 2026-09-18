@@ -171,6 +171,31 @@ function buildHtml(runs: RunData[]) {
       backdrop-filter: blur(10px);
     }
 
+    .viewNav {
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 4px;
+      background: rgba(0, 0, 0, 0.18);
+    }
+
+    .viewNav a {
+      text-decoration: none;
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 6px 10px;
+      font-size: 12px;
+      background: var(--panel-2);
+    }
+
+    .viewNav a.active {
+      border-color: rgba(138, 173, 244, 0.6);
+      background: rgba(138, 173, 244, 0.24);
+    }
+
     select {
       appearance: none;
       background: var(--panel-2);
@@ -317,6 +342,10 @@ function buildHtml(runs: RunData[]) {
         <div class="sub">Interactive report across historical runs (status, duration, charts).</div>
       </div>
       <div class="controls">
+        <div class="viewNav" aria-label="Dashboard views">
+          <a class="active" href="index.html">Current Run Dashboard</a>
+          <a href="../historical/index.html">Historical Analytics</a>
+        </div>
         <span class="muted" style="font-size:12px;">Run</span>
         <select id="runSelect" aria-label="Select a test run"></select>
         <span class="pill" id="envPill"><span class="dot interrupted"></span><span id="envLabel">Env: -</span></span>

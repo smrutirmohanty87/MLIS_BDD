@@ -1,0 +1,56 @@
+{
+  "run": {
+    "runId": "2026-09-15T14-48-02-546",
+    "timestamp": "2026-09-15T09:18:02.546Z",
+    "environment": "SIT1",
+    "project": "chrome",
+    "suite": "Regression",
+    "status": "passed",
+    "totalTests": 3,
+    "passed": 3,
+    "failed": 0,
+    "skipped": 0,
+    "timedOut": 0,
+    "interrupted": 0,
+    "passRate": 100,
+    "durationSeconds": 383.29
+  },
+  "tests": [
+    {
+      "runId": "2026-09-15T14-48-02-546",
+      "timestamp": "2026-09-15T09:18:02.546Z",
+      "testId": "TC_REG_048",
+      "testName": "TC_REG_048 | NB-MTA validate Edit Terms Discount + Update Premium fallback and complete bind",
+      "status": "passed",
+      "durationSeconds": 139.16,
+      "environment": "SIT1",
+      "suite": "Regression",
+      "project": "MLIS",
+      "file": "tests/regression/TC_REG_048_nb_mta_edit_terms_discount_update_premium.spec.ts"
+    },
+    {
+      "runId": "2026-09-15T14-48-02-546",
+      "timestamp": "2026-09-15T09:18:02.546Z",
+      "testId": "TC_REG_049",
+      "testName": "TC_REG_049 | Save and exit quote, then update discount on Salesforce Quotes tab and continue quote",
+      "status": "passed",
+      "durationSeconds": 137.83,
+      "environment": "SIT1",
+      "suite": "Regression",
+      "project": "MLIS",
+      "file": "tests/regression/TC_REG_049_nb_quote_discount_slider_update_premium_continue_quote.spec.ts"
+    },
+    {
+      "runId": "2026-09-15T14-48-02-546",
+      "timestamp": "2026-09-15T09:18:02.546Z",
+      "testId": "TC_REG_052",
+      "testName": "TC_REG_052 | Continue to summary, save and exit, search ref on home and in Salesforce global search, add terms and save",
+      "status": "passed",
+      "durationSeconds": 92.96,
+      "environment": "SIT1",
+      "suite": "Regression",
+      "project": "MLIS",
+      "file": "tests/regression/TC_REG_052_nb_save_exit_search_salesforce_add_terms.spec.ts"
+    }
+  ]
+}

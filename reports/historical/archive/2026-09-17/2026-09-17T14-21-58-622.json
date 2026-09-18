@@ -1,0 +1,32 @@
+{
+  "run": {
+    "runId": "2026-09-17T14-21-58-622",
+    "timestamp": "2026-09-17T08:51:58.622Z",
+    "environment": "SIT1",
+    "project": "chrome",
+    "suite": "Regression",
+    "status": "failed",
+    "totalTests": 1,
+    "passed": 0,
+    "failed": 1,
+    "skipped": 0,
+    "timedOut": 0,
+    "interrupted": 0,
+    "passRate": 0,
+    "durationSeconds": 317.05
+  },
+  "tests": [
+    {
+      "runId": "2026-09-17T14-21-58-622",
+      "timestamp": "2026-09-17T08:51:58.622Z",
+      "testId": "TC_REG_034",
+      "testName": "TC_REG_034 | Create Claim on a live policy and complete all claim path statuses",
+      "status": "failed",
+      "durationSeconds": 300.97,
+      "environment": "SIT1",
+      "suite": "Regression",
+      "project": "MLIS",
+      "file": "tests/regression/TC_REG_034_change_claim_status_all_path_states_on_live_policy.spec.ts"
+    }
+  ]
+}

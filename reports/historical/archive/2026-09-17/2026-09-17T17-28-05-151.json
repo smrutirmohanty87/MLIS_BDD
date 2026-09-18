@@ -1,0 +1,19 @@
+{
+  "run": {
+    "runId": "2026-09-17T17-28-05-151",
+    "timestamp": "2026-09-17T11:58:05.151Z",
+    "environment": "UAT1",
+    "project": "unknown",
+    "suite": "Mixed",
+    "status": "failed",
+    "totalTests": 0,
+    "passed": 0,
+    "failed": 0,
+    "skipped": 0,
+    "timedOut": 0,
+    "interrupted": 0,
+    "passRate": 0,
+    "durationSeconds": 0.03
+  },
+  "tests": []
+}

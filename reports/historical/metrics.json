@@ -1,0 +1,10 @@
+{
+  "generatedAt": "2026-09-18T09:38:52.724Z",
+  "totalRuns": 54,
+  "totalTestsExecuted": 109,
+  "totalPassed": 96,
+  "totalFailed": 13,
+  "averagePassRate": 61.6,
+  "averageExecutionDurationSeconds": 125.54,
+  "totalExecutionDurationSeconds": 6778.950000000001
+}

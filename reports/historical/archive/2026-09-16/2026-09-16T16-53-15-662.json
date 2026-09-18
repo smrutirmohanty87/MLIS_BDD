@@ -1,0 +1,32 @@
+{
+  "run": {
+    "runId": "2026-09-16T16-53-15-662",
+    "timestamp": "2026-09-16T11:23:15.662Z",
+    "environment": "UAT2",
+    "project": "chrome",
+    "suite": "Other",
+    "status": "passed",
+    "totalTests": 1,
+    "passed": 1,
+    "failed": 0,
+    "skipped": 0,
+    "timedOut": 0,
+    "interrupted": 0,
+    "passRate": 100,
+    "durationSeconds": 276.12
+  },
+  "tests": [
+    {
+      "runId": "2026-09-16T16-53-15-662",
+      "timestamp": "2026-09-16T11:23:15.662Z",
+      "testId": "temp_uat2_enhanced_jwt_login_hold",
+      "testName": "UAT2 enhanced user Salesforce JWT login and hold",
+      "status": "passed",
+      "durationSeconds": 271.61,
+      "environment": "UAT2",
+      "suite": "Other",
+      "project": "MLIS",
+      "file": "tests/temp_uat2_enhanced_jwt_login_hold.spec.ts"
+    }
+  ]
+}

@@ -1,0 +1,80 @@
+{
+  "run": {
+    "runId": "20260918_145507_377",
+    "timestamp": "2026-09-18T09:25:07.377Z",
+    "environment": "UAT1",
+    "project": "chrome",
+    "suite": "Other",
+    "status": "passed",
+    "totalTests": 5,
+    "passed": 5,
+    "failed": 0,
+    "skipped": 0,
+    "timedOut": 0,
+    "interrupted": 0,
+    "passRate": 100,
+    "durationSeconds": 3.64
+  },
+  "tests": [
+    {
+      "runId": "20260918_145507_377",
+      "timestamp": "2026-09-18T09:25:07.377Z",
+      "testId": "historical-analytics",
+      "testName": "createUniqueRunId avoids duplicates",
+      "status": "passed",
+      "durationSeconds": 0.01,
+      "environment": "UAT1",
+      "suite": "Other",
+      "project": "chrome",
+      "file": "tests/reporter/historical-analytics.spec.ts"
+    },
+    {
+      "runId": "20260918_145507_377",
+      "timestamp": "2026-09-18T09:25:07.377Z",
+      "testId": "historical-analytics",
+      "testName": "persistHistoricalRun appends runs without overwrite",
+      "status": "passed",
+      "durationSeconds": 0.03,
+      "environment": "UAT1",
+      "suite": "Other",
+      "project": "chrome",
+      "file": "tests/reporter/historical-analytics.spec.ts"
+    },
+    {
+      "runId": "20260918_145507_377",
+      "timestamp": "2026-09-18T09:25:07.377Z",
+      "testId": "historical-analytics",
+      "testName": "analytics supports filtering and stability aggregation",
+      "status": "passed",
+      "durationSeconds": 0.01,
+      "environment": "UAT1",
+      "suite": "Other",
+      "project": "chrome",
+      "file": "tests/reporter/historical-analytics.spec.ts"
+    },
+    {
+      "runId": "20260918_145507_377",
+      "timestamp": "2026-09-18T09:25:07.377Z",
+      "testId": "historical-analytics",
+      "testName": "historical html renders no-data state text",
+      "status": "passed",
+      "durationSeconds": 0,
+      "environment": "UAT1",
+      "suite": "Other",
+      "project": "chrome",
+      "file": "tests/reporter/historical-analytics.spec.ts"
+    },
+    {
+      "runId": "20260918_145507_377",
+      "timestamp": "2026-09-18T09:25:07.377Z",
+      "testId": "historical-analytics",
+      "testName": "historical persistence failure is non-throwing",
+      "status": "passed",
+      "durationSeconds": 0,
+      "environment": "UAT1",
+      "suite": "Other",
+      "project": "chrome",
+      "file": "tests/reporter/historical-analytics.spec.ts"
+    }
+  ]
+}

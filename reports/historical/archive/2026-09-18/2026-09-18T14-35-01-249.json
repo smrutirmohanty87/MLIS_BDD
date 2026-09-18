@@ -1,0 +1,44 @@
+{
+  "run": {
+    "runId": "2026-09-18T14-35-01-249",
+    "timestamp": "2026-09-18T09:05:01.249Z",
+    "environment": "UAT1",
+    "project": "chrome",
+    "suite": "Sanity",
+    "status": "passed",
+    "totalTests": 2,
+    "passed": 2,
+    "failed": 0,
+    "skipped": 0,
+    "timedOut": 0,
+    "interrupted": 0,
+    "passRate": 100,
+    "durationSeconds": 114.04
+  },
+  "tests": [
+    {
+      "runId": "2026-09-18T14-35-01-249",
+      "timestamp": "2026-09-18T09:05:01.249Z",
+      "testId": "TC_SAN_001",
+      "testName": "TC_SAN_001 | Create Commercial England & Wales policy (multiple products)",
+      "status": "passed",
+      "durationSeconds": 57.29,
+      "environment": "UAT1",
+      "suite": "Sanity",
+      "project": "MLIS",
+      "file": "tests/sanity/TC_SAN_001_create_commercial_ew_policy_multiple_products.spec.ts"
+    },
+    {
+      "runId": "2026-09-18T14-35-01-249",
+      "timestamp": "2026-09-18T09:05:01.249Z",
+      "testId": "TC_SAN_002",
+      "testName": "TC_SAN_002 | Create Commercial England & Wales policy (multiple products) via referral",
+      "status": "passed",
+      "durationSeconds": 50.31,
+      "environment": "UAT1",
+      "suite": "Sanity",
+      "project": "MLIS",
+      "file": "tests/sanity/TC_SAN_002_create_commercial_ew_policy_multiple_products_via_referral.spec.ts"
+    }
+  ]
+}

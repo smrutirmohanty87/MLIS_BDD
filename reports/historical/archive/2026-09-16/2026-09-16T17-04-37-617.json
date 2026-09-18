@@ -1,0 +1,32 @@
+{
+  "run": {
+    "runId": "2026-09-16T17-04-37-617",
+    "timestamp": "2026-09-16T11:34:37.617Z",
+    "environment": "UAT2",
+    "project": "chrome",
+    "suite": "Regression",
+    "status": "passed",
+    "totalTests": 1,
+    "passed": 1,
+    "failed": 0,
+    "skipped": 0,
+    "timedOut": 0,
+    "interrupted": 0,
+    "passRate": 100,
+    "durationSeconds": 116.36
+  },
+  "tests": [
+    {
+      "runId": "2026-09-16T17-04-37-617",
+      "timestamp": "2026-09-16T11:34:37.617Z",
+      "testId": "TC_REG_054",
+      "testName": "TC_REG_050 | Complete quote journey and verify quote uplift values on Quotes tab",
+      "status": "passed",
+      "durationSeconds": 112.04,
+      "environment": "UAT2",
+      "suite": "Regression",
+      "project": "MLIS",
+      "file": "tests/regression/TC_REG_054_quote_journey_underwriter_uplift.spec.ts"
+    }
+  ]
+}

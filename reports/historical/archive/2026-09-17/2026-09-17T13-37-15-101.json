@@ -1,0 +1,32 @@
+{
+  "run": {
+    "runId": "2026-09-17T13-37-15-101",
+    "timestamp": "2026-09-17T08:07:15.101Z",
+    "environment": "SIT1",
+    "project": "chrome",
+    "suite": "Regression",
+    "status": "failed",
+    "totalTests": 1,
+    "passed": 0,
+    "failed": 1,
+    "skipped": 0,
+    "timedOut": 0,
+    "interrupted": 0,
+    "passRate": 0,
+    "durationSeconds": 234.77
+  },
+  "tests": [
+    {
+      "runId": "2026-09-17T13-37-15-101",
+      "timestamp": "2026-09-17T08:07:15.101Z",
+      "testId": "16_TC_REG_claims_broker_portal_to_open_claim_status_change",
+      "testName": "TC_REG_CLAIMS_BROKER_TO_OPEN_CLAIM_STATUS_CHANGE | Create broker submission, open policy via Risk ID, create claim, and complete Open Circumstance status",
+      "status": "failed",
+      "durationSeconds": 224.25,
+      "environment": "SIT1",
+      "suite": "Regression",
+      "project": "MLIS",
+      "file": "tests/claims/16_TC_REG_claims_broker_portal_to_open_claim_status_change.spec.ts"
+    }
+  ]
+}

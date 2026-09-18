@@ -32,6 +32,7 @@ export default defineConfig({
     ['line'],
     ['html', { open: 'never' }],
     ['./src/reporters/dashboard-reporter.ts', { outputDir: 'reports/dashboard', open: true, maxRuns: 40 }],
+    ['./src/reporters/historical-reporter.ts', { outputDir: 'reports/historical' }],
   ],
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {

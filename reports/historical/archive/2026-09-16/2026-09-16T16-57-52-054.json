@@ -1,0 +1,32 @@
+{
+  "run": {
+    "runId": "2026-09-16T16-57-52-054",
+    "timestamp": "2026-09-16T11:27:52.054Z",
+    "environment": "UAT2",
+    "project": "chrome",
+    "suite": "Sanity",
+    "status": "passed",
+    "totalTests": 1,
+    "passed": 1,
+    "failed": 0,
+    "skipped": 0,
+    "timedOut": 0,
+    "interrupted": 0,
+    "passRate": 100,
+    "durationSeconds": 102.57
+  },
+  "tests": [
+    {
+      "runId": "2026-09-16T16-57-52-054",
+      "timestamp": "2026-09-16T11:27:52.054Z",
+      "testId": "TC_SAN_006",
+      "testName": "TC_SAN_006 | Complete full residential England & Wales quote journey end-to-end",
+      "status": "passed",
+      "durationSeconds": 97.27,
+      "environment": "UAT2",
+      "suite": "Sanity",
+      "project": "MLIS",
+      "file": "tests/sanity/TC_SAN_006_complete_full_residential_ew_quote_journey.spec.ts"
+    }
+  ]
+}
