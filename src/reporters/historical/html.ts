@@ -380,13 +380,11 @@ export function buildHistoricalHtml(payload: Payload): string {
       const env = $('envFilter').value;
       const suite = $('suiteFilter').value;
       const project = $('projectFilter').value;
-      const status = $('statusFilter').value;
 
       return items.filter((run) => {
         if (env !== 'ALL' && run.environment !== env) return false;
         if (suite !== 'ALL' && run.suite !== suite) return false;
         if (project !== 'ALL' && run.project !== project) return false;
-        if (status !== 'ALL' && run.status !== status) return false;
 
         const d = toDate(run.timestamp);
         if (!d) return false;
@@ -520,13 +518,41 @@ export function buildHistoricalHtml(payload: Payload): string {
       }
     }
 
-    function metricsFor(filteredRuns) {
+    function statusScopedCounts(run, selectedStatus) {
+      if (selectedStatus === 'passed') {
+        return {
+          total: Number(run.passed || 0),
+          passed: Number(run.passed || 0),
+          failed: 0,
+          passRate: Number(run.passed || 0) > 0 ? 100 : 0,
+        };
+      }
+
+      if (selectedStatus === 'failed') {
+        return {
+          total: Number(run.failed || 0),
+          passed: 0,
+          failed: Number(run.failed || 0),
+          passRate: 0,
+        };
+      }
+
+      return {
+        total: Number(run.totalTests || 0),
+        passed: Number(run.passed || 0),
+        failed: Number(run.failed || 0),
+        passRate: Number(run.passRate || 0),
+      };
+    }
+
+    function metricsFor(filteredRuns, selectedStatus) {
       const totalRuns = filteredRuns.length;
-      const totalTestsExecuted = filteredRuns.reduce((sum, r) => sum + r.totalTests, 0);
-      const totalPassed = filteredRuns.reduce((sum, r) => sum + r.passed, 0);
-      const totalFailed = filteredRuns.reduce((sum, r) => sum + r.failed, 0);
+      const scoped = filteredRuns.map((run) => statusScopedCounts(run, selectedStatus));
+      const totalTestsExecuted = scoped.reduce((sum, r) => sum + r.total, 0);
+      const totalPassed = scoped.reduce((sum, r) => sum + r.passed, 0);
+      const totalFailed = scoped.reduce((sum, r) => sum + r.failed, 0);
       const totalExecutionDurationSeconds = filteredRuns.reduce((sum, r) => sum + r.durationSeconds, 0);
-      const averagePassRate = totalRuns > 0 ? round2(filteredRuns.reduce((sum, r) => sum + r.passRate, 0) / totalRuns) : 0;
+      const averagePassRate = totalTestsExecuted > 0 ? round2((totalPassed / totalTestsExecuted) * 100) : 0;
       const averageExecutionDurationSeconds = totalRuns > 0 ? round2(totalExecutionDurationSeconds / totalRuns) : 0;
       return { totalRuns, totalTestsExecuted, totalPassed, totalFailed, totalExecutionDurationSeconds, averagePassRate, averageExecutionDurationSeconds };
     }
@@ -535,12 +561,13 @@ export function buildHistoricalHtml(payload: Payload): string {
       return new Set(filteredRuns.map((r) => r.runId));
     }
 
-    function stabilityRows(filteredRuns) {
+    function stabilityRows(filteredRuns, selectedStatus) {
       const allowed = runIdsSet(filteredRuns);
       const map = new Map();
 
       for (const t of tests) {
         if (!allowed.has(t.runId)) continue;
+        if (selectedStatus !== 'ALL' && t.status !== selectedStatus) continue;
         const key = t.testId + '::' + t.suite;
         const row = map.get(key) || { testId: t.testId, testName: t.testName, suite: t.suite, runs: 0, passed: 0, failed: 0 };
         row.runs += 1;
@@ -559,13 +586,18 @@ export function buildHistoricalHtml(payload: Payload): string {
     }
 
     function render(filteredRuns) {
-      const empty = filteredRuns.length === 0;
+      const selectedStatus = $('statusFilter').value;
+      const sortedBase = filteredRuns.slice().sort((a, b) => (a.timestamp < b.timestamp ? -1 : 1));
+      const sorted = selectedStatus === 'ALL'
+        ? sortedBase
+        : sortedBase.filter((run) => statusScopedCounts(run, selectedStatus).total > 0);
+
+      const empty = sorted.length === 0;
       $('emptyState').style.display = empty ? '' : 'none';
       $('contentArea').style.display = empty ? 'none' : '';
       if (empty) return;
 
-      const sorted = filteredRuns.slice().sort((a, b) => (a.timestamp < b.timestamp ? -1 : 1));
-      const m = metricsFor(sorted);
+      const m = metricsFor(sorted, selectedStatus);
 
       $('mTotalRuns').textContent = String(m.totalRuns);
       $('mTotalTests').textContent = String(m.totalTestsExecuted);
@@ -575,10 +607,10 @@ export function buildHistoricalHtml(payload: Payload): string {
       $('mAvgDuration').textContent = durationLabel(m.averageExecutionDurationSeconds);
       $('mTotalDuration').textContent = durationLabel(m.totalExecutionDurationSeconds);
 
-      const passRates = sorted.map((r) => Number(r.passRate || 0));
+      const passRates = sorted.map((r) => Number(statusScopedCounts(r, selectedStatus).passRate || 0));
       const durations = sorted.map((r) => Number(r.durationSeconds || 0));
-      const passedCounts = sorted.map((r) => Number(r.passed || 0));
-      const failedCounts = sorted.map((r) => Number(r.failed || 0));
+      const passedCounts = sorted.map((r) => Number(statusScopedCounts(r, selectedStatus).passed || 0));
+      const failedCounts = sorted.map((r) => Number(statusScopedCounts(r, selectedStatus).failed || 0));
 
       $('passRateMeta').textContent = sorted.length + ' runs';
       $('durationMeta').textContent = sorted.length + ' runs';
@@ -592,6 +624,7 @@ export function buildHistoricalHtml(payload: Payload): string {
       runRows.innerHTML = '';
       const newestFirst = sorted.slice().reverse();
       for (const run of newestFirst) {
+        const scoped = statusScopedCounts(run, selectedStatus);
         const row = document.createElement('tr');
         row.innerHTML =
           '<td><span class="pill">' + esc(run.runId) + '</span></td>' +
@@ -599,16 +632,16 @@ export function buildHistoricalHtml(payload: Payload): string {
           '<td>' + esc(run.environment) + '</td>' +
           '<td>' + esc(run.project) + '</td>' +
           '<td>' + esc(run.suite) + '</td>' +
-          '<td>' + esc(run.totalTests) + '</td>' +
-          '<td class="pass">' + esc(run.passed) + '</td>' +
-          '<td class="fail">' + esc(run.failed) + '</td>' +
-          '<td>' + esc(run.passRate + '%') + '</td>' +
+          '<td>' + esc(scoped.total) + '</td>' +
+          '<td class="pass">' + esc(scoped.passed) + '</td>' +
+          '<td class="fail">' + esc(scoped.failed) + '</td>' +
+          '<td>' + esc(scoped.passRate + '%') + '</td>' +
           '<td>' + esc(durationLabel(run.durationSeconds)) + '</td>' +
           '<td>' + esc(run.status) + '</td>';
         runRows.appendChild(row);
       }
 
-      const stable = stabilityRows(sorted);
+      const stable = stabilityRows(sorted, selectedStatus);
       const stabilityEl = $('stabilityRows');
       stabilityEl.innerHTML = '';
       for (const s of stable) {

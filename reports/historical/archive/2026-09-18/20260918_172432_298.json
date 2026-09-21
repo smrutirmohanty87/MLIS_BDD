@@ -1,0 +1,92 @@
+{
+  "run": {
+    "runId": "20260918_172432_298",
+    "timestamp": "2026-09-18T11:54:32.298Z",
+    "environment": "CLAIMSQA",
+    "project": "chrome",
+    "suite": "Other",
+    "status": "passed",
+    "totalTests": 6,
+    "passed": 6,
+    "failed": 0,
+    "skipped": 0,
+    "timedOut": 0,
+    "interrupted": 0,
+    "passRate": 100,
+    "durationSeconds": 4.09
+  },
+  "tests": [
+    {
+      "runId": "20260918_172432_298",
+      "timestamp": "2026-09-18T11:54:32.298Z",
+      "testId": "historical-analytics",
+      "testName": "createUniqueRunId avoids duplicates",
+      "status": "passed",
+      "durationSeconds": 0.02,
+      "environment": "CLAIMSQA",
+      "suite": "Other",
+      "project": "chrome",
+      "file": "tests/reporter/historical-analytics.spec.ts"
+    },
+    {
+      "runId": "20260918_172432_298",
+      "timestamp": "2026-09-18T11:54:32.298Z",
+      "testId": "historical-analytics",
+      "testName": "persistHistoricalRun appends runs without overwrite",
+      "status": "passed",
+      "durationSeconds": 0.05,
+      "environment": "CLAIMSQA",
+      "suite": "Other",
+      "project": "chrome",
+      "file": "tests/reporter/historical-analytics.spec.ts"
+    },
+    {
+      "runId": "20260918_172432_298",
+      "timestamp": "2026-09-18T11:54:32.298Z",
+      "testId": "historical-analytics",
+      "testName": "analytics supports filtering and stability aggregation",
+      "status": "passed",
+      "durationSeconds": 0.01,
+      "environment": "CLAIMSQA",
+      "suite": "Other",
+      "project": "chrome",
+      "file": "tests/reporter/historical-analytics.spec.ts"
+    },
+    {
+      "runId": "20260918_172432_298",
+      "timestamp": "2026-09-18T11:54:32.298Z",
+      "testId": "historical-analytics",
+      "testName": "historical html renders no-data state text",
+      "status": "passed",
+      "durationSeconds": 0,
+      "environment": "CLAIMSQA",
+      "suite": "Other",
+      "project": "chrome",
+      "file": "tests/reporter/historical-analytics.spec.ts"
+    },
+    {
+      "runId": "20260918_172432_298",
+      "timestamp": "2026-09-18T11:54:32.298Z",
+      "testId": "historical-analytics",
+      "testName": "historical persistence failure is non-throwing",
+      "status": "passed",
+      "durationSeconds": 0,
+      "environment": "CLAIMSQA",
+      "suite": "Other",
+      "project": "chrome",
+      "file": "tests/reporter/historical-analytics.spec.ts"
+    },
+    {
+      "runId": "20260918_172432_298",
+      "timestamp": "2026-09-18T11:54:32.298Z",
+      "testId": "historical-analytics",
+      "testName": "syncFromDashboardRuns imports legacy environments and keeps append-only records",
+      "status": "passed",
+      "durationSeconds": 0.03,
+      "environment": "CLAIMSQA",
+      "suite": "Other",
+      "project": "chrome",
+      "file": "tests/reporter/historical-analytics.spec.ts"
+    }
+  ]
+}
