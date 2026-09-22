@@ -1,10 +1,10 @@
 {
-  "generatedAt": "2026-09-18T11:59:40.890Z",
-  "totalRuns": 58,
-  "totalTestsExecuted": 121,
-  "totalPassed": 108,
-  "totalFailed": 13,
-  "averagePassRate": 60.8,
-  "averageExecutionDurationSeconds": 117.04,
-  "totalExecutionDurationSeconds": 6788.330000000001
+  "generatedAt": "2026-09-22T08:52:44.768Z",
+  "totalRuns": 71,
+  "totalTestsExecuted": 134,
+  "totalPassed": 113,
+  "totalFailed": 21,
+  "averagePassRate": 56.71,
+  "averageExecutionDurationSeconds": 106.96,
+  "totalExecutionDurationSeconds": 7594.31
 }

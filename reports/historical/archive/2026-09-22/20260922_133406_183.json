@@ -1,0 +1,32 @@
+{
+  "run": {
+    "runId": "20260922_133406_183",
+    "timestamp": "2026-09-22T08:04:06.183Z",
+    "environment": "UAT2",
+    "project": "chrome",
+    "suite": "Sanity",
+    "status": "passed",
+    "totalTests": 1,
+    "passed": 1,
+    "failed": 0,
+    "skipped": 0,
+    "timedOut": 0,
+    "interrupted": 0,
+    "passRate": 100,
+    "durationSeconds": 102.72
+  },
+  "tests": [
+    {
+      "runId": "20260922_133406_183",
+      "timestamp": "2026-09-22T08:04:06.183Z",
+      "testId": "TC_SAN_005",
+      "testName": "TC_SAN_005 | Complete full commercial England & Wales quote journey end-to-end",
+      "status": "passed",
+      "durationSeconds": 95.67,
+      "environment": "UAT2",
+      "suite": "Sanity",
+      "project": "chrome",
+      "file": "tests/sanity/TC_SAN_005_complete_full_commercial_ew_quote_journey.spec.ts"
+    }
+  ]
+}

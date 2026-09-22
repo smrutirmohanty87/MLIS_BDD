@@ -1,0 +1,32 @@
+{
+  "run": {
+    "runId": "20260921_185544_380",
+    "timestamp": "2026-09-21T13:25:44.380Z",
+    "environment": "SIT1",
+    "project": "chrome",
+    "suite": "Other",
+    "status": "failed",
+    "totalTests": 1,
+    "passed": 0,
+    "failed": 1,
+    "skipped": 0,
+    "timedOut": 0,
+    "interrupted": 0,
+    "passRate": 0,
+    "durationSeconds": 13.44
+  },
+  "tests": [
+    {
+      "runId": "20260921_185544_380",
+      "timestamp": "2026-09-21T13:25:44.380Z",
+      "testId": "temp_jwt_login_check",
+      "testName": "temp jwt login check",
+      "status": "failed",
+      "durationSeconds": 6.79,
+      "environment": "SIT1",
+      "suite": "Other",
+      "project": "chrome",
+      "file": "tests/temp_jwt_login_check.spec.ts"
+    }
+  ]
+}

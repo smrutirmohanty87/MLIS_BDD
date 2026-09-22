@@ -1,0 +1,32 @@
+{
+  "run": {
+    "runId": "20260921_193806_062",
+    "timestamp": "2026-09-21T14:08:06.062Z",
+    "environment": "UAT1",
+    "project": "chrome",
+    "suite": "Sanity",
+    "status": "failed",
+    "totalTests": 1,
+    "passed": 0,
+    "failed": 1,
+    "skipped": 0,
+    "timedOut": 0,
+    "interrupted": 0,
+    "passRate": 0,
+    "durationSeconds": 94.55
+  },
+  "tests": [
+    {
+      "runId": "20260921_193806_062",
+      "timestamp": "2026-09-21T14:08:06.062Z",
+      "testId": "TC_SAN_008",
+      "testName": "TC_SAN_008 | Cancel policy from inception (full premium return)",
+      "status": "failed",
+      "durationSeconds": 86.11,
+      "environment": "UAT1",
+      "suite": "Sanity",
+      "project": "chrome",
+      "file": "tests/sanity/TC_SAN_008_cancel_from_inception_full_premium_return.spec.ts"
+    }
+  ]
+}
