@@ -34,8 +34,9 @@ test.describe('temp sit1 claims login hold', () => {
 
     await salesforce.goto();
     await salesforce.login(claimCreds.username, claimCreds.password, {
-      useJwt: false,
+      useJwt: true,
       fast: true,
+      jwtUsername: claimCreds.username,
     });
     await salesforce.closeAllWorkspaceTabs();
 

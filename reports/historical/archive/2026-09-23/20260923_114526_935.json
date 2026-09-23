@@ -1,0 +1,32 @@
+{
+  "run": {
+    "runId": "20260923_114526_935",
+    "timestamp": "2026-09-23T06:15:26.935Z",
+    "environment": "CLAIMSQA",
+    "project": "chrome",
+    "suite": "Regression",
+    "status": "failed",
+    "totalTests": 1,
+    "passed": 0,
+    "failed": 1,
+    "skipped": 0,
+    "timedOut": 0,
+    "interrupted": 0,
+    "passRate": 0,
+    "durationSeconds": 167.17
+  },
+  "tests": [
+    {
+      "runId": "20260923_114526_935",
+      "timestamp": "2026-09-23T06:15:26.935Z",
+      "testId": "TC_REG_034",
+      "testName": "TC_REG_034 | Create Claim on a live policy, fill claim info, and complete Open Circumstance status",
+      "status": "failed",
+      "durationSeconds": 155.98,
+      "environment": "CLAIMSQA",
+      "suite": "Regression",
+      "project": "chrome",
+      "file": "tests/claims/18_TC_REG_034_change_claim_status_to_open_circumstance_on_live_policy.spec.ts"
+    }
+  ]
+}

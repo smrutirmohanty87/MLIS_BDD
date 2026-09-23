@@ -1,0 +1,32 @@
+{
+  "run": {
+    "runId": "20260923_151205_303",
+    "timestamp": "2026-09-23T09:42:05.303Z",
+    "environment": "UAT2",
+    "project": "chrome",
+    "suite": "Claims",
+    "status": "passed",
+    "totalTests": 1,
+    "passed": 1,
+    "failed": 0,
+    "skipped": 0,
+    "timedOut": 0,
+    "interrupted": 0,
+    "passRate": 100,
+    "durationSeconds": 14.1
+  },
+  "tests": [
+    {
+      "runId": "20260923_151205_303",
+      "timestamp": "2026-09-23T09:42:05.303Z",
+      "testId": "13_temp_uat2_claims_jwt_login_check",
+      "testName": "UAT2 claims user Salesforce JWT login check",
+      "status": "passed",
+      "durationSeconds": 7.49,
+      "environment": "UAT2",
+      "suite": "Claims",
+      "project": "chrome",
+      "file": "tests/claims/13_temp_uat2_claims_jwt_login_check.spec.ts"
+    }
+  ]
+}

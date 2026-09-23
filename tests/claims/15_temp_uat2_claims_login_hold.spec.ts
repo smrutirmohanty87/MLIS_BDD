@@ -24,8 +24,9 @@ test.describe('temp uat2 claims login hold', () => {
     const salesforce = new SalesforcePortalPage(page);
     await salesforce.goto();
     await salesforce.login(username, password, {
-      useJwt: false,
+      useJwt: true,
       fast: true,
+      jwtUsername: username,
     });
 
     console.log('UAT2 claims login successful. Holding browser session until window is closed manually.');

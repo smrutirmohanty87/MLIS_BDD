@@ -1,0 +1,32 @@
+{
+  "run": {
+    "runId": "20260923_151230_283",
+    "timestamp": "2026-09-23T09:42:30.283Z",
+    "environment": "SIT1",
+    "project": "chrome",
+    "suite": "Claims",
+    "status": "passed",
+    "totalTests": 1,
+    "passed": 1,
+    "failed": 0,
+    "skipped": 0,
+    "timedOut": 0,
+    "interrupted": 0,
+    "passRate": 100,
+    "durationSeconds": 15
+  },
+  "tests": [
+    {
+      "runId": "20260923_151230_283",
+      "timestamp": "2026-09-23T09:42:30.283Z",
+      "testId": "16_temp_sit1_claims_jwt_login_check",
+      "testName": "SIT1 claims user Salesforce JWT login check",
+      "status": "passed",
+      "durationSeconds": 8.64,
+      "environment": "SIT1",
+      "suite": "Claims",
+      "project": "chrome",
+      "file": "tests/claims/16_temp_sit1_claims_jwt_login_check.spec.ts"
+    }
+  ]
+}

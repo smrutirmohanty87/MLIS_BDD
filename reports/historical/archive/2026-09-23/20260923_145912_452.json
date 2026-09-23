@@ -1,0 +1,32 @@
+{
+  "run": {
+    "runId": "20260923_145912_452",
+    "timestamp": "2026-09-23T09:29:12.452Z",
+    "environment": "UAT1",
+    "project": "chrome",
+    "suite": "Regression",
+    "status": "failed",
+    "totalTests": 1,
+    "passed": 0,
+    "failed": 1,
+    "skipped": 0,
+    "timedOut": 0,
+    "interrupted": 0,
+    "passRate": 0,
+    "durationSeconds": 404.58
+  },
+  "tests": [
+    {
+      "runId": "20260923_145912_452",
+      "timestamp": "2026-09-23T09:29:12.452Z",
+      "testId": "00_temp_uat1_salesforce_enhanced_jwt_login_hold",
+      "testName": "login as UAT1 Salesforce enhanced user with JWT and hold session until browser is closed",
+      "status": "failed",
+      "durationSeconds": 391.15,
+      "environment": "UAT1",
+      "suite": "Regression",
+      "project": "chrome",
+      "file": "tests/regression/00_temp_uat1_salesforce_enhanced_jwt_login_hold.spec.ts"
+    }
+  ]
+}

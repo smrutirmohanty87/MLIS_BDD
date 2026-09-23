@@ -311,12 +311,29 @@ export class SalesforcePortalPage {
   async login(
     username: string,
     password: string,
-    options?: { useJwt?: boolean; fast?: boolean; allowPasswordFallbackAfterJwt?: boolean },
+    options?: {
+      useJwt?: boolean;
+      fast?: boolean;
+      allowPasswordFallbackAfterJwt?: boolean;
+      jwtUsername?: string;
+      forceJwtForUat1?: boolean;
+      forceJwtForClaimsUser?: boolean;
+    },
   ) {
     const envName = this.normalizeEnvName(process.env.TEST_ENV);
-    const jwtAllowedForEnv = envName !== 'UAT1';
+    const forceJwtForUat1 =
+      options?.forceJwtForUat1
+      ?? /^(1|true|yes)$/i.test((process.env.SALESFORCE_FORCE_JWT_IN_UAT1 ?? '').trim());
+    const forceJwtForClaimsUser =
+      options?.forceJwtForClaimsUser
+      ?? /^(1|true|yes)$/i.test((process.env.SALESFORCE_FORCE_JWT_FOR_CLAIMSUSER ?? '').trim());
+    const disableJwtForClaimsUser = /^(1|true|yes)$/i.test(
+      (process.env.SALESFORCE_DISABLE_JWT_FOR_CLAIMSUSER ?? '').trim(),
+    );
+    const jwtAllowedForEnv = envName !== 'UAT1' || forceJwtForUat1;
     const usernameLooksLikeClaimsUser = /(?:^|[-_@.])(clm|claim)(?:[-_@.]|$)/i.test(username);
-    const useJwt = (options?.useJwt ?? true) && jwtAllowedForEnv && !usernameLooksLikeClaimsUser;
+    const jwtAllowedForUsername = !usernameLooksLikeClaimsUser || forceJwtForClaimsUser || !disableJwtForClaimsUser;
+    const useJwt = (options?.useJwt ?? true) && jwtAllowedForEnv && jwtAllowedForUsername;
     const fast = options?.fast ?? false;
     const allowPasswordFallbackAfterJwt = options?.allowPasswordFallbackAfterJwt ?? false;
 
@@ -327,7 +344,7 @@ export class SalesforcePortalPage {
 
     if (useJwt && getSalesforceJwtConfig()) {
       try {
-        const jwtUsername = getSalesforceJwtUsername() ?? username;
+        const jwtUsername = options?.jwtUsername?.trim() || getSalesforceJwtUsername() || username;
         await this.loginWithJwt(jwtUsername);
         if (fast) {
           return;
