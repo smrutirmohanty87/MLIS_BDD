@@ -2218,5 +2218,29 @@
     "suite": "Claims",
     "project": "chrome",
     "file": "tests/claims/16_temp_sit1_claims_jwt_login_check.spec.ts"
+  },
+  {
+    "runId": "20260924_134534_188",
+    "timestamp": "2026-09-24T08:15:34.188Z",
+    "testId": "08_TC_REG_claims_new_reserve_visibility",
+    "testName": "TC_REG_CLAIMS_NEW_RESERVE_VISIBILITY | Validate New Reserve button visibility by claim status",
+    "status": "passed",
+    "durationSeconds": 39.67,
+    "environment": "UAT2",
+    "suite": "Regression",
+    "project": "chrome",
+    "file": "tests/claims/08_TC_REG_claims_new_reserve_visibility.spec.ts"
+  },
+  {
+    "runId": "20260924_194231_446",
+    "timestamp": "2026-09-24T14:12:31.446Z",
+    "testId": "TC_SAN_008",
+    "testName": "TC_SAN_008 | Cancel policy from inception (full premium return)",
+    "status": "passed",
+    "durationSeconds": 233.14,
+    "environment": "UAT1",
+    "suite": "Sanity",
+    "project": "chrome",
+    "file": "tests/sanity/TC_SAN_008_cancel_from_inception_full_premium_return.spec.ts"
   }
 ]

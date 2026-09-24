@@ -3,7 +3,7 @@ import { SalesforcePortalPage } from '../../src/pages/salesforce-cancellation';
 
 function getClaimUserCredentials() {
   const rawEnv = (process.env.TEST_ENV ?? 'UAT2').trim().toUpperCase();
-  const envName = rawEnv === 'SIT' ? 'SIT1' : rawEnv;
+  const envName = rawEnv;
   const username = process.env[`SALEFORCE_${envName}_CLAIMUSER`]?.trim();
   const password = process.env[`SALEFORCE_${envName}_CLAIMUSER_PASSWORD`]?.trim();
 

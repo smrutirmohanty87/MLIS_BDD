@@ -1,0 +1,19 @@
+{
+  "run": {
+    "runId": "20260924_191010_902",
+    "timestamp": "2026-09-24T13:40:10.902Z",
+    "environment": "SIT1",
+    "project": "multiple",
+    "suite": "Mixed",
+    "status": "passed",
+    "totalTests": 0,
+    "passed": 0,
+    "failed": 0,
+    "skipped": 0,
+    "timedOut": 0,
+    "interrupted": 0,
+    "passRate": 0,
+    "durationSeconds": 2.07
+  },
+  "tests": []
+}

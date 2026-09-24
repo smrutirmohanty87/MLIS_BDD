@@ -2,7 +2,7 @@ import { expect, Page, test } from '@playwright/test';
 import { SalesforcePortalPage } from '../../src/pages/salesforce-cancellation';
 
 function claimCredentials() {
-  const env = (process.env.TEST_ENV ?? 'UAT2').trim().toUpperCase() === 'SIT' ? 'SIT1' : (process.env.TEST_ENV ?? 'UAT2').trim().toUpperCase();
+  const env = (process.env.TEST_ENV ?? 'UAT2').trim().toUpperCase();
   const username = process.env[`SALEFORCE_${env}_CLAIMUSER`]?.trim();
   const password = process.env[`SALEFORCE_${env}_CLAIMUSER_PASSWORD`]?.trim();
   if (!username || !password) throw new Error(`Missing claim credentials for ${env}.`);

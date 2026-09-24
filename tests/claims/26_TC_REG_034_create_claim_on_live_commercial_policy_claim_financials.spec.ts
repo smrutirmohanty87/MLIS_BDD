@@ -36,7 +36,7 @@ test.describe('@regression | E2E | Claims | Commercial', () => {
 
     const getClaimUserCredentials = () => {
       const rawEnv = (process.env.TEST_ENV ?? 'SIT1').trim().toUpperCase();
-      const envName = rawEnv === 'SIT' ? 'SIT1' : rawEnv;
+      const envName = rawEnv;
       const usernameVar = `SALEFORCE_${envName}_CLAIMUSER`;
       const passwordVar = `SALEFORCE_${envName}_CLAIMUSER_PASSWORD`;
 

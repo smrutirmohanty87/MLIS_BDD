@@ -7,7 +7,7 @@ function escapeRegex(value: string) {
 
 function getClaimUserCredentials() {
   const rawEnv = (process.env.TEST_ENV ?? 'UAT2').trim().toUpperCase();
-  const envName = rawEnv === 'SIT' ? 'SIT1' : rawEnv;
+  const envName = rawEnv;
   const usernameVar = `SALEFORCE_${envName}_CLAIMUSER`;
   const passwordVar = `SALEFORCE_${envName}_CLAIMUSER_PASSWORD`;
   const username = process.env[usernameVar]?.trim();

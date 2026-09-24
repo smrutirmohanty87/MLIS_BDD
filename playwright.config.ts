@@ -58,6 +58,13 @@ export default defineConfig({
         channel: 'chrome',
       },
     },
+    {
+      name: 'edge',
+      use: {
+        ...devices['Desktop Edge'],
+        channel: 'msedge',
+      },
+    },
   ],
 
   /* Run your local dev server before starting the tests */

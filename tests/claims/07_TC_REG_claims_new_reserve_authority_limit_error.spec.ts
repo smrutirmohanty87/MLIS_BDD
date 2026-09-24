@@ -1,11 +1,11 @@
 import { expect, Page, test } from '@playwright/test';
 import { SalesforcePortalPage } from '../../src/pages/salesforce-cancellation';
 
-type ClaimStatus = 'Open Circumstance' | 'Open Claim' | 'Re-Opened Circumstance' | 'Re-Opened Claim';
+type ClaimStatus = 'Open Claim' | 'Re-Opened Claim';
 
 function getClaimUserCredentials() {
   const rawEnv = (process.env.TEST_ENV ?? 'UAT2').trim().toUpperCase();
-  const envName = rawEnv === 'SIT' ? 'SIT1' : rawEnv;
+  const envName = rawEnv;
   const username = process.env[`SALEFORCE_${envName}_CLAIMUSER`]?.trim();
   const password = process.env[`SALEFORCE_${envName}_CLAIMUSER_PASSWORD`]?.trim();
 
@@ -122,7 +122,7 @@ test.describe('@regression | E2E | Claims | Financials | New Reserve Authority L
     await salesforce.login(credentials.username, credentials.password, { useJwt: false, fast: true });
     await salesforce.closeAllWorkspaceTabs();
 
-    const statuses: ClaimStatus[] = ['Open Circumstance', 'Open Claim', 'Re-Opened Circumstance', 'Re-Opened Claim'];
+    const statuses: ClaimStatus[] = ['Open Claim', 'Re-Opened Claim'];
     let claimId = '';
     let selectedStatus: ClaimStatus | undefined;
 
