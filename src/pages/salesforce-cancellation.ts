@@ -330,7 +330,24 @@ export class SalesforcePortalPage {
     const disableJwtForClaimsUser = /^(1|true|yes)$/i.test(
       (process.env.SALESFORCE_DISABLE_JWT_FOR_CLAIMSUSER ?? '').trim(),
     );
-    const jwtAllowedForEnv = envName !== 'UAT1' || forceJwtForUat1;
+    const normalizedUsername = username.trim().toLowerCase();
+    const uat1EnhancedUserCandidates = [
+      process.env.SALEFORCE_UAT1_ENHANCEDUSER,
+      process.env.SALESFORCE_UAT1_ENHANCEDUSER,
+      process.env.UAT1_SALESFORCE_USERNAME,
+      process.env.SALESFORCE_UAT1_JWT_USERNAME,
+    ]
+      .map((value) => (value ?? '').trim().toLowerCase())
+      .filter((value) => value.length > 0);
+    const isUat1EnhancedUser = envName === 'UAT1' && uat1EnhancedUserCandidates.includes(normalizedUsername);
+    const uat1ClaimsUserCandidates = [
+      process.env.SALEFORCE_UAT1_CLAIMUSER,
+      process.env.SALESFORCE_UAT1_CLAIMUSER,
+    ]
+      .map((value) => (value ?? '').trim().toLowerCase())
+      .filter((value) => value.length > 0);
+    const isUat1ClaimsUser = envName === 'UAT1' && uat1ClaimsUserCandidates.includes(normalizedUsername);
+    const jwtAllowedForEnv = envName !== 'UAT1' || forceJwtForUat1 || isUat1EnhancedUser || isUat1ClaimsUser;
     const usernameLooksLikeClaimsUser = /(?:^|[-_@.])(clm|claim)(?:[-_@.]|$)/i.test(username);
     const jwtAllowedForUsername = !usernameLooksLikeClaimsUser || forceJwtForClaimsUser || !disableJwtForClaimsUser;
     const useJwt = (options?.useJwt ?? true) && jwtAllowedForEnv && jwtAllowedForUsername;

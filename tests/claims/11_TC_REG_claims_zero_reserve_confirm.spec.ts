@@ -226,7 +226,7 @@ test.describe('@regression | E2E | Claims | Zero Reserve', () => {
     const salesforce = new SalesforcePortalPage(page);
     const credentials = claimCredentials();
     await salesforce.goto();
-    await salesforce.login(credentials.username, credentials.password, { useJwt: false, fast: true });
+    await salesforce.login(credentials.username, credentials.password, { useJwt: true, fast: true, jwtUsername: credentials.username });
     await salesforce.closeAllWorkspaceTabs();
     page = await openPolicyAndClaim(page, salesforce);
     await fillClaimDetails(page, salesforce);

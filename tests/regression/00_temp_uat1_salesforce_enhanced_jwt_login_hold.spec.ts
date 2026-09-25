@@ -31,7 +31,6 @@ test('login as UAT1 Salesforce enhanced user with JWT and hold session until bro
     useJwt: true,
     fast: true,
     jwtUsername,
-    forceJwtForUat1: true,
   });
 
   console.log('UAT1 enhanced Salesforce JWT login successful. Keeping session open until browser is closed.');

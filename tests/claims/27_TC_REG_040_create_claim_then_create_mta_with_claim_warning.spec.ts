@@ -92,7 +92,7 @@ test.describe('@regression | E2E | Claims | MTA', () => {
     // Open policy in Salesforce.
     await salesforce.goto();
     const sfCreds = getClaimUserCredentials();
-    await salesforce.login(sfCreds.username, sfCreds.password, { useJwt: false, fast: true });
+    await salesforce.login(sfCreds.username, sfCreds.password, { useJwt: true, fast: true, jwtUsername: sfCreds.username });
     await salesforce.closeAllWorkspaceTabs();
 
     // Create claim from policy.

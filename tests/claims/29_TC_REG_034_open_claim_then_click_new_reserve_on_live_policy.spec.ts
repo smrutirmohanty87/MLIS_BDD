@@ -136,7 +136,6 @@ async function completeOpenClaimStatus(page: Page) {
     })
     .toBe(true);
 
-  // Ensure the next path state target is selected before completing the transition.
   await expect
     .poll(async () => {
       const selected = await openClaimOption.getAttribute('aria-selected').catch(() => null);
@@ -160,23 +159,7 @@ async function completeOpenClaimStatus(page: Page) {
   await markComplete.click({ timeout: 10000, force: true });
 
   const doneButton = page.getByRole('button', { name: /^Done$/i }).last();
-  await expect
-    .poll(async () => {
-      const spinnerVisible = await page
-        .locator('.slds-spinner_container:visible, lightning-spinner:visible, .forceComponentSpinner:visible')
-        .first()
-        .isVisible({ timeout: 500 })
-        .catch(() => false);
-      if (spinnerVisible) {
-        return false;
-      }
-      return await doneButton.isVisible({ timeout: 500 }).catch(() => false);
-    }, {
-      timeout: 60000,
-      intervals: [1000, 2000, 5000],
-      message: 'Done button did not appear after marking Open Circumstance complete.',
-    })
-    .toBe(true);
+  await expect(doneButton).toBeVisible({ timeout: 60000 });
 
   for (let attempt = 1; attempt <= 4; attempt += 1) {
     try {
@@ -192,7 +175,6 @@ async function completeOpenClaimStatus(page: Page) {
     }
   }
 
-  // Some org/page variants commit status inline without a Done modal.
   await expect
     .poll(async () => {
       const spinnerVisible = await page
@@ -221,16 +203,139 @@ async function completeOpenClaimStatus(page: Page) {
       message: 'Open Claim completion did not set the claim path/status to Open Claim.',
     })
     .toBe(true);
+}
 
-  await expect(doneButton).toBeHidden({ timeout: 30000 }).catch(() => undefined);
+async function completeReserveFlowFromClaimInformation(page: Page, salesforce: SalesforcePortalPage) {
+  await page.waitForTimeout(2000);
+  await salesforce.openClaimInformationTab();
+
+  let newReserveButton = page.getByRole('button', { name: /^New Reserve$/i }).first();
+  const newReserveDirectlyVisible = await newReserveButton.isVisible({ timeout: 3000 }).catch(() => false);
+
+  if (!newReserveDirectlyVisible) {
+    const claimFinancialsTab = page
+      .getByRole('tab', { name: /^Claim Financials$/i })
+      .or(page.getByRole('link', { name: /^Claim Financials$/i }))
+      .or(page.getByRole('button', { name: /^Claim Financials$/i }))
+      .first();
+
+    await expect(claimFinancialsTab).toBeVisible({ timeout: 60000 });
+    await claimFinancialsTab.click({ timeout: 10000, force: true });
+
+    newReserveButton = page.getByRole('button', { name: /^New Reserve$/i }).first();
+    const newReserveVisibleInList = await newReserveButton.isVisible({ timeout: 3000 }).catch(() => false);
+
+    if (!newReserveVisibleInList) {
+      const reserveTabCandidates = page.locator(
+        [
+          '[role="tab"]:visible',
+          'a:visible',
+          'button:visible',
+          '.slds-tabs_default__link:visible',
+          '.slds-tabs_scoped__link:visible',
+          '.slds-tabs_default__item:visible',
+          '.slds-tabs_scoped__item:visible',
+          'span:visible',
+        ].join(', '),
+      ).filter({ hasText: /^Reserve$/i }).first();
+
+      await expect(reserveTabCandidates).toBeVisible({ timeout: 30000 });
+      await reserveTabCandidates.scrollIntoViewIfNeeded().catch(() => undefined);
+
+      let clicked = false;
+      for (let attempt = 1; attempt <= 3; attempt += 1) {
+        try {
+          await reserveTabCandidates.click({ timeout: 10000, force: true });
+          clicked = true;
+          break;
+        } catch {
+          await page.waitForTimeout(500);
+        }
+      }
+
+      if (!clicked) {
+        await page.evaluate(() => {
+          const nodes = Array.from(document.querySelectorAll(
+            '[role="tab"], a, button, .slds-tabs_default__link, .slds-tabs_scoped__link, .slds-tabs_default__item, .slds-tabs_scoped__item, span',
+          ));
+          const reserveNode = nodes.find((node) => /^reserve$/i.test((node.textContent ?? '').trim()));
+          if (reserveNode instanceof HTMLElement) {
+            reserveNode.click();
+          }
+        });
+      }
+
+      newReserveButton = page.getByRole('button', { name: /^New Reserve$/i }).first();
+    }
+  }
+
+  await expect(newReserveButton).toBeVisible({ timeout: 30000 });
+  await newReserveButton.click({ timeout: 10000 });
+
+  const nextButton = page.getByRole('button', { name: /^Next$/i }).first();
+  await expect(nextButton).toBeVisible({ timeout: 30000 });
+  await nextButton.click({ timeout: 10000 });
+
+  await expect(
+    page
+      .getByRole('spinbutton', { name: /100% Indemnity Reserve/i })
+      .or(page.getByRole('textbox', { name: /100% Indemnity Reserve/i }))
+      .first(),
+  ).toBeVisible({ timeout: 60000 });
+
+  const reserveFields: Array<{ label: RegExp; value: string }> = [
+    { label: /100% Indemnity Reserve/i, value: '1500' },
+    { label: /DUAL Share Indemnity Reserve/i, value: '1500' },
+    { label: /100% Cost Reserve/i, value: '300' },
+    { label: /DUAL Share Cost Reserve/i, value: '300' },
+    { label: /100% Fee Reserve/i, value: '200' },
+    { label: /DUAL Share Fee Reserve/i, value: '200' },
+  ];
+
+  for (const reserveField of reserveFields) {
+    const field = page
+      .getByRole('spinbutton', { name: reserveField.label })
+      .or(page.getByRole('textbox', { name: reserveField.label }))
+      .first();
+    await expect(field).toBeVisible({ timeout: 30000 });
+    await field.fill(reserveField.value);
+  }
+
+  const postReserveButton = page.getByRole('button', { name: /^Post Reserve$/i }).first();
+  await expect(postReserveButton).toBeVisible({ timeout: 30000 });
+  await postReserveButton.click({ timeout: 10000 });
+
+  const confirmationHeading = page.getByRole('heading', { name: /^Confirmation$/i }).first();
+  if (await confirmationHeading.isVisible({ timeout: 5000 }).catch(() => false)) {
+    const confirmButton = page.getByRole('button', { name: /^Confirm$/i }).first();
+    await expect(confirmButton).toBeVisible({ timeout: 10000 });
+    await confirmButton.click({ timeout: 10000 });
+    await expect(confirmationHeading).toBeHidden({ timeout: 60000 });
+  }
+
+  await page.waitForTimeout(3000);
+  await page.reload({ waitUntil: 'domcontentloaded' });
+
+  const claimFinancialsTabAfterPost = page
+    .getByRole('tab', { name: /^Claim Financials$/i })
+    .or(page.getByRole('link', { name: /^Claim Financials$/i }))
+    .or(page.getByRole('button', { name: /^Claim Financials$/i }))
+    .first();
+
+  await expect(claimFinancialsTabAfterPost).toBeVisible({ timeout: 60000 });
+  await claimFinancialsTabAfterPost.click({ timeout: 10000, force: true });
+
+  await expect(
+    page.locator('article, [role="region"], .slds-card').filter({ hasText: /Latest Reserve List/i }).first(),
+  ).toBeVisible({ timeout: 60000 });
 }
 
 test.describe('@regression | E2E | Claims', () => {
-  test('TC_REG_034 | Create Claim on a live policy, fill claim info, and complete Open Claim status', async ({ page }) => {
-    test.setTimeout(900000);
+  test('TC_REG_034 | Create Claim on a live policy, complete Open Claim status, and complete reserve flow', async ({ page }) => {
+    test.setTimeout(1200000);
     test.slow();
 
-    const caseRef = `E2E-CLAIM-OPEN-CLAIM-${Date.now()}`;
+    const caseRef = `E2E-CLAIM-OPEN-CLAIM-NEW-RESERVE-${Date.now()}`;
 
     const brokerLogin = new LoginPage(page);
     const quoteManager = new QuoteManagerPage(page);
@@ -318,7 +423,7 @@ test.describe('@regression | E2E | Claims', () => {
     await saveClaimInformation(page);
 
     await completeOpenClaimStatus(page);
+    await completeReserveFlowFromClaimInformation(page, salesforce);
     await page.waitForTimeout(5000);
   });
-
 });

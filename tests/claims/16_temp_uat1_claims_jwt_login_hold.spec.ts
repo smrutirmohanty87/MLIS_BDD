@@ -20,8 +20,6 @@ test('login as UAT1 claims user with JWT and hold session until browser is close
     useJwt: true,
     fast: true,
     jwtUsername: username,
-    forceJwtForUat1: true,
-    forceJwtForClaimsUser: true,
   });
 
   console.log('UAT1 claims user Salesforce JWT login successful. Keeping session open until browser is closed.');

@@ -1,0 +1,32 @@
+{
+  "run": {
+    "runId": "20260925_183502_361",
+    "timestamp": "2026-09-25T13:05:02.361Z",
+    "environment": "UAT1",
+    "project": "chrome",
+    "suite": "Claims",
+    "status": "passed",
+    "totalTests": 1,
+    "passed": 1,
+    "failed": 0,
+    "skipped": 0,
+    "timedOut": 0,
+    "interrupted": 0,
+    "passRate": 100,
+    "durationSeconds": 112.99
+  },
+  "tests": [
+    {
+      "runId": "20260925_183502_361",
+      "timestamp": "2026-09-25T13:05:02.361Z",
+      "testId": "16_temp_uat1_claims_jwt_login_hold",
+      "testName": "login as UAT1 claims user with JWT and hold session until browser is closed",
+      "status": "passed",
+      "durationSeconds": 106.37,
+      "environment": "UAT1",
+      "suite": "Claims",
+      "project": "chrome",
+      "file": "tests/claims/16_temp_uat1_claims_jwt_login_hold.spec.ts"
+    }
+  ]
+}

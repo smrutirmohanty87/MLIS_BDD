@@ -253,7 +253,7 @@ test.describe('@regression | E2E | Claims | Parties', () => {
     const salesforce = new SalesforcePortalPage(page);
     await salesforce.goto();
     const credentials = getClaimUserCredentials();
-    await salesforce.login(credentials.username, credentials.password, { useJwt: false, fast: true });
+    await salesforce.login(credentials.username, credentials.password, { useJwt: true, fast: true, jwtUsername: credentials.username });
     await salesforce.closeAllWorkspaceTabs();
 
     await openClaimWithParties(page);

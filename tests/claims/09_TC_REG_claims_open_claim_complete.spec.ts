@@ -324,7 +324,7 @@ test.describe('@regression | E2E | Claims | Open Claim Completion', () => {
 
     const claimCredentials = getClaimUserCredentials();
     await salesforce.goto();
-    await salesforce.login(claimCredentials.username, claimCredentials.password, { useJwt: false, fast: true });
+    await salesforce.login(claimCredentials.username, claimCredentials.password, { useJwt: true, fast: true, jwtUsername: claimCredentials.username });
     await salesforce.closeAllWorkspaceTabs();
 
     page = await openRandomInsurancePolicyAndCreateClaim(page, salesforce);

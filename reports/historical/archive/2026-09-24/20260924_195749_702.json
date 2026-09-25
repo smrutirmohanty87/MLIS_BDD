@@ -1,0 +1,32 @@
+{
+  "run": {
+    "runId": "20260924_195749_702",
+    "timestamp": "2026-09-24T14:27:49.702Z",
+    "environment": "SIT1",
+    "project": "chrome",
+    "suite": "Regression",
+    "status": "failed",
+    "totalTests": 1,
+    "passed": 0,
+    "failed": 1,
+    "skipped": 0,
+    "timedOut": 0,
+    "interrupted": 0,
+    "passRate": 0,
+    "durationSeconds": 294.33
+  },
+  "tests": [
+    {
+      "runId": "20260924_195749_702",
+      "timestamp": "2026-09-24T14:27:49.702Z",
+      "testId": "28_TC_REG_claims_e2e_create_claim_and_post_reserve",
+      "testName": "TC_REG_CLAIMS_E2E_CREATE_CLAIM_AND_POST_RESERVE | Create live policy, create claim, and post reserve",
+      "status": "failed",
+      "durationSeconds": 280.79,
+      "environment": "SIT1",
+      "suite": "Regression",
+      "project": "chrome",
+      "file": "tests/claims/28_TC_REG_claims_e2e_create_claim_and_post_reserve.spec.ts"
+    }
+  ]
+}

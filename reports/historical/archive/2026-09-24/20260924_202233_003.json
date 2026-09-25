@@ -1,0 +1,32 @@
+{
+  "run": {
+    "runId": "20260924_202233_003",
+    "timestamp": "2026-09-24T14:52:33.003Z",
+    "environment": "SIT1",
+    "project": "chrome",
+    "suite": "Regression",
+    "status": "failed",
+    "totalTests": 1,
+    "passed": 0,
+    "failed": 1,
+    "skipped": 0,
+    "timedOut": 0,
+    "interrupted": 0,
+    "passRate": 0,
+    "durationSeconds": 165.32
+  },
+  "tests": [
+    {
+      "runId": "20260924_202233_003",
+      "timestamp": "2026-09-24T14:52:33.003Z",
+      "testId": "TC_REG_034",
+      "testName": "TC_REG_034 | Create Claim on a live policy, fill claim info, and complete Open Claim status",
+      "status": "failed",
+      "durationSeconds": 153.67,
+      "environment": "SIT1",
+      "suite": "Regression",
+      "project": "chrome",
+      "file": "tests/claims/19_TC_REG_034_change_claim_status_to_open_claim_on_live_policy.spec.ts"
+    }
+  ]
+}

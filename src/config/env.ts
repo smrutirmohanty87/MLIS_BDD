@@ -135,6 +135,17 @@ export function getSalesforceJwtUsername(): string | undefined {
 export function getQuoteJourneyFieldValues(): QuoteJourneyFieldValues {
   const envName = normalizeEnvName(process.env.TEST_ENV);
 
+  if (envName === 'UAT1') {
+    return {
+      brokerAccountQuery: 'Portal MLIS | Partner a/c 01-A1 (automated) | comm-none',
+      brokerAccountOption: 'Portal MLIS | Partner a/c 01-A1 (automated) | comm-none',
+      brokerUserQuery: 'T-0131-UAT1-PORTAL-MLIS auto-comm-none-01',
+      brokerUserOption: 'T-0131-UAT1-PORTAL-MLIS auto-comm-none-01',
+      brand: 'My Legal Indemnity Shop',
+      jurisdiction: 'England and Wales',
+    };
+  }
+
   if (envName === 'UAT2') {
     return {
       brokerAccountQuery: 'MLP LAW LTD',

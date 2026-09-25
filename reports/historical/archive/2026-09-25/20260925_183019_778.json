@@ -1,0 +1,19 @@
+{
+  "run": {
+    "runId": "20260925_183019_778",
+    "timestamp": "2026-09-25T13:00:19.778Z",
+    "environment": "CLAIMSQA",
+    "project": "multiple",
+    "suite": "Mixed",
+    "status": "passed",
+    "totalTests": 0,
+    "passed": 0,
+    "failed": 0,
+    "skipped": 0,
+    "timedOut": 0,
+    "interrupted": 0,
+    "passRate": 0,
+    "durationSeconds": 1.38
+  },
+  "tests": []
+}

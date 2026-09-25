@@ -182,7 +182,7 @@ test.describe('@regression | E2E | Claims | Task | Complete', () => {
     const salesforce = new SalesforcePortalPage(page);
     await salesforce.goto();
     const claimCreds = getClaimUserCredentials();
-    await salesforce.login(claimCreds.username, claimCreds.password, { useJwt: false, fast: true });
+    await salesforce.login(claimCreds.username, claimCreds.password, { useJwt: true, fast: true, jwtUsername: claimCreds.username });
     await salesforce.closeAllWorkspaceTabs();
 
     const navMenuButton = page.getByRole('button', { name: /Show Navigation Menu/i }).first();
