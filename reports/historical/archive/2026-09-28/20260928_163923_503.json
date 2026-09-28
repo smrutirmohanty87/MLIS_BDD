@@ -1,0 +1,32 @@
+{
+  "run": {
+    "runId": "20260928_163923_503",
+    "timestamp": "2026-09-28T11:09:23.503Z",
+    "environment": "CLAIMSQA",
+    "project": "chrome",
+    "suite": "Regression",
+    "status": "failed",
+    "totalTests": 1,
+    "passed": 0,
+    "failed": 1,
+    "skipped": 0,
+    "timedOut": 0,
+    "interrupted": 0,
+    "passRate": 0,
+    "durationSeconds": 389.14
+  },
+  "tests": [
+    {
+      "runId": "20260928_163923_503",
+      "timestamp": "2026-09-28T11:09:23.503Z",
+      "testId": "TC_REG_034",
+      "testName": "TC_REG_034 | Create Claim on a live policy, complete Open Claim status, and complete reserve flow",
+      "status": "failed",
+      "durationSeconds": 376.18,
+      "environment": "CLAIMSQA",
+      "suite": "Regression",
+      "project": "chrome",
+      "file": "tests/claims/29_TC_REG_034_open_claim_then_click_new_reserve_on_live_policy.spec.ts"
+    }
+  ]
+}

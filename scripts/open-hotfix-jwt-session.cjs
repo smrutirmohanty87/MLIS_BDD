@@ -101,9 +101,22 @@ async function main() {
   const keyPathRaw = readFirstEnv([
     `SALESFORCE_${envName}_JWT_PRIVATE_KEY_PATH`,
     `SALEFORCE_${envName}_JWT_PRIVATE_KEY_PATH`,
-  ]);
-  const keyPath = path.resolve(keyPathRaw.replace(/^"|"$/g, ''));
-  const privateKeyPem = fs.readFileSync(keyPath, 'utf8');
+  ], false);
+  const privateKeyInline = readFirstEnv([
+    `SALESFORCE_${envName}_JWT_PRIVATE_KEY`,
+    `SALEFORCE_${envName}_JWT_PRIVATE_KEY`,
+  ], false);
+
+  let privateKeyPem = privateKeyInline;
+  if (!privateKeyPem) {
+    if (!keyPathRaw) {
+      throw new Error(
+        `Missing JWT private key for ${envName}. Set SALESFORCE_${envName}_JWT_PRIVATE_KEY_PATH or SALESFORCE_${envName}_JWT_PRIVATE_KEY.`,
+      );
+    }
+    const keyPath = path.resolve(keyPathRaw.replace(/^"|"$/g, ''));
+    privateKeyPem = fs.readFileSync(keyPath, 'utf8');
+  }
 
   console.log(`[jwt] Authenticating ${username} against ${loginUrl} ...`);
   const { accessToken, instanceUrl } = await getJwtToken({
@@ -121,7 +134,7 @@ async function main() {
   await page.goto(frontdoorUrl, { waitUntil: 'domcontentloaded', timeout: 120000 });
   await page.waitForLoadState('networkidle', { timeout: 120000 }).catch(() => undefined);
 
-  console.log('[jwt] HOTFIX opened successfully. Close the browser window to end this session.');
+  console.log(`[jwt] ${envName} opened successfully. Close the browser window to end this session.`);
 
   await new Promise((resolve) => browser.on('disconnected', resolve));
   console.log('[jwt] Browser closed by user. Exiting.');

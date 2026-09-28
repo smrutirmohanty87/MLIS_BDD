@@ -1,0 +1,32 @@
+{
+  "run": {
+    "runId": "20260925_202445_206",
+    "timestamp": "2026-09-25T14:54:45.206Z",
+    "environment": "CLAIMSQA",
+    "project": "chrome",
+    "suite": "Sanity",
+    "status": "failed",
+    "totalTests": 1,
+    "passed": 0,
+    "failed": 1,
+    "skipped": 0,
+    "timedOut": 0,
+    "interrupted": 0,
+    "passRate": 0,
+    "durationSeconds": 8.6
+  },
+  "tests": [
+    {
+      "runId": "20260925_202445_206",
+      "timestamp": "2026-09-25T14:54:45.206Z",
+      "testId": "TC_SAN_001",
+      "testName": "Create Commercial England & Wales policy (multiple products)",
+      "status": "failed",
+      "durationSeconds": 0.06,
+      "environment": "CLAIMSQA",
+      "suite": "Sanity",
+      "project": "chrome",
+      "file": "tests/BDD/.features-gen/tests/BDD/features/Sanity/TC_SAN_001_create_commercial_ew_policy_multiple_products.feature.spec.js"
+    }
+  ]
+}

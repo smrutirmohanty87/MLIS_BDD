@@ -1,0 +1,32 @@
+{
+  "run": {
+    "runId": "20260925_195804_155",
+    "timestamp": "2026-09-25T14:28:04.155Z",
+    "environment": "CLAIMSQA",
+    "project": "chrome",
+    "suite": "Other",
+    "status": "passed",
+    "totalTests": 1,
+    "passed": 1,
+    "failed": 0,
+    "skipped": 0,
+    "timedOut": 0,
+    "interrupted": 0,
+    "passRate": 100,
+    "durationSeconds": 40.67
+  },
+  "tests": [
+    {
+      "runId": "20260925_195804_155",
+      "timestamp": "2026-09-25T14:28:04.155Z",
+      "testId": "commercial-ew-start-quote.feature.spec.js",
+      "testName": "Start a commercial England and Wales quote",
+      "status": "passed",
+      "durationSeconds": 24.65,
+      "environment": "CLAIMSQA",
+      "suite": "Other",
+      "project": "chrome",
+      "file": "tests/BDD/.features-gen/tests/BDD/features/MLIS/commercial-ew-start-quote.feature.spec.js"
+    }
+  ]
+}
