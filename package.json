@@ -4,6 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "setup": "npm ci ; npx playwright install",
+    "env:check": "node scripts/validate-env-jwt.cjs",
+    "env:check:all": "node scripts/validate-env-jwt.cjs --envs=SIT1,UAT1,UAT2,CLAIMSQA,HOTFIX,BAUDEV",
+    "jwt:open": "node scripts/open-hotfix-jwt-session.cjs",
     "test": "npx playwright test --project=chrome --headed --workers=1",
     "test:sanity": "npx playwright test tests/sanity/ --project=chrome --headed --workers=1",
     "test:sanity:chrome": "npx playwright test tests/sanity/ --project=chrome --headed --workers=1",
@@ -20,6 +24,9 @@
     "test:bdx:intro:chrome": "npx playwright test tests/BDX/TC_BDX_001_INTRO_cancel_full_premium_return.spec.ts --project=chrome --headed --workers=1",
     "test:bdx:rest:chrome": "npx playwright test tests/BDX/TC_BDX_002_INTER_COMM_policy_bdx_lines.spec.ts tests/BDX/TC_BDX_003_BDE_COMM_policy_bdx_lines.spec.ts tests/BDX/TC_BDX_004_NO_COMM_policy_bdx_lines.spec.ts --project=chrome --headed --workers=1",
     "test:bdx:all:chrome": "npx playwright test tests/BDX/ --project=chrome --headed --workers=1",
+    "bdd:gen": "npx bddgen test -c playwright.bdd.config.ts",
+    "test:bdd:sanity": "npx playwright test -c playwright.bdd.config.ts --project=chrome --headed --workers=1 --grep @sanity",
+    "test:bdd:regression": "npx playwright test -c playwright.bdd.config.ts --project=chrome --headed --workers=1 --grep @regression",
     "autonomous:run": "node scripts/autonomous-run.js",
     "oliva:install": "npm --prefix oliva-automation/oliva-automation ci",
     "oliva:test": "npm --prefix oliva-automation/oliva-automation test",
@@ -36,7 +43,8 @@
     "@playwright/test": "^1.58.2",
     "@types/node": "^25.3.1",
     "artillery-engine-playwright": "^1.27.0",
-    "dotenv": "^16.6.1"
+    "dotenv": "^16.6.1",
+    "playwright-bdd": "^9.2.1"
   },
   "dependencies": {
     "exceljs": "^4.4.0",

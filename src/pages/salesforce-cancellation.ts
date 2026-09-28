@@ -1792,32 +1792,54 @@ export class SalesforcePortalPage {
   }
 
   async openClaimInformationTab() {
+    await this.waitForLightningIdle();
+
     const claimInfoTab = this.page.getByRole('tab', { name: /Claim Information/i }).first();
-    if (await claimInfoTab.isVisible({ timeout: 6000 }).catch(() => false)) {
-      await this.clickWhenUiReady(claimInfoTab);
-      await this.waitForLightningIdle();
-      return;
-    }
-
     const claimInfoLink = this.page.getByRole('link', { name: /Claim Information/i }).first();
-    if (await claimInfoLink.isVisible({ timeout: 6000 }).catch(() => false)) {
-      await this.clickWhenUiReady(claimInfoLink);
-      await this.waitForLightningIdle();
-      return;
-    }
-
     const claimInfoButton = this.page.getByRole('button', { name: /Claim Information/i }).first();
-    if (await claimInfoButton.isVisible({ timeout: 6000 }).catch(() => false)) {
-      await this.clickWhenUiReady(claimInfoButton);
-      await this.waitForLightningIdle();
-      return;
-    }
+    const claimInfoToggle = this.page
+      .locator('xpath=//span[contains(normalize-space(.), "Claim Information")]/ancestor::a[1] | //span[contains(normalize-space(.), "Claim Information")]/ancestor::button[1]')
+      .first();
 
-    const claimInfoToggle = this.page.locator('xpath=//span[contains(normalize-space(.), "Claim Information")]/ancestor::a[1] | //span[contains(normalize-space(.), "Claim Information")]/ancestor::button[1]').first();
-    if (await claimInfoToggle.isVisible({ timeout: 6000 }).catch(() => false)) {
-      await this.clickWhenUiReady(claimInfoToggle);
-      await this.waitForLightningIdle();
-      return;
+    const clickableCandidates = [claimInfoTab, claimInfoLink, claimInfoButton, claimInfoToggle];
+
+    for (let attempt = 1; attempt <= 6; attempt += 1) {
+      // In slow CLAIMSQA orgs, tabstrip and subtab content often hydrate several seconds after page render.
+      for (const candidate of clickableCandidates) {
+        if (await candidate.isVisible({ timeout: 3000 }).catch(() => false)) {
+          await candidate.scrollIntoViewIfNeeded().catch(() => undefined);
+          await this.clickWhenUiReady(candidate).catch(() => undefined);
+          await this.waitForLightningIdle();
+          await this.page.waitForTimeout(600);
+
+          const lossFieldAfterClick = this.page.getByRole('textbox', { name: /Loss Narrative/i }).first();
+          if (await lossFieldAfterClick.isVisible({ timeout: 2500 }).catch(() => false)) {
+            return;
+          }
+
+          const claimInfoPanel = this.page
+            .locator('[role="tabpanel"], article, .slds-card')
+            .filter({ hasText: /Claim Classification|Claim Dates|Date of FNOL Acknowledgement|Loss Narrative/i })
+            .first();
+          if (await claimInfoPanel.isVisible({ timeout: 2500 }).catch(() => false)) {
+            return;
+          }
+        }
+      }
+
+      // If we can see the content already, stop retrying even if tab click target changed in DOM.
+      const lossField = this.page.getByRole('textbox', { name: /Loss Narrative/i }).first();
+      if (await lossField.isVisible({ timeout: 2000 }).catch(() => false)) {
+        return;
+      }
+
+      const sectionHeader = this.page
+        .locator('xpath=//h2[contains(normalize-space(.), "Claim Classification") or contains(normalize-space(.), "Claim Dates")][1]');
+      if (await sectionHeader.isVisible({ timeout: 2000 }).catch(() => false)) {
+        return;
+      }
+
+      await this.page.waitForTimeout(2500);
     }
 
     const lossField = this.page.getByRole('textbox', { name: /Loss Narrative/i }).first();

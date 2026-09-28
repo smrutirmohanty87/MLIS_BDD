@@ -8,11 +8,38 @@ export class SalesforceQuoteJourneyCommercialEWPage {
   async loginAndOpenQuoteJourney(username: string, password: string) {
     const salesforce = new SalesforcePortalPage(this.page);
     await salesforce.login(username, password, { useJwt: true, fast: true });
-    await expect(this.page.getByRole('link', { name: 'Quote Journey' })).toBeVisible({ timeout: 120000 });
 
-    await this.clickWhenReady(this.page.getByRole('link', { name: 'Quote Journey' }));
-    await expect(this.page.getByRole('heading', { name: /quote journey/i })).toBeVisible({ timeout: 120000 });
-    await expect(this.page.getByRole('heading', { name: /product selection/i }).first()).toBeVisible({ timeout: 120000 });
+    const qjHeading = this.page.getByRole('heading', { name: /quote journey/i }).first();
+    const productSelectionHeading = this.page.getByRole('heading', { name: /product selection/i }).first();
+    const qjCandidates = [
+      this.page.getByRole('link', { name: /^Quote Journey$/i }).first(),
+      this.page.getByRole('tab', { name: /^Quote Journey$/i }).first(),
+      this.page.locator('a[title="Quote Journey"], one-app-nav-bar a:has-text("Quote Journey")').first(),
+    ];
+
+    for (let attempt = 1; attempt <= 5; attempt += 1) {
+      await this.waitForLightningIdle();
+      for (const candidate of qjCandidates) {
+        if (await candidate.isVisible({ timeout: 1500 }).catch(() => false)) {
+          try {
+            await candidate.scrollIntoViewIfNeeded().catch(() => undefined);
+            await candidate.click({ timeout: 12000 });
+          } catch {
+            await candidate.click({ force: true, timeout: 12000 });
+          }
+
+          if (await qjHeading.isVisible({ timeout: 20000 }).catch(() => false)) {
+            await expect(productSelectionHeading).toBeVisible({ timeout: 120000 });
+            return;
+          }
+        }
+      }
+
+      await this.page.keyboard.press('Escape').catch(() => undefined);
+      await this.page.waitForTimeout(1200);
+    }
+
+    throw new Error('Unable to open Quote Journey from Salesforce navigation.');
   }
 
   async completeCommercialQuoteJourney(caseRef: string) {
