@@ -1,0 +1,32 @@
+{
+  "run": {
+    "runId": "20260928_183613_981",
+    "timestamp": "2026-09-28T13:06:13.981Z",
+    "environment": "UAT2",
+    "project": "chrome",
+    "suite": "Regression",
+    "status": "failed",
+    "totalTests": 1,
+    "passed": 0,
+    "failed": 1,
+    "skipped": 0,
+    "timedOut": 0,
+    "interrupted": 0,
+    "passRate": 0,
+    "durationSeconds": 15.92
+  },
+  "tests": [
+    {
+      "runId": "20260928_183613_981",
+      "timestamp": "2026-09-28T13:06:13.981Z",
+      "testId": "TC_REG_011",
+      "testName": "Execute legacy regression test for TC_REG_011",
+      "status": "failed",
+      "durationSeconds": 10.45,
+      "environment": "UAT2",
+      "suite": "Regression",
+      "project": "chrome",
+      "file": "tests/BDD/.features-gen/tests/BDD/features/regression/tc_reg_011_open_notes_attachments_salesforce_ew_policy.spec.feature.spec.js"
+    }
+  ]
+}

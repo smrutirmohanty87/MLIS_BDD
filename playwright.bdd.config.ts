@@ -20,7 +20,13 @@ export default defineConfig({
   forbidOnly: isCI,
   retries: isCI ? 2 : 0,
   workers: 1,
-  reporter: [['line'], ['html', { open: 'never' }]],
+  reporter: [
+    ['line'],
+    ['html', { open: 'never' }],
+    ['allure-playwright', { outputFolder: 'allure-results', detail: true, suiteTitle: false }],
+    ['./src/reporters/dashboard-reporter.ts', { outputDir: 'reports/dashboard', open: true, maxRuns: 40 }],
+    ['./src/reporters/historical-reporter.ts', { outputDir: 'reports/historical' }],
+  ],
   use: {
     headless: true,
     trace: 'retain-on-failure',
